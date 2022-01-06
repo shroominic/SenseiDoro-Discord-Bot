@@ -1,9 +1,8 @@
-# Bot client class
-
 from session import Session
 import discord
 
 
+# Bot Client Class
 class PomoDojoClient(discord.Client):
     def __init__(self, *args, **options):
         super(PomoDojoClient, self).__init__(*args, **options)
@@ -38,6 +37,10 @@ class PomoDojoClient(discord.Client):
         # cleanup all previous sessions
         if message.content == "/cleanup":
             await message.channel.send("Yeah mom, I'll cleanup my room very soon!")
+            # deletes active sessions
+            for sees in self.sessions:
+                await sees.dispose()
+            # deletes sessions from previous times
             for category in message.guild.categories:
                 if "🍅" in category.name:
                     for vc in category.voice_channels:
