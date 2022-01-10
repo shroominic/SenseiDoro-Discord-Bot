@@ -1,5 +1,6 @@
 from session import Session
 import discord
+import asyncio
 
 
 # Bot Client Class
@@ -28,38 +29,49 @@ class PomoDojoClient(discord.Client):
             # checks if session already exists
             for sees in self.sessions:
                 if sees.name == session.name:
-                    await message.channel.send('Session already exists!')
+                    asyncio.create_task(message.channel.send('Session already exists!'))
+                    del session
                     return
-            # initializes the session category and channels
-            await session.create_environment()
             self.sessions.append(session)
+            # initializes the session category and channels
+            asyncio.create_task(session.create_environment())
 
         # cleanup all previous sessions
         if message.content == "/cleanup":
-            await message.channel.send("Yeah mom, I'll cleanup my room very soon!")
+            asyncio.create_task(message.channel.send("Yeah mom, I'll cleanup my room very soon!"))
             # deletes active sessions
-            for sees in self.sessions:
-                await sees.dispose()
-            # deletes sessions from previous times
-            for category in message.guild.categories:
-                if "🍅" in category.name:
-                    for vc in category.voice_channels:
-                        await vc.delete()
-                    for tc in category.text_channels:
-                        await tc.delete()
-                    await category.delete()
+            asyncio.create_task(self.cleanup(message.guild))
 
         # delete all messages inside message.channel
         if message.content == "/delete":
             await message.channel.send("I'll delete all messages in this channel!")
-            async for msg in message.channel.history(limit=200):
-                await msg.delete()
+            async for msg in message.channel.history(limit=100):
+                asyncio.create_task(msg.delete())
 
     # when something changes in voice channels
     async def on_voice_state_update(self, member, before, after):
-        if after.channel.name == "START SESSION":
-            session_name = after.channel.category.name
-            # searches for the addressed session
-            for sees in self.sessions:
-                if sees.name == session_name:
-                    await sees.start_session(member)
+        if before.channel is not None:
+            if before.channel.name == "START SESSION":
+                # TODO: Fix this workaround
+                return
+        if after.channel is not None:
+            if after.channel.name == "START SESSION":
+                session_name = after.channel.category.name
+                # searches for the addressed session
+                for sees in self.sessions:
+                    if sees.name == session_name:
+                        asyncio.create_task(sees.start_session(member))
+
+    async def cleanup(self, guild):
+        for sees in self.sessions:
+            asyncio.create_task(sees.dispose())
+        # deletes sessions from previous times
+        for category in guild.categories:
+            if "🍅" in category.name:
+                for vc in category.voice_channels:
+                    channel_id = vc.id
+                    asyncio.create_task(self.get_channel(channel_id).delete())
+                for tc in category.text_channels:
+                    channel_id = tc.id
+                    asyncio.create_task(self.get_channel(channel_id).delete())
+                asyncio.create_task(category.delete())
