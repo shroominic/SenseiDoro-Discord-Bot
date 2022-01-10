@@ -1,6 +1,7 @@
 from session import Session
 import discord
 import asyncio
+import json
 
 
 # Bot Client Class
@@ -12,6 +13,11 @@ class PomoDojoClient(discord.Client):
 
     # when bot starts up
     async def on_ready(self):
+        # serialize old session instances
+        for guild in self.guilds:
+            for category in guild.categories:
+                if "🍅" in category.name:
+                    asyncio.create_task(self.serialize(category))
         # print all connected guilds
         all_guilds = [guild.name for guild in self.guilds]
         print(f'{self.user} is connected to the following guilds: \n{all_guilds}\n')
@@ -40,7 +46,8 @@ class PomoDojoClient(discord.Client):
         if message.content == "/cleanup":
             asyncio.create_task(message.channel.send("Yeah mom, I'll cleanup my room very soon!"))
             # deletes active sessions
-            asyncio.create_task(self.cleanup(message.guild))
+            for sees in self.sessions:
+                asyncio.create_task(sees.dispose())
 
         # delete all messages inside message.channel
         if message.content == "/delete":
@@ -62,16 +69,28 @@ class PomoDojoClient(discord.Client):
                     if sees.name == session_name:
                         asyncio.create_task(sees.start_session(member))
 
-    async def cleanup(self, guild):
-        for sees in self.sessions:
-            asyncio.create_task(sees.dispose())
-        # deletes sessions from previous times
-        for category in guild.categories:
-            if "🍅" in category.name:
-                for vc in category.voice_channels:
-                    channel_id = vc.id
-                    asyncio.create_task(self.get_channel(channel_id).delete())
-                for tc in category.text_channels:
-                    channel_id = tc.id
-                    asyncio.create_task(self.get_channel(channel_id).delete())
-                asyncio.create_task(category.delete())
+    # helper function to fetch old sessions
+    async def serialize(self, category):
+        # find message with session config
+        for tc in category.text_channels:
+            if tc is not None:
+                if "session_chat" in tc.name:
+                    async for msg in tc.history(limit=200):
+                        if msg.author == self.user and msg.content.startswith('Session config:'):
+                            # parse string representation of json
+                            config_json = str(msg.content)[15::]
+                            config = json.loads(config_json)
+                            # create session instance from json
+                            session = Session(
+                                msg.guild,
+                                category,
+                                config["work_time"],
+                                config["pause_time"],
+                                config["number_sessions"])
+                            self.sessions.append(session)
+                            await session.setup_old_environment()
+
+
+
+
+
