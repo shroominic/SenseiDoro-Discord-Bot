@@ -1,5 +1,5 @@
-import asyncio
 from datetime import timedelta
+import asyncio
 
 
 class Timer:

@@ -1,6 +1,6 @@
 # Application Main
 
-from pomodojo_client import PomoDojoClient
+from clients.pomodojo_client import PomoDojoClient
 from dotenv import load_dotenv
 import discord
 import os

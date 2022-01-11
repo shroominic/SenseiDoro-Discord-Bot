@@ -1,4 +1,4 @@
-from session import Session
+from src.models.session import Session
 import discord
 import asyncio
 import json
