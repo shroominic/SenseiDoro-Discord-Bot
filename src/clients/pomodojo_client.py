@@ -11,18 +11,6 @@ class PomoDojoClient(discord.Client):
         # stores all open sessions
         self.sessions: [Session] = []
 
-    # when bot starts up
-    async def on_ready(self):
-        # serialize old session instances
-        for guild in self.guilds:
-            for category in guild.categories:
-                if "🍅" in category.name:
-                    asyncio.create_task(self.serialize(category))
-        # print all connected guilds
-        all_guilds = [guild.name for guild in self.guilds]
-        print(f'{self.user} is connected to the following guilds: \n{all_guilds}\n')
-        print('READY')
-
     # when a new message shows up
     async def on_message(self, message):
         if message.author == self.user:
@@ -68,29 +56,3 @@ class PomoDojoClient(discord.Client):
                 for sees in self.sessions:
                     if sees.name == session_name:
                         asyncio.create_task(sees.start_session(member))
-
-    # helper function to fetch old sessions
-    async def serialize(self, category):
-        # find message with session config
-        for tc in category.text_channels:
-            if tc is not None:
-                if "session_chat" in tc.name:
-                    async for msg in tc.history(limit=200):
-                        if msg.author == self.user and msg.content.startswith('Session config:'):
-                            # parse string representation of json
-                            config_json = str(msg.content)[15::]
-                            config = json.loads(config_json)
-                            # create session instance from json
-                            session = Session(
-                                msg.guild,
-                                category,
-                                config["work_time"],
-                                config["pause_time"],
-                                config["number_sessions"])
-                            self.sessions.append(session)
-                            await session.setup_old_environment()
-
-
-
-
-
