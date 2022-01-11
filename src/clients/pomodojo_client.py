@@ -41,17 +41,3 @@ class PomoDojoClient(commands.Bot):
             await message.channel.send("I'll delete all messages in this channel!")
             async for msg in message.channel.history(limit=100):
                 asyncio.create_task(msg.delete())
-
-    # when something changes in voice channels
-    async def on_voice_state_update(self, member, before, after):
-        if before.channel is not None:
-            if before.channel.name == "START SESSION":
-                # TODO: Fix this workaround
-                return
-        if after.channel is not None:
-            if after.channel.name == "START SESSION":
-                session_name = after.channel.category.name
-                # searches for the addressed session
-                for sees in self.sessions:
-                    if sees.name == session_name:
-                        asyncio.create_task(sees.start_session(member))
