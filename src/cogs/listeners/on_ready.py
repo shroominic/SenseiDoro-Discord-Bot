@@ -1,4 +1,3 @@
-
 from discord.ext.commands import Cog
 import asyncio
 import json
@@ -20,7 +19,7 @@ class OnReady(Cog, name='OnReady module'):
         for guild in self.bot.guilds:
             for category in guild.categories:
                 if "🍅" in category.name:
-                    asyncio.create_task(self.bot.serialize(category))
+                    asyncio.create_task(self.serialize(category))
 
         # print all connected guilds
         all_guilds = [guild.name for guild in self.bot.guilds]

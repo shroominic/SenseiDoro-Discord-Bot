@@ -1,4 +1,4 @@
-from timer import Timer
+from .timer import Timer
 import asyncio
 import json
 
