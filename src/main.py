@@ -6,6 +6,7 @@ import os
 
 from clients.pomodojo_client import PomoDojoClient
 from src.cogs.listeners.on_ready import OnReady
+from src.cogs.listeners.on_vs_update import OnVSUpdate
 
 
 def main():
@@ -25,6 +26,7 @@ def main():
 
     # adding cogs
     bot.add_cog(OnReady(bot))
+    bot.add_cog(OnVSUpdate(bot))
 
     # finally run the bot
     bot.run(token)

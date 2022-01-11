@@ -3,7 +3,7 @@ from discord.ext.commands import Cog
 import asyncio
 
 
-class OnReady(Cog, name='OnReady module'):
+class OnVSUpdate(Cog, name='OnVSUpdate module'):
     def __init__(self, bot):
         self.bot = bot
 
