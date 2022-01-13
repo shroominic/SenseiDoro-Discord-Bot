@@ -22,6 +22,7 @@ class Session:
         self.number_sessions = number_sessions
         self.pause_time = pause_time
         self.work_time = work_time
+        self.is_active = False
         self.session_count = 0
         self.timer_message = None
         self.timer = None
@@ -59,16 +60,9 @@ class Session:
 
     #   starting a session
     async def init_timer(self):
-        self.timer = Timer(
-            self.work_time,
-            self.pause_time,
-            self.number_sessions,
-            self.display_timer,
-            self.next_session,
-            self.pause_session,
-            self.reset_session)
+        self.timer = Timer(self)
         # start session timer
-        asyncio.create_task(self.timer.run_session())
+        asyncio.create_task(self.timer.start_timer())
 
     async def start_session(self, member):
         # init session
@@ -76,6 +70,7 @@ class Session:
         await member.edit(mute=True)
         self.timer_message = await self.text_channel.send(f"Time left: {self.work_time}")
         # the timer manages the whole session
+        self.is_active = True
         await self.init_timer()
 
     # session navigation
@@ -103,6 +98,7 @@ class Session:
             await member.move_to(self.lobby_channel)
             await member.edit(mute=False)
         # reset stats
+        self.is_active = False
         self.session_count = 0
         # start button
         await self.work_channel.edit(name=self.start_button)
