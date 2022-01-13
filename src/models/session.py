@@ -120,3 +120,8 @@ class Session:
             "pause_time": self.pause_time,
             "number_sessions": self.number_sessions
         })
+
+    def __eq__(self, other):
+        return self.work_time == other.work_time \
+           and self.pause_time == other.pause_time \
+           and self.number_sessions == other.number_sessions
