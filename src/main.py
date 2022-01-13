@@ -8,6 +8,7 @@ from clients.pomodojo_client import PomoDojoClient
 from src.cogs.listeners.command_err_handler import CommandErrHandler
 from src.cogs.listeners.on_ready import OnReady
 from src.cogs.listeners.on_vs_update import OnVSUpdate
+from src.cogs.commands.session_management import SessionManagement
 
 
 def main():
@@ -29,6 +30,7 @@ def main():
     bot.add_cog(OnReady(bot))
     bot.add_cog(OnVSUpdate(bot))
     bot.add_cog(CommandErrHandler(bot))
+    bot.add_cog(SessionManagement(bot))
 
     # finally run the bot
     bot.run(token)

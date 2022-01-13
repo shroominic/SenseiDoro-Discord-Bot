@@ -16,19 +16,6 @@ class PomoDojoClient(commands.Bot):
             # ignores messages from itself
             return
 
-        # init a pomodoro session
-        if message.content == "/init":
-            session = Session(message.guild)
-            # checks if session already exists
-            for sees in self.sessions:
-                if sees.name == session.name:
-                    asyncio.create_task(message.channel.send('Session already exists!'))
-                    del session
-                    return
-            self.sessions.append(session)
-            # initializes the session category and channels
-            asyncio.create_task(session.create_environment())
-
         # cleanup all previous sessions
         if message.content == "/cleanup":
             asyncio.create_task(message.channel.send("Yeah mom, I'll cleanup my room very soon!"))
