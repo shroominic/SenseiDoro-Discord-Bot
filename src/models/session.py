@@ -43,7 +43,9 @@ class Session:
             channel_name = vc.name
             if self.lobby in channel_name:
                 self.lobby_channel = vc
-            if self.start_button in channel_name or "Session" in channel_name:
+            if self.start_button in channel_name \
+                    or "Session" in channel_name \
+                    or "dude ... relax" in channel_name:
                 self.work_channel = vc
         for tc in self.category.text_channels:
             channel_name = tc.name
@@ -102,16 +104,19 @@ class Session:
         self.session_count = 0
         # start button
         await self.work_channel.edit(name=self.start_button)
+        # reset session chat
+        async for msg in self.text_channel.history(limit=100):
+            if "Session config:" in msg.content:
+                continue
+            asyncio.create_task(msg.delete())
 
     # deletes the category and all channels off self
     async def dispose(self):
         for vc in self.category.voice_channels:
-            channel_id = vc.id
-            asyncio.create_task(self.guild.get_channel(channel_id).delete())
+            await vc.delete()
         for tc in self.category.text_channels:
-            channel_id = tc.id
-            asyncio.create_task(self.guild.get_channel(channel_id).delete())
-        asyncio.create_task(self.category.delete())
+            await tc.delete()
+        await self.category.delete()
 
     # serializes important information to json string
     def to_json(self):
