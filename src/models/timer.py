@@ -1,35 +1,58 @@
 from datetime import timedelta
 import asyncio
+import time
 
 
 class Timer:
-    def __init__(self, work_time, pause_time, intervals, send_update, send_next, send_pause, send_stop):
-        self.intervals = intervals
+    def __init__(self, session):
+        self.session = session
         # time in minutes
-        self.work_time = work_time
-        self.pause_time = pause_time
-        # callback functions
-        self.send_update = send_update
+        self.work_time = session.work_time
+        self.pause_time = session.pause_time
+        # state
+        self.seconds_left = 0
+        self.last_session = ""
+        # stream
+        self.timerThread = None
 
-        self.send_next = send_next
-        self.send_pause = send_pause
-        self.send_stop = send_stop
+    async def start_timer(self):
+        self.last_session = "work"
+        self.set_time_left(self.work_time)
 
-    async def timer(self, minutes, final_function):
+        asyncio.create_task(self.timer())
+        await self.session.next_session()
+        print("timer started")
+
+    def set_time_left(self, minutes_left):
+        self.time_left = minutes_left * 60
+
+    async def timer(self):
+        next_call = time.time()
         tick = 5
-        count = 0
-        seconds = minutes * 60
-        while count < seconds:
-            await asyncio.sleep(tick)
-            count += tick
-            time_left = str(timedelta(seconds=(seconds-count)))[2::]
-            asyncio.create_task(self.send_update(time_left))
-        await final_function()
+        while self.session.is_active:
+            # to run
+            if self.time_left < 1:
+                self.manage_session()
+            else:
+                str_time = str(timedelta(seconds=self.time_left))[2::]
+                asyncio.create_task(self.session.display_timer(str_time))
+                self.time_left -= tick
+            # timer
+            next_call += tick
+            await asyncio.sleep(next_call - time.time())
 
-    async def run_session(self):
-        await self.send_next()
-        for i in range(self.intervals - 1):
-            await self.timer(self.work_time, self.send_pause)
-            await self.timer(self.pause_time, self.send_next)
-        await self.timer(self.work_time, self.send_stop)
+    def manage_session(self):
+        if self.session.session_count < self.session.number_sessions:
+            if "pause" in self.last_session:
+                self.set_time_left(self.work_time)
+                self.last_session = "work"
+                asyncio.create_task(self.session.next_session())
+            elif "work" in self.last_session:
+                self.set_time_left(self.pause_time)
+                self.last_session = "pause"
+                asyncio.create_task(self.session.pause_session())
+        else:
+            asyncio.create_task(self.session.reset_session())
+
+
 
