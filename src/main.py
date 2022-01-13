@@ -5,9 +5,9 @@ import discord
 import os
 
 from clients.pomodojo_client import PomoDojoClient
-from src.cogs.listeners.command_err_handler import CommandErrHandler
 from src.cogs.listeners.on_ready import OnReady
 from src.cogs.listeners.on_vs_update import OnVSUpdate
+from src.cogs.listeners.command_err_handler import CommandErrHandler
 from src.cogs.commands.session_management import SessionManagement
 from src.cogs.commands.tools import Tools
 
@@ -24,8 +24,7 @@ def main():
     # init bot client
     bot = PomoDojoClient(
         intents=intents,
-        command_prefix="$"
-    )
+        command_prefix="$")
 
     # adding cogs
     bot.add_cog(OnReady(bot))
