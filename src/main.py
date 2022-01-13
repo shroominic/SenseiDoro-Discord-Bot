@@ -9,6 +9,7 @@ from src.cogs.listeners.command_err_handler import CommandErrHandler
 from src.cogs.listeners.on_ready import OnReady
 from src.cogs.listeners.on_vs_update import OnVSUpdate
 from src.cogs.commands.session_management import SessionManagement
+from src.cogs.commands.tools import Tools
 
 
 def main():
@@ -31,6 +32,7 @@ def main():
     bot.add_cog(OnVSUpdate(bot))
     bot.add_cog(CommandErrHandler(bot))
     bot.add_cog(SessionManagement(bot))
+    bot.add_cog(Tools(bot))
 
     # finally run the bot
     bot.run(token)
