@@ -13,6 +13,7 @@ class SessionManagement(commands.Cog):
         """
         Creates a new session environment with a session instance.
         You can customize with these 3 parameters:
+        :param ctx: context of command
         :param work_time: duration in minutes of one work session
         :param pause_time: duration in minutes of one pause
         :param intervals: how many work sessions until the timer stops
