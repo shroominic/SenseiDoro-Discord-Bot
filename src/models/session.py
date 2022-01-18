@@ -5,52 +5,53 @@ import json
 
 # Pomodoro Session Class
 class Session:
-    def __init__(self, guild, category=None, work_time=30, pause_time=5, number_sessions=4):
-        self.name = f"🍅 - [{work_time} | {pause_time}]"
+    def __init__(self, guild, category=None, work_time=30, break_time=5, session_repetitions=4):
+        self.name = f"🍅 - [{work_time} | {break_time}]"
         self.category = category
         self.guild = guild
-        # channel enums
-        self.start_button = "START SESSION"
-        self.session_chat = "session_chat"
-        self.lobby = "Lobby"
-        # channels
-        self.text_channel = None
+        # channel names
+        self.start_button_name = "START SESSION"
+        self.chat_channel_name = "session_chat"
+        self.session_config = "session_config"
+        self.lobby_name = "Lobby"
+        # channels instance
+        self.text_channel_instance = None
         # todo hidden self.config_channel
-        self.lobby_channel = None
-        self.work_channel = None
+        self.lobby_channel_instance = None
+        self.work_channel_instance = None
         # timer settings
-        self.number_sessions = number_sessions
-        self.pause_time = pause_time
+        self.break_time = break_time
         self.work_time = work_time
-        self.is_active = False
+        self.session_repetitions = session_repetitions
         self.session_count = 0
-        self.timer_message = None
-        self.timer = None
+        self.timer_instance = None
+        self.timer_message_instance = None
+        self.is_active = False
         # todo statistics
 
     async def create_environment(self):
         # create session category
         self.category = await self.guild.create_category_channel(self.name)
         # create initial channels
-        self.text_channel = await self.guild.create_text_channel(self.session_chat, category=self.category)
-        self.lobby_channel = await self.guild.create_voice_channel(self.lobby, category=self.category)
-        self.work_channel = await self.guild.create_voice_channel(self.start_button, category=self.category)
+        self.text_channel_instance = await self.guild.create_text_channel(self.chat_channel_name, category=self.category)
+        self.lobby_channel_instance = await self.guild.create_voice_channel(self.lobby_name, category=self.category)
+        self.work_channel_instance = await self.guild.create_voice_channel(self.start_button_name, category=self.category)
         # send serialization of session as message
-        await self.text_channel.send(f"Session config: {self.to_json()}")
+        await self.text_channel_instance.send(f"Session config: {self.to_json()}")
 
     async def setup_old_environment(self):
         for vc in self.category.voice_channels:
             channel_name = vc.name
-            if self.lobby in channel_name:
-                self.lobby_channel = vc
-            if self.start_button in channel_name \
+            if self.lobby_name in channel_name:
+                self.lobby_channel_instance = vc
+            if self.start_button_name in channel_name \
                     or "Session" in channel_name \
                     or "dude ... relax" in channel_name:
-                self.work_channel = vc
+                self.work_channel_instance = vc
         for tc in self.category.text_channels:
             channel_name = tc.name
-            if self.session_chat in channel_name:
-                self.text_channel = tc
+            if self.chat_channel_name in channel_name:
+                self.text_channel_instance = tc
         await self.reset_session()
 
     def increase_session_count(self):
@@ -58,19 +59,19 @@ class Session:
 
     async def display_timer(self, time_left):
         info_timer_string = f"Time left: {time_left}"
-        await self.timer_message.edit(content=info_timer_string)
+        await self.timer_message_instance.edit(content=info_timer_string)
 
     #   starting a session
     async def init_timer(self):
-        self.timer = Timer(self)
+        self.timer_instance = Timer(self)
         # start session timer
-        asyncio.create_task(self.timer.start_timer())
+        asyncio.create_task(self.timer_instance.start_timer())
 
     async def start_session(self, member):
         # init session
-        await self.text_channel.send("Session has started!")
+        await self.text_channel_instance.send("Session has started!")
         await member.edit(mute=True)
-        self.timer_message = await self.text_channel.send(f"Time left: {self.work_time}")
+        self.timer_message_instance = await self.text_channel_instance.send(f"Time left: {self.work_time}")
         # the timer manages the whole session
         self.is_active = True
         await self.init_timer()
@@ -80,32 +81,32 @@ class Session:
         self.increase_session_count()
         # TODO: Closed Permission for work_channel
         # rename session
-        await self.work_channel.edit(name=f"Session [ {self.session_count} | {self.number_sessions} ]")
+        await self.work_channel_instance.edit(name=f"Session [ {self.session_count} | {self.session_repetitions} ]")
         # move all members from lobby to session
-        for member in self.lobby_channel.members:
-            await member.move_to(self.work_channel)
+        for member in self.lobby_channel_instance.members:
+            await member.move_to(self.work_channel_instance)
             await member.edit(mute=True)
 
     async def pause_session(self):
         # move and unmute all waiting members
-        for member in self.work_channel.members:
-            await member.move_to(self.lobby_channel)
+        for member in self.work_channel_instance.members:
+            await member.move_to(self.lobby_channel_instance)
             await member.edit(mute=False)
         # some chill quote
-        await self.work_channel.edit(name="dude ... relax")
+        await self.work_channel_instance.edit(name="dude ... relax")
 
     async def reset_session(self):
         # move all back to lobby
-        for member in self.work_channel.members:
-            await member.move_to(self.lobby_channel)
+        for member in self.work_channel_instance.members:
+            await member.move_to(self.lobby_channel_instance)
             await member.edit(mute=False)
         # reset stats
         self.is_active = False
         self.session_count = 0
         # start button
-        await self.work_channel.edit(name=self.start_button)
+        await self.work_channel_instance.edit(name=self.start_button_name)
         # reset session chat
-        async for msg in self.text_channel.history(limit=100):
+        async for msg in self.text_channel_instance.history(limit=100):
             if "Session config:" in msg.content:
                 continue
             asyncio.create_task(msg.delete())
@@ -125,11 +126,11 @@ class Session:
     def to_json(self):
         return json.dumps({
             "work_time": self.work_time,
-            "pause_time": self.pause_time,
-            "number_sessions": self.number_sessions
+            "pause_time": self.break_time,
+            "number_sessions": self.session_repetitions
         })
 
     def __eq__(self, other):
         return self.work_time == other.work_time \
-           and self.pause_time == other.pause_time \
-           and self.number_sessions == other.number_sessions
+               and self.break_time == other.break_time \
+               and self.session_repetitions == other.session_repetitions
