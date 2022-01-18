@@ -18,11 +18,15 @@ class Tools(commands.Cog, name='Tools module'):
             asyncio.create_task(sees.dispose())
 
     @commands.command()
-    async def delete(self, ctx):
+    async def delete(self, ctx, to_delete=""):
         """
         Deletes all messages in the text channel where called.
         """
-        asyncio.create_task(ctx.send("I'll delete all messages in this channel!"))
-        # delete all messages inside message.channel
-        async for msg in ctx.channel.history(limit=100):
-            asyncio.create_task(msg.delete())
+        if "messages" in to_delete:
+            await ctx.send("I'll delete all messages for you!")
+            # delete all messages inside message.channel
+            async for msg in ctx.channel.history(limit=100):
+                asyncio.create_task(msg.delete())
+        else:
+            await ctx.send("Type '$delete messages'")
+
