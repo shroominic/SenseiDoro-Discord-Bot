@@ -2,6 +2,8 @@
 from discord.ext.commands import Cog
 import asyncio
 
+from src.models.session import Session
+
 
 class OnVSUpdate(Cog, name='OnVSUpdate module'):
     def __init__(self, bot):
@@ -13,13 +15,10 @@ class OnVSUpdate(Cog, name='OnVSUpdate module'):
         This function gets called, when something changes in voice channels.
         """
         if before.channel is not None:
-            if before.channel.name == "START SESSION":
-                # TODO: Fix this workaround
+            if before.channel.name == Session.start_button_name:
+                # only workaround?
                 return
         if after.channel is not None:
-            if after.channel.name == "START SESSION":
-                session_name = after.channel.category.name
-                # searches for the addressed session
-                for sees in self.bot.sessions:
-                    if sees.name == session_name:
-                        asyncio.create_task(sees.start_session(member))
+            if after.channel.name == Session.start_button_name:
+                session = await Session.get_session(after.channel, self.bot)
+                asyncio.create_task(session.start_session(member))
