@@ -25,7 +25,7 @@ class Tools(commands.Cog, name='Tools module'):
         if "messages" in to_delete:
             await ctx.send("I'll delete all messages for you!")
             # delete all messages inside message.channel
-            async for msg in ctx.channel.history(limit=100):
+            async for msg in ctx.channel.history():
                 asyncio.create_task(msg.delete())
         else:
             await ctx.send("Type '$delete messages'")
