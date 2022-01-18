@@ -47,6 +47,7 @@ class OnReady(Cog, name='OnReady module'):
                                 category,
                                 config["work_time"],
                                 config["pause_time"],
-                                config["number_sessions"])
+                                config["number_sessions"],
+                                config["id"])
                             self.bot.sessions.append(session)
                             await session.setup_old_environment()
