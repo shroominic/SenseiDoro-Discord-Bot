@@ -35,7 +35,7 @@ class OnReady(Cog, name='OnReady module'):
         # find message with session config
         for tc in category.text_channels:
             if tc is not None:
-                if "session_chat" in tc.name:
+                if tc.name == Session.session_config:
                     async for msg in tc.history(limit=200):
                         if msg.author == self.bot.user and msg.content.startswith('Session config:'):
                             # parse string representation of json

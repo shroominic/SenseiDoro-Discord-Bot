@@ -16,7 +16,7 @@ class Session:
         self.lobby_name = "Lobby"
         # channels instance
         self.text_channel_instance = None
-        # todo hidden self.config_channel
+        self.config_channel_instance = None
         self.lobby_channel_instance = None
         self.work_channel_instance = None
         # timer settings
@@ -33,11 +33,25 @@ class Session:
         # create session category
         self.category = await self.guild.create_category_channel(self.name)
         # create initial channels
-        self.text_channel_instance = await self.guild.create_text_channel(self.chat_channel_name, category=self.category)
-        self.lobby_channel_instance = await self.guild.create_voice_channel(self.lobby_name, category=self.category)
-        self.work_channel_instance = await self.guild.create_voice_channel(self.start_button_name, category=self.category)
+        self.text_channel_instance = await self.guild.create_text_channel(
+            self.chat_channel_name,
+            category=self.category
+        )
+        self.lobby_channel_instance = await self.guild.create_voice_channel(
+            self.lobby_name,
+            category=self.category
+        )
+        self.work_channel_instance = await self.guild.create_voice_channel(
+            self.start_button_name,
+            category=self.category
+        )
+        self.config_channel_instance = await self.guild.create_text_channel(
+            self.session_config,
+            category=self.category
+        )
+        await self.config_channel_instance.set_permissions(self.guild.default_role, read_messages=False)
         # send serialization of session as message
-        await self.text_channel_instance.send(f"Session config: {self.to_json()}")
+        await self.config_channel_instance.send(f"Session config: {self.to_json()}")
 
     async def setup_old_environment(self):
         for vc in self.category.voice_channels:
