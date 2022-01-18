@@ -110,8 +110,11 @@ class Session:
                 continue
             asyncio.create_task(msg.delete())
 
-    # deletes the category and all channels off self
+    # deletes the session
     async def dispose(self):
+        # turn timer off
+        self.is_active = False
+        # delete channels
         for vc in self.category.voice_channels:
             await vc.delete()
         for tc in self.category.text_channels:
