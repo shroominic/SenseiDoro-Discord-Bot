@@ -5,15 +5,22 @@ import json
 
 # Pomodoro Session Class
 class Session:
-    def __init__(self, guild, category=None, work_time=30, break_time=5, session_repetitions=4):
+    # channel names
+    start_button_name = "START SESSION"
+    chat_channel_name = "session_chat"
+    session_config = "config"
+    lobby_name = "Lobby"
+    # next session id
+    next_id = 0
+    def __init__(self, guild, category=None, work_time=30, break_time=5, session_repetitions=4, session_id=None):
         self.name = f"🍅 - [{work_time} | {break_time}]"
         self.category = category
         self.guild = guild
-        # channel names
-        self.start_button_name = "START SESSION"
-        self.chat_channel_name = "session_chat"
-        self.session_config = "session_config"
-        self.lobby_name = "Lobby"
+        # session id
+        self.id = session_id
+        if not session_id:
+            self.id = Session.next_id
+            Session.next_id += 1
         # channels instance
         self.text_channel_instance = None
         self.config_channel_instance = None
@@ -139,12 +146,11 @@ class Session:
     # serializes important information to json string
     def to_json(self):
         return json.dumps({
+            "id": self.id,
             "work_time": self.work_time,
             "pause_time": self.break_time,
             "number_sessions": self.session_repetitions
         })
 
     def __eq__(self, other):
-        return self.work_time == other.work_time \
-               and self.break_time == other.break_time \
-               and self.session_repetitions == other.session_repetitions
+        return self.id == other.id
