@@ -1,6 +1,5 @@
 from src.models.session import Session
 from discord.ext import commands
-import asyncio
 
 
 # Bot Client Class

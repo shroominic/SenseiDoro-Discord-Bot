@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 import discord
 import os
 
-from clients.pomodojo_client import PomoDojoClient
+from src.clients.pomodojo_client import PomoDojoClient
 from src.cogs.listeners.on_ready import OnReady
 from src.cogs.listeners.on_vs_update import OnVSUpdate
 from src.cogs.listeners.command_err_handler import CommandErrHandler
