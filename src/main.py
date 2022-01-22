@@ -12,7 +12,7 @@ from src.cogs.commands.session_management import SessionManagement
 from src.cogs.commands.tools import Tools
 
 
-def main():
+def run():
     # load token from .env
     load_dotenv()
     token = os.getenv('DISCORD_TOKEN')
@@ -38,4 +38,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    run()

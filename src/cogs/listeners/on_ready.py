@@ -35,19 +35,19 @@ class OnReady(Cog, name='OnReady module'):
         # find message with session config
         for tc in category.text_channels:
             if tc is not None:
-                if tc.name == Session.session_config:
-                    async for msg in tc.history(limit=200):
+                if tc.name == Session.config_label:
+                    async for msg in tc.history():
                         if msg.author == self.bot.user and msg.content.startswith('Session config:'):
                             # parse string representation of json
                             config_json = str(msg.content)[15::]
                             config = json.loads(config_json)
                             # create session instance from json
                             session = Session(
-                                msg.guild,
-                                category,
-                                config["work_time"],
-                                config["pause_time"],
-                                config["number_sessions"],
-                                config["id"])
+                                guild=msg.guild,
+                                category=category,
+                                work_time=config["work_time"],
+                                break_time=config["pause_time"],
+                                session_repetitions=config["number_sessions"],
+                                session_name=config["name"])
                             self.bot.sessions.append(session)
                             await session.setup_old_environment()
