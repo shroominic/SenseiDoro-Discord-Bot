@@ -17,13 +17,8 @@ def run():
     load_dotenv()
     token = os.getenv('DISCORD_TOKEN')
 
-    # client can see all users
-    intents = discord.Intents.default()
-    intents.members = True
-
     # init bot client
     bot = PomoDojoClient(
-        intents=intents,
         command_prefix="$")
 
     # adding cogs
