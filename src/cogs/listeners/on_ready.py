@@ -31,6 +31,7 @@ class OnReady(Cog, name='OnReady module'):
         """
         Searches for all pomodoro sessions on the server
         to reinitialize lost instances during a restart.
+        :param category: category of session to serialize
         """
         # find message with session config
         for tc in category.text_channels:

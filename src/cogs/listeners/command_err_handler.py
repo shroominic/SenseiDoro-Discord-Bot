@@ -12,6 +12,8 @@ class CommandErrHandler(Cog):
         """
         The event triggered when an error
         is raised while invoking a command.
+        :param ctx: context of command
+        :param error: specific command error
         """
         if isinstance(error, CommandNotFound):
             await ctx.send("This command does not exist!")

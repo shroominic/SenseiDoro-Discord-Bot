@@ -11,6 +11,7 @@ class Tools(commands.Cog, name='Tools module'):
     async def cleanup(self, ctx):
         """
         Removes all Session environments from the bot. (TODO: Only in a server)
+        :param ctx: context of command
         """
         asyncio.create_task(ctx.send("Yeah mom, I'll cleanup my room very soon!"))
         # deletes active sessions
@@ -21,6 +22,8 @@ class Tools(commands.Cog, name='Tools module'):
     async def delete(self, ctx, to_delete=""):
         """
         Deletes all messages in the text channel where called.
+        :param ctx: context of command
+        :param to_delete: keyword argument
         """
         if "messages" in to_delete:
             await ctx.send("I'll delete all messages for you!")
