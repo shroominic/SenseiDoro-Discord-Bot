@@ -1,7 +1,7 @@
 from discord.ext import commands
 import asyncio
 
-from src.models.session import Session
+from src.models.session import Session, tools
 
 
 class SessionManagement(commands.Cog):
@@ -37,7 +37,7 @@ class SessionManagement(commands.Cog):
         :param session_command: use "delete" or "reset" to manage your session
         """
         # get session instance
-        session = await Session.get_session(ctx.channel, self.bot)
+        session = await tools.get_session(ctx.channel, self.bot)
 
         if "delete" in session_command:
             await session.dispose()

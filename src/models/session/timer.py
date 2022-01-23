@@ -53,6 +53,3 @@ class Timer:
                 asyncio.create_task(self.session.pause_session())
         else:
             asyncio.create_task(self.session.reset_session())
-
-
-

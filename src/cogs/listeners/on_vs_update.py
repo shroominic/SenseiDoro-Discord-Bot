@@ -2,7 +2,7 @@
 from discord.ext.commands import Cog
 import asyncio
 
-from src.models.session import Session
+from src.models.session import Session, tools
 
 
 class OnVSUpdate(Cog, name='OnVSUpdate module'):
@@ -20,5 +20,5 @@ class OnVSUpdate(Cog, name='OnVSUpdate module'):
                 return
         if after.channel is not None:
             if after.channel.name == Session.start_button_label:
-                session = await Session.get_session(after.channel, self.bot)
+                session = await tools.get_session(after.channel, self.bot)
                 asyncio.create_task(session.start_session(member))
