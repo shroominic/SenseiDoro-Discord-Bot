@@ -13,6 +13,9 @@ class OnVSUpdate(Cog, name='OnVSUpdate module'):
     async def on_voice_state_update(self, member, before, after):
         """
         This function gets called, when something changes in voice channels.
+        :param member: addressed member
+        :param before: state before update
+        :param after: state after update
         """
         if before.channel is not None:
             if before.channel.name == Session.start_button_label:
