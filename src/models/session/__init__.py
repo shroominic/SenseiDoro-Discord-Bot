@@ -37,7 +37,6 @@ class Session:
         self.timer_instance = None
         self.timer_info_pointer = None
         self.is_active = False
-        # todo statistics
 
     async def create_environment(self):
         # create models category
@@ -103,7 +102,6 @@ class Session:
     # models navigation
     async def next_session(self):
         self.increase_session_count()
-        # TODO: Closed Permission for work_channel
         # rename models
         await self.work_channel_pointer.edit(name=f"Session [ {self.session_count} | {self.session_repetitions} ]")
         # move all members from lobby to models
