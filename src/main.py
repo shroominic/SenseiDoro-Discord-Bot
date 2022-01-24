@@ -1,7 +1,6 @@
 # Application Main
 
 from dotenv import load_dotenv
-import discord
 import os
 
 from src.clients.pomodojo_client import PomoDojoClient
@@ -18,8 +17,7 @@ def run():
     token = os.getenv('DISCORD_TOKEN')
 
     # init bot client
-    bot = PomoDojoClient(
-        command_prefix="$")
+    bot = PomoDojoClient(command_prefix="$")
 
     # adding cogs
     bot.add_cog(OnReady(bot))
@@ -28,7 +26,6 @@ def run():
     bot.add_cog(SessionManagement(bot))
     bot.add_cog(Tools(bot))
 
-    # finally run the bot
     bot.run(token)
 
 

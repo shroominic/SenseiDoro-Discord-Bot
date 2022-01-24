@@ -44,11 +44,11 @@ class OnReady(Cog, name='OnReady module'):
                             config = json.loads(config_json)
                             # create session instance from json
                             session = Session(
-                                guild=msg.guild,
+                                guild=msg.guild_pointer,
                                 category=category,
                                 work_time=config["work_time"],
                                 break_time=config["pause_time"],
-                                session_repetitions=config["number_sessions"],
+                                repetitions=config["number_sessions"],
                                 session_name=config["name"])
                             self.bot.sessions.append(session)
-                            await session.setup_old_environment()
+                            await session.create_from_old_environment()

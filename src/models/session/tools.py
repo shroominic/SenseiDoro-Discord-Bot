@@ -4,7 +4,7 @@ from models.session import Session
 
 
 async def get_session(some_channel, bot):
-    for channel in some_channel.category.text_channels:
+    for channel in some_channel.category_pointer.text_channels:
         if channel.name == Session.config_label:
             async for msg in channel.history():
                 if "Session config:" in msg.content:

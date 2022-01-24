@@ -1,6 +1,7 @@
 from discord.ext import commands
 import asyncio
 
+from models.session import env_manager
 from src.models.session import Session, tools
 
 
@@ -9,16 +10,24 @@ class SessionManagement(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    async def create(self, ctx, work_time: int = 25, pause_time: int = 5, intervals: int = 4):
+    async def create(self, ctx, name: str = "Pomodoro", work_time: int = 25, break_time: int = 5, repetitions: int = 4):
         """
         Creates a new session environment with a session instance.
         You can customize with these 3 parameters:
         :param ctx: context of command
+        :param name: session name
         :param work_time: duration in minutes of one work session
-        :param pause_time: duration in minutes of one pause
-        :param intervals: how many work sessions until the timer stops
+        :param break_time: duration in minutes of one pause
+        :param repetitions: how many work sessions until the timer stops
         """
-        new_session = Session(ctx.guild, work_time=work_time, break_time=pause_time, session_repetitions=intervals)
+        new_session = Session(
+            guild=ctx.guild_pointer,
+            category=None,
+            work_time=work_time,
+            break_time=break_time,
+            repetitions=repetitions,
+            session_name=name
+        )
         # checks if session already exists
         for session in self.bot.sessions:
             if session == new_session:
@@ -27,7 +36,7 @@ class SessionManagement(commands.Cog):
                 return
         self.bot.sessions.append(new_session)
         # initializes the session category and channels
-        await new_session.create_environment()
+        await env_manager.create_new_environment(new_session)
 
     @commands.command()
     async def session(self, ctx, session_command=""):
