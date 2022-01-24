@@ -2,7 +2,7 @@
 from discord.ext.commands import Cog
 import asyncio
 
-from src.models.session import Session, tools
+from session import Session, tools
 
 
 class OnVSUpdate(Cog, name='OnVSUpdate module'):

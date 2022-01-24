@@ -1,6 +1,6 @@
 import json
 
-from models.session import Session
+from session import Session
 
 
 async def get_session(some_channel, bot):

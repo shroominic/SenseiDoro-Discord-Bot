@@ -2,7 +2,7 @@ from discord.ext.commands import Cog
 import asyncio
 import json
 
-from src.models.session import Session
+from session import Session
 
 
 class OnReady(Cog, name='OnReady module'):

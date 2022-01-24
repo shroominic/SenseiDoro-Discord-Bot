@@ -1,4 +1,4 @@
-from src.models.session import Session
+from session import Session
 from discord.ext import commands
 
 
