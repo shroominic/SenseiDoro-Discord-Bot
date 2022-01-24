@@ -38,45 +38,9 @@ class Session:
         self.timer_info_pointer = None
         self.is_active = False
 
-    async def create_environment(self):
-        # create models category
-        self.category = await self.guild.create_category_channel(self.name)
-        # create initial channels
-        self.text_channel_pointer = await self.guild.create_text_channel(
-            self.chat_label,
-            category=self.category
-        )
-        self.lobby_channel_pointer = await self.guild.create_voice_channel(
-            self.lobby_label,
-            category=self.category
-        )
-        self.work_channel_pointer = await self.guild.create_voice_channel(
-            self.start_button_label,
-            category=self.category
-        )
-        self.config_channel_pointer = await self.guild.create_text_channel(
-            self.config_label,
-            category=self.category
-        )
-        await self.config_channel_pointer.set_permissions(self.guild.default_role, read_messages=False)
-        # send serialization of models as message
-        await self.config_channel_pointer.send(f"Session config: {self.to_json()}")
-
-    async def setup_old_environment(self):
-        for vc in self.category.voice_channels:
-            channel_name = vc.name
-            if self.lobby_label in channel_name:
-                self.lobby_channel_pointer = vc
-            if self.start_button_label in channel_name \
-                    or "Session" in channel_name \
-                    or "dude ... relax" in channel_name:
-                self.work_channel_pointer = vc
-        for tc in self.category.text_channels:
-            channel_name = tc.name
-            if self.chat_label in channel_name:
-                self.text_channel_pointer = tc
-        await self.reset_session()
-
+    #############
+    #   START   #
+    #############
     def increase_session_count(self):
         self.session_count += 1
 
