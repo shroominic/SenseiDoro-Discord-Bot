@@ -2,7 +2,7 @@ from discord.ext.commands import Cog
 import asyncio
 import json
 
-from session import Session, env_manager
+from src.session import Session, env_manager
 from dojo import Dojo
 
 
