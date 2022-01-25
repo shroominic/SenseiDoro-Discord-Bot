@@ -1,3 +1,5 @@
+import discord
+
 from .timer import Timer
 import asyncio
 import json
@@ -39,6 +41,8 @@ class Session:
     #############
 
     async def start_session(self, member):
+        # send session information
+        await self.info_channel_pointer.send(embed=self.get_info_embed())
         # init session
         await member.edit(mute=True)
         # the timer manages the whole session
@@ -92,6 +96,13 @@ class Session:
     ###############
     #    TOOLS    #
     ###############
+
+    def get_info_embed(self):
+        info_embed = discord.Embed(title="Session info")
+        info_embed.add_field(name="work time", value=f"{self.timer.work_time} min")
+        info_embed.add_field(name="break time", value=f"{self.timer.break_time} min")
+        info_embed.add_field(name="repetitions", value=f"{self.timer.repetitions} times")
+        return info_embed
 
     async def dispose(self):
         # turn timer off

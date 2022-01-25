@@ -21,7 +21,7 @@ class Timer:
 
     async def start_timer(self):
         timer_embed = discord.Embed(title="Work Timer", color=0xff0000)
-        timer_embed.add_field(name="Time left:", value=f"{self.work_time}:00")
+        timer_embed.description = f"{self.work_time}:00"
         # setup timing message
         self.timer_info_pointer = await self.session.info_channel_pointer.send(embed=timer_embed)
         self.last_session = "work"
@@ -48,7 +48,7 @@ class Timer:
         # format time to string
         str_time = str(timedelta(seconds=self.seconds_left))[2::]
         timer_embed = discord.Embed(title="Session Timer", color=0xff0000)
-        timer_embed.add_field(name="time left:", value=str_time)
+        timer_embed.description = str_time
         # edit timer message
         await self.timer_info_pointer.edit(embed=timer_embed)
 
