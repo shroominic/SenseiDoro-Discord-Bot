@@ -1,15 +1,6 @@
-import json
-
-from session import Session
-
 
 async def get_session(some_channel, bot):
-    for channel in some_channel.category_pointer.text_channels:
-        if channel.name == Session.config_label:
-            async for msg in channel.history():
-                if "Session config:" in msg.content:
-                    if msg.author == bot.user and msg.content.startswith('Session config:'):
-                        # parse string representation of json
-                        config_json = str(msg.content)[15::]
-                        config = json.loads(config_json)
-                        return list(filter(lambda x: x.id == config["id"], bot.sessions))[0]
+    # get dojo reference
+    dojo = bot.dojos[some_channel.guild.id]
+    session = dojo.sessions[some_channel.category.id]
+    return session

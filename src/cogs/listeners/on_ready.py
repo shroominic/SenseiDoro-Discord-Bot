@@ -2,10 +2,11 @@ from discord.ext.commands import Cog
 import asyncio
 import json
 
-from session import Session
+from session import Session, env_manager
+from dojo import Dojo
 
 
-class OnReady(Cog, name='OnReady module'):
+class OnReady(Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -15,6 +16,9 @@ class OnReady(Cog, name='OnReady module'):
         When the bot has fully started,
         this function will get called.
         """
+        for guild in self.bot.guilds:
+            dojo = Dojo(guild=guild, bot=self.bot)
+            self.bot.dojos[guild.id] = dojo
         # serialize old session instances
         for guild in self.bot.guilds:
             for category in guild.categories:
@@ -33,6 +37,8 @@ class OnReady(Cog, name='OnReady module'):
         to reinitialize lost instances during a restart.
         :param category: category of session to serialize
         """
+        # get dojo reference
+        dojo = self.bot.dojos[category.guild.id]
         # find message with session config
         for tc in category.text_channels:
             if tc is not None:
@@ -43,12 +49,12 @@ class OnReady(Cog, name='OnReady module'):
                             config_json = str(msg.content)[15::]
                             config = json.loads(config_json)
                             # create session instance from json
-                            session = Session(
-                                guild=msg.guild_pointer,
+                            session_instance = Session(
+                                dojo=dojo,
                                 category=category,
                                 work_time=config["work_time"],
                                 break_time=config["pause_time"],
                                 repetitions=config["number_sessions"],
                                 session_name=config["name"])
-                            self.bot.sessions.append(session)
-                            await session.create_from_old_environment()
+                            dojo.sessions[category.id] = session_instance
+                            await env_manager.create_from_old_environment(session_instance)

@@ -14,7 +14,7 @@ class Session:
     chat_label = "chat"
 
     def __init__(self,
-                 guild,
+                 dojo,
                  category,
                  work_time,
                  break_time,
@@ -22,9 +22,9 @@ class Session:
                  session_name="Pomodoro"
                  ):
         self.name = session_name
-        self.label = f"🍅 {self.name}]"
+        self.label = f"🍅 {self.name}"
         # pointers
-        self.guild_pointer = guild
+        self.dojo = dojo
         self.category_pointer = category
         self.info_channel_pointer = None
         self.chat_channel_pointer = None
@@ -40,7 +40,7 @@ class Session:
 
     async def start_session(self, member):
         # init session
-        await self.chat_channel_pointer.send("Session has started!")
+        await self.info_channel_pointer.send("Session has started!")
         await member.edit(mute=True)
         # the timer manages the whole session
         self.timer.is_active = True
@@ -75,15 +75,21 @@ class Session:
         for member in self.work_channel_pointer.members:
             await member.move_to(self.lobby_channel_pointer)
             await member.edit(mute=False)
+        for member in self.lobby_channel_pointer.members:
+            await member.edit(mute=False)
         # reset stats
         self.timer.is_active = False
-        self.session_count = 0
+        self.timer.session_count = 0
         # start button
-        await self.work_channel_pointer.edit(name=self.start_button_label)
+        await self.work_channel_pointer.delete()
+        self.work_channel_pointer = await self.dojo.guild.create_voice_channel(
+            self.start_button_label,
+            category=self.category_pointer
+        )
         # reset session chat
-        async for msg in self.chat_channel_pointer.history(limit=100):
-            if "Session config:" in msg.content:
-                continue
+        async for msg in self.chat_channel_pointer.history():
+            asyncio.create_task(msg.delete())
+        async for msg in self.info_channel_pointer.history():
             asyncio.create_task(msg.delete())
 
     ###############

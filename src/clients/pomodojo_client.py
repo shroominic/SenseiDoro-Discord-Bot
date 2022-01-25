@@ -6,5 +6,5 @@ from discord.ext import commands
 class PomoDojoClient(commands.Bot):
     def __init__(self, *args, **options):
         super(PomoDojoClient, self).__init__(*args, **options)
-        # stores all open sessions
-        self.sessions: [Session] = []
+        # stores all dojos of connected guilds
+        self.dojos = {}
