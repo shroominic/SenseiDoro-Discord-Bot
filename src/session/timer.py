@@ -27,7 +27,7 @@ class Timer:
     async def timer(self):
         next_call = time.time()
         tick = 5
-        while self.session.is_active:
+        while self.is_active:
             # to run
             if self.seconds_left < 1:
                 self.manage_session()
