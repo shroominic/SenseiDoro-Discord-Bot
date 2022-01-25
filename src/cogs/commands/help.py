@@ -1,3 +1,4 @@
+import discord
 from discord.ext import commands
 
 
@@ -11,16 +12,26 @@ class Help(commands.Cog):
         Helps you out of every situation :)
         """
         if "" in help_command:
-            await ctx.send("""
-            If you see this the first time just type $create and look what happens.
+            description = """
             To start a session just join the START SESSION channel.
             All your mates waiting in the Lobby will automatically follow you.
-            Use $help <create/session> to get detailed information about the commands.
-            """)
-        elif "create" in help_command:
-            await ctx.send("To create a new session use '$create <name> <work_time> <break_time> <repetitions>'.")
-        elif "session" in help_command:
-            await ctx.send("You can currently '$session reset' or '$session delete'. \
-            This only works inside a session chat.")
+            """
+            embed = discord.Embed(title="Help", description=description, color=0xff0000)
+
+            create_command = "$create <name> <work_time> <break_time> <repetitions>"
+            create_info = """
+            Use this command to create a new session environment.
+            Type just '$create' for the classic pomodoro experience.
+            """
+            embed.add_field(name=create_command, value=create_info, inline=False)
+
+            session_command = "$session [command]"
+            session_info = """
+            This command only works inside a session chat!
+            You can use '$session reset' or '$session delete' to delete or reset your session.
+            """
+            embed.add_field(name=session_command, value=session_info, inline=False)
+            await ctx.send(embed=embed)
+
         else:
             await ctx.send("Sorry, I can't help you with this :(")
