@@ -1,4 +1,3 @@
-from session import Session
 from discord.ext import commands
 
 
