@@ -1,10 +1,10 @@
 # Application Main
 
 from dotenv import load_dotenv
-import discord
 import os
 
 from src.clients.pomodojo_client import PomoDojoClient
+from src.cogs.commands.help import Help
 from src.cogs.listeners.on_ready import OnReady
 from src.cogs.listeners.on_vs_update import OnVSUpdate
 from src.cogs.listeners.command_err_handler import CommandErrHandler
@@ -18,8 +18,7 @@ def run():
     token = os.getenv('DISCORD_TOKEN')
 
     # init bot client
-    bot = PomoDojoClient(
-        command_prefix="$")
+    bot = PomoDojoClient(command_prefix="$")
 
     # adding cogs
     bot.add_cog(OnReady(bot))
@@ -27,8 +26,9 @@ def run():
     bot.add_cog(CommandErrHandler(bot))
     bot.add_cog(SessionManagement(bot))
     bot.add_cog(Tools(bot))
+    bot.remove_command('help')
+    bot.add_cog(Help(bot))
 
-    # finally run the bot
     bot.run(token)
 
 

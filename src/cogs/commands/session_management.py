@@ -1,7 +1,8 @@
 from discord.ext import commands
 import asyncio
 
-from src.models.session import Session, tools
+from session import env_manager
+from session import Session, tools
 
 
 class SessionManagement(commands.Cog):
@@ -9,25 +10,36 @@ class SessionManagement(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    async def create(self, ctx, work_time: int = 25, pause_time: int = 5, intervals: int = 4):
+    async def create(self, ctx, name: str = "Pomodoro", work_time: int = 25, break_time: int = 5, repetitions: int = 4):
         """
         Creates a new session environment with a session instance.
         You can customize with these 3 parameters:
         :param ctx: context of command
+        :param name: session name
         :param work_time: duration in minutes of one work session
-        :param pause_time: duration in minutes of one pause
-        :param intervals: how many work sessions until the timer stops
+        :param break_time: duration in minutes of one pause
+        :param repetitions: how many work sessions until the timer stops
         """
-        new_session = Session(ctx.guild, work_time=work_time, break_time=pause_time, session_repetitions=intervals)
+        # get dojo reference
+        dojo = self.bot.dojos[ctx.guild.id]
+        # create new session
+        new_session = Session(
+            dojo=dojo,
+            category=None,
+            work_time=work_time,
+            break_time=break_time,
+            repetitions=repetitions,
+            session_name=name
+        )
         # checks if session already exists
-        for session in self.bot.sessions:
-            if session == new_session:
-                asyncio.create_task(ctx.send('Session already exists!'))
-                del new_session
-                return
-        self.bot.sessions.append(new_session)
+        if len(dojo.sessions) >= dojo.session_limit:
+            asyncio.create_task(ctx.send(
+                f'Session limit reached. You can only have {dojo.session_limit} 🍅 sessions on your server.'))
+            del new_session
+            return
         # initializes the session category and channels
-        await new_session.create_environment()
+        await env_manager.create_new_environment(new_session)
+        dojo.sessions[new_session.category_pointer.id] = new_session
 
     @commands.command()
     async def session(self, ctx, session_command=""):
@@ -41,7 +53,7 @@ class SessionManagement(commands.Cog):
 
         if "delete" in session_command:
             await session.dispose()
-        if "reset" in session_command:
+        elif "reset" in session_command:
             await session.reset_session()
         else:
             await ctx.send("Type '$session delete' or '$session reset'")
