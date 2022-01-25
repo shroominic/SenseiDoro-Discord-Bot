@@ -3,7 +3,7 @@ import asyncio
 import json
 
 from src.session import Session, env_manager
-from dojo import Dojo
+from src.dojo import Dojo
 
 
 class OnReady(Cog):
