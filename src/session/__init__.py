@@ -40,12 +40,9 @@ class Session:
 
     async def start_session(self, member):
         # init session
-        await self.info_channel_pointer.send("Session has started!")
         await member.edit(mute=True)
         # the timer manages the whole session
         self.timer.is_active = True
-        # setup timing message
-        self.timer.timer_info_pointer = await self.info_channel_pointer.send(f"Time left: {self.timer.work_time}")
         # start session timer
         asyncio.create_task(self.timer.start_timer())
 
@@ -104,6 +101,7 @@ class Session:
             await vc.delete()
         for tc in self.category_pointer.text_channels:
             await tc.delete()
+        del self.dojo.sessions[self.category_pointer.id]
         await self.category_pointer.delete()
 
     def to_json(self):
