@@ -2,8 +2,8 @@ from discord.ext.commands import Cog
 import asyncio
 import json
 
-from session import Session, env_manager
-from dojo import Dojo
+from src.session import Session, env_manager
+from src.dojo import Dojo
 
 
 class OnReady(Cog):
@@ -13,8 +13,8 @@ class OnReady(Cog):
     @Cog.listener()
     async def on_ready(self):
         """
-        When the bot has fully started,
-        this function will get called.
+        Called when the client is done preparing the data received from Discord.
+        Usually after login is successful and the Client.guilds and co. are filled up.
         """
         for guild in self.bot.guilds:
             dojo = Dojo(guild=guild, bot=self.bot)
@@ -35,7 +35,8 @@ class OnReady(Cog):
         """
         Searches for all pomodoro sessions on the server
         to reinitialize lost instances during a restart.
-        :param category: category of session to serialize
+
+        param category: category of session to serialize
         """
         # get dojo reference
         dojo = self.bot.dojos[category.guild.id]

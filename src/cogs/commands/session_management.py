@@ -1,8 +1,8 @@
 from discord.ext import commands
 import asyncio
 
-from session import env_manager
-from session import Session, tools
+from src.session import env_manager
+from src.session import Session, tools
 
 
 class SessionManagement(commands.Cog):
