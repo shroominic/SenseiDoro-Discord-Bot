@@ -87,9 +87,7 @@ class Session:
             self.start_button_label,
             category=self.category_pointer
         )
-        # reset session chat
-        async for msg in self.chat_channel_pointer.history():
-            asyncio.create_task(msg.delete())
+        # reset session info
         async for msg in self.info_channel_pointer.history():
             asyncio.create_task(msg.delete())
 
