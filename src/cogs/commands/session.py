@@ -1,9 +1,9 @@
 from discord.ext import commands
 
-from src.session import Session, tools
+from src.session import tools
 
 
-class Session(commands.Cog):
+class SessionCommand(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
