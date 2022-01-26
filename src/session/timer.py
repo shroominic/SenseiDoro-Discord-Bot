@@ -56,7 +56,7 @@ class Timer:
         self.seconds_left = minutes_left * 60
 
     def manage_session(self):
-        if self.session.session_count < self.session.session_repetitions:
+        if self.session_count < self.repetitions:
             if "pause" in self.last_session:
                 self.set_time_left(self.work_time)
                 self.last_session = "work"
