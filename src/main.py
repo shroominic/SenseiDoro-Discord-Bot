@@ -3,7 +3,7 @@
 from dotenv import load_dotenv
 import os
 
-from src.clients.pomodojo_client import PomoDojoClient
+from src.clients.sensei_client import SenseiClient
 from src.cogs.commands.help import Help
 from src.cogs.listeners.on_ready import OnReady
 from src.cogs.listeners.on_vs_update import OnVSUpdate
@@ -18,7 +18,7 @@ def run():
     token = os.getenv('DISCORD_TOKEN')
 
     # init bot client
-    bot = PomoDojoClient(command_prefix="$")
+    bot = SenseiClient(command_prefix="$")
 
     # adding cogs
     bot.add_cog(OnReady(bot))
