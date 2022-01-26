@@ -56,6 +56,6 @@ class OnReady(Cog):
                                 work_time=config["work_time"],
                                 break_time=config["pause_time"],
                                 repetitions=config["number_sessions"],
-                                session_name=config["name"])
+                                session_name=config["name"],
+                                is_new_session=False)
                             dojo.sessions[category.id] = session_instance
-                            await env_manager.create_from_old_environment(session_instance)

@@ -1,5 +1,6 @@
 import discord
 
+from . import env_manager
 from .timer import Timer
 import asyncio
 import json
@@ -21,11 +22,12 @@ class Session:
                  work_time,
                  break_time,
                  repetitions,
+                 is_new_session,
                  session_name="Pomodoro"
                  ):
         self.name = session_name
         self.label = f"🍅 {self.name}"
-        # pointers
+        # references
         self.dojo = dojo
         self.category_pointer = category
         self.info_channel_pointer = None
@@ -33,16 +35,25 @@ class Session:
         self.work_channel_pointer = None
         self.lobby_channel_pointer = None
         self.config_channel_pointer = None
+        self.info_msg_embed = None
         # timer settings
         self.timer = Timer(self, work_time, break_time, repetitions)
+        # async init
+        asyncio.create_task(self.init(is_new_session))
+
+    async def init(self, is_new_session):
+        # initializes the session category and channels
+        await env_manager.create_environment(is_new_session, self)
+        # creates information embed
+        if not self.info_msg_embed:
+            info_embed = self.get_info_embed()
+            self.info_msg_embed = await self.info_channel_pointer.send(embed=info_embed)
 
     #############
     #   START   #
     #############
 
     async def start_session(self, member):
-        # send session information
-        await self.info_channel_pointer.send(embed=self.get_info_embed())
         # init session
         await member.edit(mute=True)
         # the timer manages the whole session
@@ -56,6 +67,7 @@ class Session:
 
     async def next_session(self):
         self.timer.increase_session_count()
+        asyncio.create_task(self.update_info_embed())
         # rename session
         await self.work_channel_pointer.edit(name=f"Session [ {self.timer.session_count} | {self.timer.repetitions} ]")
         # move all members from lobby to session
@@ -90,6 +102,9 @@ class Session:
         # reset session info
         async for msg in self.info_channel_pointer.history():
             asyncio.create_task(msg.delete())
+        # new info embed
+        info_embed = self.get_info_embed()
+        self.info_msg_embed = await self.info_channel_pointer.send(embed=info_embed)
 
     ###############
     #    TOOLS    #
@@ -99,8 +114,12 @@ class Session:
         info_embed = discord.Embed(title="Session info")
         info_embed.add_field(name="work time", value=f"{self.timer.work_time} min")
         info_embed.add_field(name="break time", value=f"{self.timer.break_time} min")
-        info_embed.add_field(name="repetitions", value=f"{self.timer.repetitions} times")
+        info_embed.add_field(name="session", value=f"[ {self.timer.session_count} | {self.timer.repetitions} ]")
         return info_embed
+
+    async def update_info_embed(self):
+        info_embed = self.get_info_embed()
+        await self.info_msg_embed.edit(embed=info_embed)
 
     async def dispose(self):
         # turn timer off

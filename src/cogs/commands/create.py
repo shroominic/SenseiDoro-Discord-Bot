@@ -22,6 +22,13 @@ class Create(commands.Cog):
         """
         # get dojo reference
         dojo = self.bot.dojos[ctx.guild.id]
+
+        # checks for session limit
+        if len(dojo.sessions) >= dojo.session_limit:
+            asyncio.create_task(ctx.send(
+                f'Session limit reached. You can only have {dojo.session_limit} sessions on your server.'))
+            return
+
         # create new session
         new_session = Session(
             dojo=dojo,
@@ -29,14 +36,7 @@ class Create(commands.Cog):
             work_time=work_time,
             break_time=break_time,
             repetitions=repetitions,
-            session_name=name
-        )
-        # checks for session limit
-        if len(dojo.sessions) >= dojo.session_limit:
-            asyncio.create_task(ctx.send(
-                f'Session limit reached. You can only have {dojo.session_limit} 🍅 sessions on your server.'))
-            del new_session
-            return
-        # initializes the session category and channels
-        await env_manager.create_new_environment(new_session)
+            session_name=name,
+            is_new_session=True)
+
         dojo.sessions[new_session.category_pointer.id] = new_session

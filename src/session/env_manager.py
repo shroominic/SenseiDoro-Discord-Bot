@@ -1,4 +1,10 @@
 
+async def create_environment(is_new_session, session):
+    if is_new_session:
+        await create_new_environment(session)
+    else:
+        await create_from_old_environment(session)
+
 
 async def create_new_environment(session):
     guild = session.dojo.guild
