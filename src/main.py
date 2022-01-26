@@ -9,7 +9,8 @@ from src.cogs.listeners.on_ready import OnReady
 from src.cogs.listeners.on_vs_update import OnVSUpdate
 from src.cogs.listeners.on_guild_join import OnGuildJoin
 from src.cogs.listeners.command_err_handler import CommandErrHandler
-from src.cogs.commands.session_management import SessionManagement
+from src.cogs.commands.session import Session
+from src.cogs.commands.create import Create
 from src.cogs.commands.tools import Tools
 
 
@@ -26,7 +27,8 @@ def run():
     bot.add_cog(OnVSUpdate(bot))
     bot.add_cog(OnGuildJoin(bot))
     bot.add_cog(CommandErrHandler(bot))
-    bot.add_cog(SessionManagement(bot))
+    bot.add_cog(Session(bot))
+    bot.add_cog(Create(bot))
     bot.add_cog(Tools(bot))
     bot.remove_command('help')
     bot.add_cog(Help(bot))
