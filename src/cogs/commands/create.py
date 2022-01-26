@@ -2,10 +2,10 @@ from discord.ext import commands
 import asyncio
 
 from src.session import env_manager
-from src.session import Session, tools
+from src.session import Session
 
 
-class SessionManagement(commands.Cog):
+class Create(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -31,7 +31,7 @@ class SessionManagement(commands.Cog):
             repetitions=repetitions,
             session_name=name
         )
-        # checks if session already exists
+        # checks for session limit
         if len(dojo.sessions) >= dojo.session_limit:
             asyncio.create_task(ctx.send(
                 f'Session limit reached. You can only have {dojo.session_limit} 🍅 sessions on your server.'))
@@ -40,20 +40,3 @@ class SessionManagement(commands.Cog):
         # initializes the session category and channels
         await env_manager.create_new_environment(new_session)
         dojo.sessions[new_session.category_pointer.id] = new_session
-
-    @commands.command()
-    async def session(self, ctx, session_command=""):
-        """
-        Get control over your session:
-        :param ctx: context of command
-        :param session_command: use "delete" or "reset" to manage your session
-        """
-        # get session instance
-        session = await tools.get_session(ctx.channel, self.bot)
-
-        if "delete" in session_command:
-            await session.dispose()
-        elif "reset" in session_command:
-            await session.reset_session()
-        else:
-            await ctx.send("Type '$session delete' or '$session reset'")
