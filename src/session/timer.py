@@ -16,19 +16,30 @@ class Timer:
         # state
         self.is_active = False
         self.seconds_left = 0
-        self.session_state = ""
+        self.session_state = "Work"
         self.session_count = 0
         # set time left
         self.set_time_left(self.work_time)
 
     async def start_timer(self):
-        timer_embed = self.get_timer_embed()
+        # reset timer
+        self.reset()
         # setup timing message
+        timer_embed = self.get_timer_embed()
         self.timer_info_pointer = await self.session.info_channel_pointer.send(embed=timer_embed)
-        self.session_state = "work"
         # create timer thread
+        self.is_active = True
         asyncio.create_task(self.timer())
         await self.session.next_session()
+
+    def stop_timer(self):
+        self.is_active = False
+
+    def reset(self):
+        self.is_active = False
+        self.session_count = 0
+        self.session_state = "Work"
+        self.set_time_left(self.work_time)
 
     async def timer(self):
         next_call = time.time()
@@ -61,13 +72,13 @@ class Timer:
 
     def manage_session(self):
         if self.session_count < self.repetitions:
-            if "pause" in self.session_state:
+            if "Pause" in self.session_state:
                 self.set_time_left(self.work_time)
-                self.session_state = "work"
+                self.session_state = "Work"
                 asyncio.create_task(self.session.next_session())
-            elif "work" in self.session_state:
+            elif "Work" in self.session_state:
                 self.set_time_left(self.break_time)
-                self.session_state = "pause"
+                self.session_state = "Pause"
                 asyncio.create_task(self.session.take_a_break())
         else:
             asyncio.create_task(self.session.reset_session())

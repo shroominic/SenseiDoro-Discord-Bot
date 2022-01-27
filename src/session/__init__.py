@@ -56,8 +56,6 @@ class Session:
     async def start_session(self, member):
         # init session
         await member.edit(mute=True)
-        # the timer manages the whole session
-        self.timer.is_active = True
         # start session timer
         asyncio.create_task(self.timer.start_timer())
 
@@ -91,8 +89,7 @@ class Session:
         for member in self.lobby_channel_pointer.members:
             await member.edit(mute=False)
         # reset stats
-        self.timer.is_active = False
-        self.timer.session_count = 0
+        self.timer.reset()
         # start button
         await self.work_channel_pointer.delete()
         self.work_channel_pointer = await self.dojo.guild.create_voice_channel(
