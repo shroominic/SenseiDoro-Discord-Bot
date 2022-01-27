@@ -30,13 +30,12 @@ class Create(commands.Cog):
             return
 
         # create new session
-        new_session = Session(
+        Session(
             dojo=dojo,
             category=None,
             work_time=work_time,
             break_time=break_time,
             repetitions=repetitions,
             session_name=name,
-            is_new_session=True)
-
-        dojo.sessions[new_session.category_pointer.id] = new_session
+            is_new_session=True
+        )

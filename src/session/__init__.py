@@ -44,6 +44,8 @@ class Session:
     async def init(self, is_new_session):
         # initializes the session category and channels
         await env_manager.create_environment(is_new_session, self)
+        # list session instance inside dojo.sessions dict
+        self.dojo.sessions[self.category_pointer.id] = self
         # creates information embed
         if not self.info_msg_embed:
             info_embed = self.get_info_embed()
@@ -56,8 +58,6 @@ class Session:
     async def start_session(self, member):
         # init session
         await member.edit(mute=True)
-        # the timer manages the whole session
-        self.timer.is_active = True
         # start session timer
         asyncio.create_task(self.timer.start_timer())
 
@@ -80,31 +80,38 @@ class Session:
         for member in self.work_channel_pointer.members:
             await member.move_to(self.lobby_channel_pointer)
             await member.edit(mute=False)
-        # some chill quote
-        await self.work_channel_pointer.edit(name=self.session_break_label)
+        # work channel break msg
+        await self.work_channel_pointer.delete()
+        self.work_channel_pointer = await self.dojo.guild.create_voice_channel(
+            self.session_break_label,
+            category=self.category_pointer
+        )
 
     async def reset_session(self):
+        # reset stats
+        self.timer.reset()
         # move all back to lobby
         for member in self.work_channel_pointer.members:
             await member.move_to(self.lobby_channel_pointer)
             await member.edit(mute=False)
         for member in self.lobby_channel_pointer.members:
             await member.edit(mute=False)
-        # reset stats
-        self.timer.is_active = False
-        self.timer.session_count = 0
         # start button
         await self.work_channel_pointer.delete()
         self.work_channel_pointer = await self.dojo.guild.create_voice_channel(
             self.start_button_label,
             category=self.category_pointer
         )
-        # reset session info
-        async for msg in self.info_channel_pointer.history():
-            asyncio.create_task(msg.delete())
-        # new info embed
+        # delete timer msg
+        if self.timer.timer_info_pointer:
+            await self.timer.timer_info_pointer.delete()
+
+        # edit/create info embed
         info_embed = self.get_info_embed()
-        self.info_msg_embed = await self.info_channel_pointer.send(embed=info_embed)
+        if self.info_msg_embed:
+            await self.info_msg_embed.edit(embed=info_embed)
+        else:
+            self.info_msg_embed = await self.info_channel_pointer.send(embed=info_embed)
 
     ###############
     #    TOOLS    #
@@ -120,6 +127,11 @@ class Session:
     async def update_info_embed(self):
         info_embed = self.get_info_embed()
         await self.info_msg_embed.edit(embed=info_embed)
+
+    async def update_edit(self):
+        if self.category_pointer.name != self.label:
+            await self.category_pointer.edit(name=f"🍅 {self.name}")
+        await self.update_info_embed()
 
     async def dispose(self):
         # turn timer off

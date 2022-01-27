@@ -8,18 +8,61 @@ class SessionCommand(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    async def session(self, ctx, session_command=""):
+    async def session(self, ctx, arg1="", arg2="", arg3="", arg4="", arg5=""):
         """
         Get control over your session:
         :param ctx: context of command
-        :param session_command: use "delete" or "reset" to manage your session
+        :param arg1: use "delete" or "reset" to manage your session
         """
         # get session instance
         session = await tools.get_session(ctx.channel, self.bot)
 
-        if "delete" in session_command:
+        if "delete" in arg1:
             await session.dispose()
-        elif "reset" in session_command:
+        elif "reset" in arg1:
             await session.reset_session()
+        elif "edit" in arg1:
+            if "name" in arg2:
+                if not arg3 == "":
+                    session.name = arg3
+                else:
+                    await ctx.send("Please input a string.")
+            # edit work_time
+            elif "work_time" in arg2:
+                if arg3.isnumeric():
+                    work_time = int(arg3)
+                    session.timer.work_time = work_time
+                else:
+                    await ctx.send("Please input your work_time in minutes (integer).")
+            # edit break_time
+            elif "break_time" in arg2:
+                if arg3.isnumeric():
+                    break_time = int(arg3)
+                    session.timer.break_time = break_time
+                else:
+                    await ctx.send("Please input your break_time in minutes (integer).")
+            # edit repetitions
+            elif "repetitions" in arg2:
+                if arg3.isnumeric():
+                    repetitions = int(arg3)
+                    session.timer.repetitions = repetitions
+                else:
+                    await ctx.send("Please input your repetitions as an integer.")
+            # edit work_time, break_time and repetitions
+            elif "timer" in arg2:
+                work_time, break_time, repetitions = 25, 5, 4
+                if arg3.isnumeric():
+                    work_time = int(arg3)
+                session.timer.work_time = work_time
+                if arg4.isnumeric():
+                    break_time = int(arg4)
+                session.timer.break_time = break_time
+                if arg5.isnumeric():
+                    repetitions = int(arg5)
+                session.timer.repetitions = repetitions
+            else:
+                error = "You can use '$session edit <name/work_time/break_time/repetitions/timer>'"
+                await ctx.send(error)
+            await session.update_edit()
         else:
-            await ctx.send("Type '$session delete' or '$session reset'")
+            await ctx.send("You can use '$session <delete/reset/edit>'")
