@@ -80,30 +80,38 @@ class Session:
         for member in self.work_channel_pointer.members:
             await member.move_to(self.lobby_channel_pointer)
             await member.edit(mute=False)
-        # some chill quote
-        await self.work_channel_pointer.edit(name=self.session_break_label)
+        # work channel break msg
+        await self.work_channel_pointer.delete()
+        self.work_channel_pointer = await self.dojo.guild.create_voice_channel(
+            self.session_break_label,
+            category=self.category_pointer
+        )
 
     async def reset_session(self):
+        # reset stats
+        self.timer.reset()
         # move all back to lobby
         for member in self.work_channel_pointer.members:
             await member.move_to(self.lobby_channel_pointer)
             await member.edit(mute=False)
         for member in self.lobby_channel_pointer.members:
             await member.edit(mute=False)
-        # reset stats
-        self.timer.reset()
         # start button
         await self.work_channel_pointer.delete()
         self.work_channel_pointer = await self.dojo.guild.create_voice_channel(
             self.start_button_label,
             category=self.category_pointer
         )
-        # reset session info
-        async for msg in self.info_channel_pointer.history():
-            asyncio.create_task(msg.delete())
-        # new info embed
+        # delete timer msg
+        if self.timer.timer_info_pointer:
+            await self.timer.timer_info_pointer.delete()
+
+        # edit/create info embed
         info_embed = self.get_info_embed()
-        self.info_msg_embed = await self.info_channel_pointer.send(embed=info_embed)
+        if self.info_msg_embed:
+            await self.info_msg_embed.edit(embed=info_embed)
+        else:
+            self.info_msg_embed = await self.info_channel_pointer.send(embed=info_embed)
 
     ###############
     #    TOOLS    #
