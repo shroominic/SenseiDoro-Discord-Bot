@@ -41,6 +41,7 @@ async def create_new_environment(session):
 
 
 async def create_from_old_environment(session):
+    # catch voice_channels
     for vc in session.category_pointer.voice_channels:
         channel_name = vc.name
         if session.lobby_label in channel_name:
@@ -49,6 +50,7 @@ async def create_from_old_environment(session):
                 or "Session" in channel_name \
                 or session.session_break_label in channel_name:
             session.work_channel_pointer = vc
+    # catch text_channels
     for tc in session.category_pointer.text_channels:
         channel_name = tc.name
         if session.chat_label in channel_name:
@@ -57,4 +59,13 @@ async def create_from_old_environment(session):
             session.info_channel_pointer = tc
         if session.config_label in channel_name:
             session.config_channel_pointer = tc
+    # catch msg references
+    async for msg in session.info_channel_pointer.history():
+        if msg.embeds:
+            for embed in msg.embeds:
+                if "info" in embed.title:
+                    session.info_msg_embed = msg
+                if "timer" in embed.title:
+                    session.timer.timer_info_pointer = msg
+    # session reset
     await session.reset_session()
