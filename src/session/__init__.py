@@ -44,6 +44,8 @@ class Session:
     async def init(self, is_new_session):
         # initializes the session category and channels
         await env_manager.create_environment(is_new_session, self)
+        # list session instance inside dojo.sessions dict
+        self.dojo.sessions[self.category_pointer.id] = self
         # creates information embed
         if not self.info_msg_embed:
             info_embed = self.get_info_embed()

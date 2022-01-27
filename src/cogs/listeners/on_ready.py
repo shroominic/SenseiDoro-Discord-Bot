@@ -50,12 +50,12 @@ class OnReady(Cog):
                             config_json = str(msg.content)[15::]
                             config = json.loads(config_json)
                             # create session instance from json
-                            session_instance = Session(
+                            Session(
                                 dojo=dojo,
                                 category=category,
                                 work_time=config["work_time"],
                                 break_time=config["pause_time"],
                                 repetitions=config["number_sessions"],
                                 session_name=config["name"],
-                                is_new_session=False)
-                            dojo.sessions[category.id] = session_instance
+                                is_new_session=False
+                            )
