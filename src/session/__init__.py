@@ -118,6 +118,11 @@ class Session:
         info_embed = self.get_info_embed()
         await self.info_msg_embed.edit(embed=info_embed)
 
+    async def update_edit(self):
+        if self.category_pointer.name != self.label:
+            await self.category_pointer.edit(name=f"🍅 {self.name}")
+        await self.update_info_embed()
+
     async def dispose(self):
         # turn timer off
         self.timer.is_active = False
