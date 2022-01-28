@@ -1,5 +1,7 @@
 import asyncio
 
+import discord
+
 
 async def create_environment(is_new_session, session):
     if is_new_session:
@@ -10,6 +12,18 @@ async def create_environment(is_new_session, session):
 
 async def create_new_environment(session):
     guild = session.dojo.guild
+    # permission overwrites
+    config_ow = {
+        guild.default_role: discord.PermissionOverwrite(read_messages=False),
+        guild.me: discord.PermissionOverwrite(read_messages=True)
+    }
+    info_ow = {
+        guild.default_role: discord.PermissionOverwrite(send_messages=False),
+        guild.me: discord.PermissionOverwrite(send_messages=True)
+    }
+    work_ow = {
+        guild.default_role: discord.PermissionOverwrite(speak=False)
+    }
     # create session category
     session.category_pointer = await guild.create_category_channel(session.label)
     # create initial channels
@@ -19,25 +33,23 @@ async def create_new_environment(session):
     )
     session.work_channel_pointer = await guild.create_voice_channel(
         session.start_button_label,
-        category=session.category_pointer
+        category=session.category_pointer,
+        overwrites=work_ow
     )
     session.info_channel_pointer = await guild.create_text_channel(
         session.information_label,
-        category=session.category_pointer
+        category=session.category_pointer,
+        overwrites=info_ow
     )
     session.chat_channel_pointer = await guild.create_text_channel(
         session.chat_label,
-        category=session.category_pointer
+        category=session.category_pointer,
     )
     session.config_channel_pointer = await guild.create_text_channel(
         session.config_label,
-        category=session.category_pointer
+        category=session.category_pointer,
+        overwrites=config_ow
     )
-    # set permissions
-    await session.config_channel_pointer.set_permissions(guild.me, read_messages=True)
-    await session.info_channel_pointer.set_permissions(guild.me, send_messages=True)
-    await session.config_channel_pointer.set_permissions(guild.default_role, read_messages=False)
-    await session.info_channel_pointer.set_permissions(guild.default_role, send_messages=False)
     # send serialization of session as message
     await session.config_channel_pointer.send(f"Session config: {session.to_json()}")
 
@@ -65,8 +77,10 @@ async def create_from_old_environment(session):
     async for msg in session.info_channel_pointer.history():
         if msg.embeds:
             for embed in msg.embeds:
-                if "info" in embed.title:
-                    session.info_msg_embed = msg
+                if embed.fields:
+                    for field in embed.fields:
+                        if "session" in field.name:
+                            session.info_msg_embed = msg
                 if "timer" in embed.title:
                     session.timer.info_msg = msg
     # session reset
