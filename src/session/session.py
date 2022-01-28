@@ -69,7 +69,13 @@ class Session:
     async def next_session(self):
         asyncio.create_task(self.update_info_embed())
         # rename session
-        await self.work_channel_pointer.edit(name=f"Session [ {self.timer.session_count} | {self.timer.repetitions} ]")
+        session_name = f"Session [ {self.timer.session_count} | {self.timer.repetitions} ]"
+        asyncio.create_task(self.work_channel_pointer.edit(name=session_name))
+        # close session so no one can join during work_time
+        asyncio.create_task(self.work_channel_pointer.set_permissions(self.dojo.guild.me,
+                                                                      connect=True))
+        asyncio.create_task(self.work_channel_pointer.set_permissions(self.dojo.guild.default_role,
+                                                                      connect=False, speak=False))
         # move all members from lobby to session
         for member in self.lobby_channel_pointer.members:
             await member.move_to(self.work_channel_pointer)
@@ -82,6 +88,10 @@ class Session:
         for member in self.work_channel_pointer.members:
             await member.move_to(self.lobby_channel_pointer)
             # admins do not get unmuted automatically
+            if member.guild_permissions.administrator:
+                await member.edit(mute=False)
+        # only relevant if admin leaves the session early
+        for member in self.lobby_channel_pointer.members:
             if member.guild_permissions.administrator:
                 await member.edit(mute=False)
         # work channel break msg

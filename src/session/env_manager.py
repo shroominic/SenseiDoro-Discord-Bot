@@ -27,29 +27,19 @@ async def create_new_environment(session):
     # create session category
     session.category_pointer = await guild.create_category_channel(session.label)
     # create initial channels
-    session.lobby_channel_pointer = await guild.create_voice_channel(
-        session.lobby_label,
-        category=session.category_pointer
-    )
-    session.work_channel_pointer = await guild.create_voice_channel(
-        session.start_button_label,
-        category=session.category_pointer,
-        overwrites=work_ow
-    )
-    session.info_channel_pointer = await guild.create_text_channel(
-        session.information_label,
-        category=session.category_pointer,
-        overwrites=info_ow
-    )
-    session.chat_channel_pointer = await guild.create_text_channel(
-        session.chat_label,
-        category=session.category_pointer,
-    )
-    session.config_channel_pointer = await guild.create_text_channel(
-        session.config_label,
-        category=session.category_pointer,
-        overwrites=config_ow
-    )
+    session.lobby_channel_pointer = await guild.create_voice_channel(session.lobby_label,
+                                                                     category=session.category_pointer)
+    session.work_channel_pointer = await guild.create_voice_channel(session.start_button_label,
+                                                                    category=session.category_pointer,
+                                                                    overwrites=work_ow)
+    session.info_channel_pointer = await guild.create_text_channel(session.information_label,
+                                                                   category=session.category_pointer,
+                                                                   overwrites=info_ow)
+    session.chat_channel_pointer = await guild.create_text_channel(session.chat_label,
+                                                                   category=session.category_pointer, )
+    session.config_channel_pointer = await guild.create_text_channel(session.config_label,
+                                                                     category=session.category_pointer,
+                                                                     overwrites=config_ow)
     # send serialization of session as message
     await session.config_channel_pointer.send(f"Session config: {session.to_json()}")
 
