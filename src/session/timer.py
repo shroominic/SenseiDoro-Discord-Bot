@@ -43,23 +43,27 @@ class Timer:
 
     async def timer(self):
         next_call = time.time()
-        tick = 10
         while self.is_active:
-            # timer logic
-            next_call += tick
-            await asyncio.sleep(next_call - time.time())
+            if self.seconds_left <= 10:
+                tick = 1
+            else:
+                tick = 10
             # to run
             if self.seconds_left < 1:
+                self.display_update()
                 self.manage_session()
             else:
-                asyncio.create_task(self.display_update())
+                # timer logic
+                self.display_update()
+                next_call += tick
                 self.seconds_left -= tick
+                await asyncio.sleep(next_call - time.time())
 
-    async def display_update(self):
+    def display_update(self):
         # format time to string
         timer_embed = self.get_timer_embed()
         # edit timer message
-        await self.timer_info_pointer.edit(embed=timer_embed)
+        asyncio.create_task(self.timer_info_pointer.edit(embed=timer_embed))
 
     def get_timer_embed(self):
         str_time = str(timedelta(seconds=self.seconds_left))[2::]
