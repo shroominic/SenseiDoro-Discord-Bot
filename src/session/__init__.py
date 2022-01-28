@@ -129,8 +129,9 @@ class Session:
         await self.info_msg_embed.edit(embed=info_embed)
 
     async def update_edit(self):
+        self.label = f"🍅 {self.name}"
         if self.category_pointer.name != self.label:
-            await self.category_pointer.edit(name=f"🍅 {self.name}")
+            await self.category_pointer.edit(name=self.label)
         await self.update_info_embed()
 
     async def dispose(self):
