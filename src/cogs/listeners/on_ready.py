@@ -27,8 +27,8 @@ class OnReady(Cog):
 
         # print all connected guilds
         all_guilds = [guild.name for guild in self.bot.guilds]
-        print(f'{self.bot.user} is connected to the following guilds: \n{all_guilds}\n')
-        print('READY')
+        print(f'{self.bot.user} is connected to the following guilds: \n{all_guilds}')
+        print('READY\n')
 
     # helper function to fetch old sessions
     async def serialize(self, category):
