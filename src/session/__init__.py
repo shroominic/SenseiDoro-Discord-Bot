@@ -10,7 +10,7 @@ import json
 class Session:
     # channel labels
     start_button_label = "START SESSION"
-    session_break_label = ""
+    session_break_label = "Take a break, ma mate!"
     information_label = "information"
     config_label = "config"
     lobby_label = "Lobby"
