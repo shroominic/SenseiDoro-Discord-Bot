@@ -8,7 +8,7 @@ import discord
 class Timer:
     def __init__(self, session, work_time, break_time, repetitions):
         self.session = session
-        self.timer_info_pointer = None
+        self.info_msg = None
         # settings
         self.work_time = work_time
         self.break_time = break_time
@@ -26,7 +26,7 @@ class Timer:
         self.reset()
         # setup timing message
         timer_embed = self.get_timer_embed()
-        self.timer_info_pointer = await self.session.info_channel_pointer.send(embed=timer_embed)
+        self.info_msg = await self.session.info_channel_pointer.send(embed=timer_embed)
         # create timer thread
         self.is_active = True
         asyncio.create_task(self.timer())
@@ -63,7 +63,7 @@ class Timer:
         # format time to string
         timer_embed = self.get_timer_embed()
         # edit timer message
-        asyncio.create_task(self.timer_info_pointer.edit(embed=timer_embed))
+        asyncio.create_task(self.info_msg.edit(embed=timer_embed))
 
     def get_timer_embed(self):
         str_time = str(timedelta(seconds=self.seconds_left))[2::]

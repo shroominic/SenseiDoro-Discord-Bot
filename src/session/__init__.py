@@ -103,8 +103,8 @@ class Session:
             category=self.category_pointer
         )
         # delete timer msg
-        if self.timer.timer_info_pointer:
-            await self.timer.timer_info_pointer.delete()
+        if self.timer.info_msg:
+            await self.timer.info_msg.delete()
 
         # edit/create info embed
         info_embed = self.get_info_embed()

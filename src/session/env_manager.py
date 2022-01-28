@@ -66,6 +66,6 @@ async def create_from_old_environment(session):
                 if "info" in embed.title:
                     session.info_msg_embed = msg
                 if "timer" in embed.title:
-                    session.timer.timer_info_pointer = msg
+                    session.timer.info_msg = msg
     # session reset
     await session.reset_session()
