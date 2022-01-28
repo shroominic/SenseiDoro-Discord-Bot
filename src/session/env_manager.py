@@ -1,3 +1,5 @@
+import asyncio
+
 
 async def create_environment(is_new_session, session):
     if is_new_session:
@@ -68,4 +70,4 @@ async def create_from_old_environment(session):
                 if "timer" in embed.title:
                     session.timer.info_msg = msg
     # session reset
-    await session.reset_session()
+    asyncio.create_task(session.reset_session())

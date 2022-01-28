@@ -30,7 +30,9 @@ class Timer:
         # create timer thread
         self.is_active = True
         asyncio.create_task(self.timer())
-        await self.session.next_session()
+        # start next session
+        self.increase_session_count()
+        asyncio.create_task(self.session.next_session())
 
     def stop_timer(self):
         self.is_active = False
@@ -79,12 +81,14 @@ class Timer:
             if "Pause" in self.session_state:
                 self.set_time_left(self.work_time)
                 self.session_state = "Work"
+                self.increase_session_count()
                 asyncio.create_task(self.session.next_session())
             elif "Work" in self.session_state:
                 self.set_time_left(self.break_time)
                 self.session_state = "Pause"
                 asyncio.create_task(self.session.take_a_break())
         else:
+            self.stop_timer()
             asyncio.create_task(self.session.reset_session())
 
     def increase_session_count(self):

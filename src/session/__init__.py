@@ -66,7 +66,6 @@ class Session:
     ##################
 
     async def next_session(self):
-        self.timer.increase_session_count()
         asyncio.create_task(self.update_info_embed())
         # rename session
         await self.work_channel_pointer.edit(name=f"Session [ {self.timer.session_count} | {self.timer.repetitions} ]")
