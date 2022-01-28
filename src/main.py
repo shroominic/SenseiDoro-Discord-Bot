@@ -1,5 +1,5 @@
 # Application Main
-
+import discord
 from dotenv import load_dotenv
 import os
 
@@ -9,7 +9,7 @@ from src.cogs.listeners.on_ready import OnReady
 from src.cogs.listeners.on_vs_update import OnVSUpdate
 from src.cogs.listeners.on_guild_join import OnGuildJoin
 from src.cogs.listeners.command_err_handler import CommandErrHandler
-from src.cogs.commands.session import SessionCommand
+from src.cogs.commands.session_cmd import SessionCommand
 from src.cogs.commands.create import Create
 from src.cogs.commands.tools import Tools
 
@@ -19,8 +19,12 @@ def run():
     load_dotenv()
     token = os.getenv('DISCORD_TOKEN')
 
+    # client can see all users
+    intents = discord.Intents.default()
+    intents.members = True
+
     # init bot client
-    bot = SenseiClient(command_prefix="$")
+    bot = SenseiClient(command_prefix="$", intents=intents)
 
     # adding cogs
     bot.add_cog(OnReady(bot))
