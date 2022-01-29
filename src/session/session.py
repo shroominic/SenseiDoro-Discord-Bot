@@ -106,6 +106,25 @@ class Session:
             overwrites=work_ow
         )
 
+    async def force_break(self, minutes=420):
+        # current session don't count
+        self.timer.session_count -= 1
+        asyncio.create_task(self.update_info_embed())
+        # self.timer.break_time as default value
+        if minutes > 120:
+            # start normal break
+            self.timer.set_time_left(0)
+        else:
+            # set (new) break_time
+            temp = self.timer.break_time
+            self.timer.break_time = minutes
+            # start a (minutes long) break
+            self.timer.set_time_left(0)
+            # set old break_time
+            await asyncio.sleep(self.timer.tick)
+            self.timer.break_time = temp
+            asyncio.create_task(self.update_info_embed())
+
     async def reset_session(self):
         # reset stats
         self.timer.reset()

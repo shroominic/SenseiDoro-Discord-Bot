@@ -21,6 +21,13 @@ class SessionCommand(commands.Cog):
             await session.dispose()
         elif "reset" in arg1:
             await session.reset_session()
+        elif "break" in arg1:
+            if "" == arg2:
+                await session.force_break()
+            elif arg2.isnumeric():
+                await session.force_break(int(arg2))
+            else:
+                await ctx.send("Please input your break time in minutes (integer).")
         elif "edit" in arg1:
             if "name" in arg2:
                 if not arg3 == "":
