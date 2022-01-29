@@ -12,7 +12,11 @@ class SessionCommand(commands.Cog):
         """
         Get control over your session:
         :param ctx: context of command
-        :param arg1: use "delete" or "reset" to manage your session
+        :param arg1: use 'delete', 'reset', 'break' or 'edit' to manage your session
+        :param arg2: cmd specific
+        :param arg3: cmd specific
+        :param arg4: cmd specific
+        :param arg5: cmd specific
         """
         # get session instance
         session = await tools.get_session(ctx.channel, self.bot)
