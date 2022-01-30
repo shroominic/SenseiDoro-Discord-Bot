@@ -122,11 +122,11 @@ class SessionCommand(commands.Cog):
                 # error
                 title = "Wrong argument"
                 feedback = "Try '$session edit <name/work_time/break_time/repetitions/timer>'"
-                asyncio.create_task(cmd_helper.feedback(ctx, title, feedback))
+                asyncio.create_task(cmd_helper.feedback(ctx, title, feedback, 15))
             await session.update_edit()
         else:
             # error
             title = "Wrong argument"
             feedback = "Try '$session <delete/reset/edit>'"
-            asyncio.create_task(cmd_helper.feedback(ctx, title, feedback))
+            asyncio.create_task(cmd_helper.feedback(ctx, title, feedback, 15))
 

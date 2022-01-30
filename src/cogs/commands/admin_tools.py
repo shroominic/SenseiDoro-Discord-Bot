@@ -5,7 +5,7 @@ from discord.ext import commands
 from src.cogs.commands import cmd_helper
 
 
-class Tools(commands.Cog):
+class AdminTools(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
