@@ -15,6 +15,8 @@ class Dojo:
         self.moderator_role = None
         self.member_role = None
         self.dojo_manager_role = None
+        # configuration
+        self.mute_admins = True
         # async init
         asyncio.create_task(self.init_async())
 
