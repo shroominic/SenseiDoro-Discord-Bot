@@ -17,3 +17,5 @@ class OnGuildJoin(Cog):
         """
         dojo = Dojo(guild=guild, bot=self.bot)
         self.bot.dojos[guild.id] = dojo
+        # console info
+        print(f"New guild: {guild.name}, {guild.id}")
