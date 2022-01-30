@@ -1,4 +1,8 @@
+import asyncio
+
 from discord.ext import commands
+
+from src.cogs.commands import cmd_helper
 
 
 class Config(commands.Cog):
@@ -16,7 +20,16 @@ class Config(commands.Cog):
         if "mute_admins" in config_command:
             if isinstance(arg1, bool):
                 dojo.mute_admins = arg1
+                # feedback
+                title = "Config changed"
+                feedback = f"[mute_admins] <- {arg1}"
+                asyncio.create_task(cmd_helper.feedback(ctx, title, feedback))
             else:
-                ctx.send("Sorry, I need a boolean.")
+                # error
+                title = "Boolean required"
+                asyncio.create_task(cmd_helper.feedback(ctx, title))
         else:
-            await ctx.send("Sorry, this config command doesn't exist.")
+            # error
+            title = "Wrong argument"
+            feedback = "{show configurable items}"  # TODO
+            asyncio.create_task(cmd_helper.feedback(ctx, title, feedback))

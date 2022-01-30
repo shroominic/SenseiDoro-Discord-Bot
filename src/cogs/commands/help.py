@@ -1,5 +1,9 @@
+import asyncio
+
 import discord
 from discord.ext import commands
+
+from src.cogs.commands import cmd_helper
 
 
 class Help(commands.Cog):
@@ -34,4 +38,7 @@ class Help(commands.Cog):
             await ctx.send(embed=embed)
 
         else:
-            await ctx.send("Sorry, I can't help you with this :(")
+            # command error
+            title = "Wrong argument"
+            feedback = "Sorry, I can not help you with this."
+            asyncio.create_task(cmd_helper.feedback(ctx, title, feedback))
