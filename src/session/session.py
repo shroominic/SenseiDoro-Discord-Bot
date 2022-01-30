@@ -102,10 +102,13 @@ class Session:
             self.timer.break_time = minutes
             # start a (minutes long) break
             self.timer.set_time_left(0)
-            # set old break_time
-            await asyncio.sleep(self.timer.tick)
-            self.timer.break_time = temp
-            asyncio.create_task(self.update_info_embed())
+
+            async def set_old_break_time():
+                await asyncio.sleep(self.timer.tick)
+                self.timer.break_time = temp
+                asyncio.create_task(self.update_info_embed())
+
+            asyncio.create_task(set_old_break_time())
 
     async def reset_session(self):
         # resets
