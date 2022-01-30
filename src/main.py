@@ -10,8 +10,10 @@ from src.cogs.listeners.on_vs_update import OnVSUpdate
 from src.cogs.listeners.on_guild_join import OnGuildJoin
 from src.cogs.listeners.command_err_handler import CommandErrHandler
 from src.cogs.commands.session_cmd import SessionCommand
+from src.cogs.commands.admin_tools import Tools
+from src.cogs.commands.set_role import SetRole
+from src.cogs.commands.config import Config
 from src.cogs.commands.create import Create
-from src.cogs.commands.tools import Tools
 
 
 def run():
@@ -33,7 +35,9 @@ def run():
     bot.add_cog(CommandErrHandler(bot))
     bot.add_cog(SessionCommand(bot))
     bot.add_cog(Create(bot))
+    bot.add_cog(Config(bot))
     bot.add_cog(Tools(bot))
+    bot.add_cog(SetRole(bot))
     bot.remove_command('help')
     bot.add_cog(Help(bot))
 

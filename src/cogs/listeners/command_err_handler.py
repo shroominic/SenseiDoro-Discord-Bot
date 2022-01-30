@@ -1,6 +1,10 @@
-from discord.ext.commands import Cog, CommandNotFound
-import sys
 import traceback
+import asyncio
+import sys
+
+from discord.ext.commands import Cog, CommandNotFound
+
+from src.cogs.commands import cmd_helper
 
 
 class CommandErrHandler(Cog):
@@ -16,7 +20,10 @@ class CommandErrHandler(Cog):
         :param error: specific command error
         """
         if isinstance(error, CommandNotFound):
-            await ctx.send("This command does not exist!")
+            # error feedback
+            title = "Command not found"
+            feedback = "Sorry, I do not know this command."
+            asyncio.create_task(cmd_helper.feedback(ctx, title, feedback, 10))
         else:
             print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
             traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)

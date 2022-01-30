@@ -80,56 +80,50 @@ class Session:
         for member in self.lobby_channel_pointer.members:
             await member.move_to(self.work_channel_pointer)
             # admins do not get muted automatically
-            if member.guild_permissions.administrator:
+            if member.guild_permissions.administrator and self.dojo.mute_admins:
                 await member.edit(mute=True)
 
     async def take_a_break(self):
-        # move and unmute all waiting members
-        for member in self.work_channel_pointer.members:
-            await member.move_to(self.lobby_channel_pointer)
-            # admins do not get unmuted automatically
-            if member.guild_permissions.administrator:
-                await member.edit(mute=False)
-        # only relevant if admin leaves the session early
-        for member in self.lobby_channel_pointer.members:
-            if member.guild_permissions.administrator:
-                await member.edit(mute=False)
-        # work channel break msg
-        if self.work_channel_pointer:
-            await self.work_channel_pointer.delete()
-        work_ow = {
-            self.dojo.guild.default_role: discord.PermissionOverwrite(speak=False)
-        }
-        self.work_channel_pointer = await self.dojo.guild.create_voice_channel(
-            self.session_break_label,
-            category=self.category_pointer,
-            overwrites=work_ow
-        )
+        # move members to lobby and unmute admins
+        label = self.session_break_label
+        await self.reset_members_and_work_channel(label)
+
+    async def force_break(self, minutes=420):
+        # current session don't count
+        self.timer.session_count -= 1
+        asyncio.create_task(self.update_info_embed())
+        # self.timer.break_time as default value
+        if minutes > 120:
+            # start normal break
+            self.timer.set_time_left(0)
+        else:
+            # set (new) break_time
+            temp = self.timer.break_time
+            self.timer.break_time = minutes
+            # start a (minutes long) break
+            self.timer.set_time_left(0)
+
+            async def set_old_break_time():
+                await asyncio.sleep(self.timer.tick)
+                self.timer.break_time = temp
+                asyncio.create_task(self.update_info_embed())
+
+            asyncio.create_task(set_old_break_time())
 
     async def reset_session(self):
-        # reset stats
+        # resets
         self.timer.reset()
-        # move all back to lobby
-        for member in self.work_channel_pointer.members:
-            await member.move_to(self.lobby_channel_pointer)
-            await member.edit(mute=False)
-        for member in self.lobby_channel_pointer.members:
-            await member.edit(mute=False)
-        # start button
-        if self.work_channel_pointer:
-            await self.work_channel_pointer.delete()
-        work_ow = {
-            self.dojo.guild.default_role: discord.PermissionOverwrite(speak=False)
-        }
-        self.work_channel_pointer = await self.dojo.guild.create_voice_channel(
-            self.start_button_label,
-            category=self.category_pointer,
-            overwrites=work_ow
-        )
+        await self.reset_members_and_work_channel(self.start_button_label)
         # delete timer msg
         if self.timer.info_msg:
             await self.timer.info_msg.delete()
-
+            self.timer.info_msg = None
+        # clear info_channel
+        async for msg in self.info_channel_pointer.history():
+            if msg == self.info_msg_embed:
+                continue
+            else:
+                await msg.delete()
         # edit/create info embed
         info_embed = self.get_info_embed()
         if self.info_msg_embed:
@@ -141,7 +135,31 @@ class Session:
     #    TOOLS    #
     ###############
 
+    async def reset_members_and_work_channel(self, work_channel_label):
+        """ move all members back to lobby and unmute admins """
+        for member in self.work_channel_pointer.members:
+            await member.move_to(self.lobby_channel_pointer)
+            # admins do not get unmuted automatically
+            if member.guild_permissions.administrator and self.dojo.mute_admins:
+                await member.edit(mute=False)
+        # only relevant if admin leaves the session early
+        for member in self.lobby_channel_pointer.members:
+            if member.guild_permissions.administrator and self.dojo.mute_admins:
+                await member.edit(mute=False)
+        # reset work_channel
+        if self.work_channel_pointer:
+            await self.work_channel_pointer.delete()
+        work_ow = {
+            self.dojo.guild.default_role: discord.PermissionOverwrite(speak=False)
+        }
+        self.work_channel_pointer = await self.dojo.guild.create_voice_channel(
+            work_channel_label,
+            category=self.category_pointer,
+            overwrites=work_ow
+        )
+
     def get_info_embed(self):
+        """ return info_embed: creates an embed with session information """
         info_embed = discord.Embed(title=self.name)
         info_embed.add_field(name="work time", value=f"{self.timer.work_time} min")
         info_embed.add_field(name="break time", value=f"{self.timer.break_time} min")
@@ -149,6 +167,7 @@ class Session:
         return info_embed
 
     async def update_info_embed(self):
+        """ updates the information message """
         info_embed = self.get_info_embed()
         await self.info_msg_embed.edit(embed=info_embed)
 

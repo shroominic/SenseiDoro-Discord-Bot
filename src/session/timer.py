@@ -10,6 +10,7 @@ class Timer:
         self.session = session
         self.info_msg = None
         # settings
+        self.tick = 10
         self.work_time = work_time
         self.break_time = break_time
         self.repetitions = repetitions
@@ -51,7 +52,7 @@ class Timer:
             if self.seconds_left <= 10:
                 tick = 1
             else:
-                tick = 10
+                tick = self.tick
             # check if timer is over
             if self.seconds_left < 1:
                 self.display_update()
