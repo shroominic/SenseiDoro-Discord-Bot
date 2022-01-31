@@ -4,7 +4,7 @@ import sys
 
 from discord.ext.commands import Cog, CommandNotFound
 
-from src.cogs.commands import cmd_helper
+from src.cogs.slash_cmds import cmd_helper
 
 
 class CommandErrHandler(Cog):

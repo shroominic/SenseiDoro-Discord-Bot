@@ -2,19 +2,16 @@ import asyncio
 
 from discord.ext import commands
 
-from src.cogs.commands import cmd_helper
+from src.cogs.slash_cmds import cmd_helper
 
 
 class AdminTools(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
+    @commands.slash_command()
     async def cleanup(self, ctx):
-        """
-        Removes all Session environments from the bot.
-        :param ctx: context of command
-        """
+        """ Removes all Session environments from the bot. """
         # cmd only for admins
         role = self.bot.dojos[ctx.guild.id].admin_role
         if role in ctx.author.roles:
@@ -36,8 +33,7 @@ class AdminTools(commands.Cog):
             feedback = "You need to have the admin role to use this command."
             asyncio.create_task(cmd_helper.feedback(ctx, title, feedback))
 
-    @commands.command()
-    @commands.has_any_role("Dojo Manager")
+    @commands.slash_command()
     async def delete(self, ctx, to_delete=""):
         """
         Deletes all messages in the text channel where called.
