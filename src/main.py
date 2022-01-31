@@ -25,14 +25,17 @@ def run():
     bot.add_cog(OnVSUpdate(bot))
     bot.add_cog(OnGuildJoin(bot))
     bot.add_cog(CommandErrHandler(bot))
-    bot.add_cog(SessionCommand(bot))
     bot.add_cog(Create(bot))
-    bot.add_cog(Config(bot))
     bot.add_cog(AdminTools(bot))
-    bot.add_cog(SetRole(bot))
+
     # overwrite help cmd
     bot.remove_command('help')
     bot.add_cog(Help(bot))
+
+    # adding slash cmds
+    bot.add_application_command(Config(bot))
+    bot.add_application_command(SetRole(bot))
+    bot.add_application_command(SessionCmd(bot))
 
     bot.run(token)
 

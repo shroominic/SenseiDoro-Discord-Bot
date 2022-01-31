@@ -1,10 +1,5 @@
 # commands
-from .commands.session_cmd import SessionCommand
-from .commands.admin_tools import AdminTools
-from .commands.config import Config
-from .commands.create import Create
-from .commands.help import Help
-from .commands.set_role import SetRole
+from .slash_cmds import *
 
 # listeners
 from .listeners.command_err_handler import CommandErrHandler

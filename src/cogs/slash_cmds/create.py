@@ -1,7 +1,7 @@
 from discord.ext import commands
 import asyncio
 
-from src.cogs.commands import cmd_helper
+from src.cogs.slash_cmds import cmd_helper
 from src.session import Session
 
 
@@ -9,7 +9,7 @@ class Create(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
+    @commands.slash_command()
     async def create(self, ctx, name: str = "Pomodoro", work_time: int = 25, break_time: int = 5, repetitions: int = 4):
         """
         Creates a new session environment with a session instance.
