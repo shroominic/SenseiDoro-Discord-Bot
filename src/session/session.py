@@ -88,7 +88,7 @@ class Session:
         label = self.session_break_label
         await self.reset_members_and_work_channel(label)
 
-    async def force_break(self, minutes=420):
+    async def force_break(self, minutes):
         # current session don't count
         self.timer.session_count -= 1
         asyncio.create_task(self.update_info_embed())

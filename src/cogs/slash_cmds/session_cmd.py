@@ -1,7 +1,7 @@
 import asyncio
 
+import discord
 from discord import SlashCommandGroup, slash_command
-from discord.ext import commands
 
 from src.cogs.slash_cmds import cmd_helper
 from src.session import tools
@@ -9,11 +9,12 @@ from src.session import tools
 
 class SessionCmd(SlashCommandGroup):
     def __init__(self, bot):
-        super().__init__(name="session", description="session configuration")
+        super().__init__(name="session", description="Session configuration")
         self.bot = bot
 
     @slash_command()
     async def delete(self, ctx):
+        """ Use this command to delete your 🍅 session."""
         # get session instance
         session = await tools.get_session(ctx.channel, self.bot)
         await session.dispose()
@@ -23,6 +24,7 @@ class SessionCmd(SlashCommandGroup):
 
     @slash_command()
     async def reset(self, ctx):
+        """ Use this command to reset your 🍅 session. """
         # get session instance
         session = await tools.get_session(ctx.channel, self.bot)
         await session.reset_session()
@@ -31,35 +33,28 @@ class SessionCmd(SlashCommandGroup):
         asyncio.create_task(cmd_helper.feedback(ctx, title))
 
     @slash_command(name="break")
-    async def _break(self, ctx, minutes=""):
+    async def _break(self, ctx, minutes: int = 420):
+        """ Use this command force a break and quit your current work session.
+            :param minutes: break duration
+        """
         # get session instance
         session = await tools.get_session(ctx.channel, self.bot)
-        # TODO : remove this weird logic
-        if "" == minutes:
-            await session.force_break()
-            # feedback
-            title = "Current work session is reset."
-            feedback = f"You now have a {session.timer.break_time} minutes break"
-            asyncio.create_task(cmd_helper.feedback(ctx, title, feedback, 10))
-        elif minutes.isnumeric():
-            await session.force_break(int(minutes))
-            # feedback
-            title = "Current work session is reset."
-            feedback = f"You now have a {session.timer.break_time} minutes break"
-            asyncio.create_task(cmd_helper.feedback(ctx, title, feedback, 10))
-        else:
-            # error
-            title = "Integer required"
-            feedback = "Please input your break time in minutes."
-            asyncio.create_task(cmd_helper.feedback(ctx, title, feedback))
+        await session.force_break(minutes)
+        # feedback
+        title = "Current work session is reset."
+        feedback = f"You now have a {session.timer.break_time} minutes break"
+        asyncio.create_task(cmd_helper.feedback(ctx, title, feedback, 10))
 
     @slash_command()
     async def edit(self, ctx, to_edit: str, value: str):
-        """ edit subcommand """
-
+        """ Use this command to edit your 🍅 session.
+            :parameter to_edit: you can edit: 'name', 'work_time', 'break_time' or 'repetitions'
+            :parameter value: new value of to_edit
+        """
+        # get session reference
+        session = await tools.get_session(ctx.channel, self.bot)
         if "name" in to_edit:
             # get session instance
-            session = await tools.get_session(ctx.channel, self.bot)
             if not value == "":
                 session.name = value
                 # feedback
@@ -70,11 +65,7 @@ class SessionCmd(SlashCommandGroup):
                 title = "String required"
                 feedback = "Please input session name as a string."
                 asyncio.create_task(cmd_helper.feedback(ctx, title, feedback))
-            await session.update_edit()
-
         elif "work_time" in to_edit:
-            # get session instance
-            session = await tools.get_session(ctx.channel, self.bot)
             if value.isnumeric():
                 work_time = int(value)
                 session.timer.work_time = work_time
@@ -86,11 +77,7 @@ class SessionCmd(SlashCommandGroup):
                 title = "Integer required"
                 feedback = "Please input your work time in minutes."
                 asyncio.create_task(cmd_helper.feedback(ctx, title, feedback))
-            await session.update_edit()
-
         elif "break_time" in to_edit:
-            # get session instance
-            session = await tools.get_session(ctx.channel, self.bot)
             if value.isnumeric():
                 break_time = int(value)
                 session.timer.break_time = break_time
@@ -102,8 +89,6 @@ class SessionCmd(SlashCommandGroup):
                 title = "Integer required"
                 feedback = "Please input your break time in minutes."
                 asyncio.create_task(cmd_helper.feedback(ctx, title, feedback))
-            await session.update_edit()
-
         elif "repetitions" in to_edit:
             # get session instance
             session = await tools.get_session(ctx.channel, self.bot)
@@ -119,12 +104,12 @@ class SessionCmd(SlashCommandGroup):
                 feedback = "Please input the number of your repetitions."
                 asyncio.create_task(cmd_helper.feedback(ctx, title, feedback))
             await session.update_edit()
-
         else:
             # error
             title = "Wrong argument"
             feedback = "Try /session edit <name/work_time/break_time/repetitions>"
             asyncio.create_task(cmd_helper.feedback(ctx, title, feedback))
+        await session.update_edit()
 
     @staticmethod
     @delete.error
@@ -132,7 +117,6 @@ class SessionCmd(SlashCommandGroup):
     @_break.error
     @edit.error
     async def session_error(ctx, error):
-        if isinstance(error, AttributeError):
-            title = "Wrong environment"
-            feedback = "Please use this command only inside a session category."
-            asyncio.create_task(cmd_helper.feedback(ctx, title, feedback))
+        title = "Wrong environment"
+        feedback = "Please use this command only inside a session category."
+        asyncio.create_task(cmd_helper.feedback(ctx, title, feedback))
