@@ -13,7 +13,6 @@ class Dojo:
         # roles
         self.admin_role = None
         self.moderator_role = None
-        self.member_role = None
         self.dojo_manager_role = None
         # configuration
         self.mute_admins = True
