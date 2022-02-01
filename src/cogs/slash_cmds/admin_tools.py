@@ -30,7 +30,7 @@ class AdminTools(commands.Cog):
                     await category.delete()
         else:
             title = "Missing Role"
-            feedback = "You need to have the admin role to use this command."
+            feedback = "You are missing the admin role to run this command."
             asyncio.create_task(cmd_helper.feedback(ctx, title, feedback))
 
     @commands.slash_command()
