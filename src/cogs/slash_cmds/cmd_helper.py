@@ -12,4 +12,5 @@ async def feedback(context, title: str, feedback_str: str = "", seconds_until_di
     await context.respond(embed=embed_msg)
     # sleep until feedback gets removed again
     await asyncio.sleep(seconds_until_dispose)
-    asyncio.create_task(context.delete())
+    if context:
+        asyncio.create_task(context.delete())
