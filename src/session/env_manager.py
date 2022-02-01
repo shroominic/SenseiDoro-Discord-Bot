@@ -41,7 +41,7 @@ async def create_new_environment(session):
                                                                      category=session.category_pointer,
                                                                      overwrites=config_ow)
     # send serialization of session as message
-    await session.config_channel_pointer.send(f"Session config: {session.to_json()}")
+    session.config_msg = await session.config_channel_pointer.send(f"Session config: {session.to_json()}")
 
 
 async def create_from_old_environment(session):
@@ -64,6 +64,9 @@ async def create_from_old_environment(session):
         if session.config_label in channel_name:
             session.config_channel_pointer = tc
     # catch msg references
+    async for msg in session.config_channel_pointer.history():
+        if msg.author == session.dojo.bot.user and msg.content.startswith('Session config:'):
+            session.config_msg = msg
     async for msg in session.info_channel_pointer.history():
         if msg.embeds:
             for embed in msg.embeds:

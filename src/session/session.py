@@ -36,6 +36,7 @@ class Session:
         self.lobby_channel_pointer = None
         self.config_channel_pointer = None
         self.info_msg_embed = None
+        self.config_msg = None
         # timer settings
         self.timer = Timer(self, work_time, break_time, repetitions)
         # async init
@@ -176,6 +177,8 @@ class Session:
         if self.category_pointer.name != self.label:
             await self.category_pointer.edit(name=self.label)
         await self.update_info_embed()
+        # update config
+        await self.config_msg.edit(f"Session config: {self.to_json()}")
 
     async def dispose(self):
         # turn timer off
