@@ -39,11 +39,18 @@ class SessionCmd(SlashCommandGroup):
         """
         # get session instance
         session = await tools.get_session(ctx.channel, self.bot)
-        await session.force_break(minutes)
-        # feedback
-        title = "Current work session is reset."
-        feedback = f"You now have a {session.timer.break_time} minutes break"
-        asyncio.create_task(cmd_helper.feedback(ctx, title, feedback, 10))
+
+        if session.timer.is_active:
+            await session.force_break(minutes)
+            # feedback
+            title = "Current work session is reset."
+            feedback = f"You now have a {session.timer.break_time} minutes break"
+            asyncio.create_task(cmd_helper.feedback(ctx, title, feedback, 10))
+        else:
+            # feedback
+            title = "No active session."
+            feedback = f"Dude, you can't have a break if you're not working!"
+            asyncio.create_task(cmd_helper.feedback(ctx, title, feedback, 10))
 
     @slash_command()
     async def edit(self, ctx, to_edit: str, value: str):

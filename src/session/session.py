@@ -91,7 +91,8 @@ class Session:
 
     async def force_break(self, minutes):
         # current session don't count
-        self.timer.session_count -= 1
+        if self.timer.session_count > 0:
+            self.timer.session_count -= 1
         asyncio.create_task(self.update_info_embed())
         # self.timer.break_time as default value
         if minutes > 120:
