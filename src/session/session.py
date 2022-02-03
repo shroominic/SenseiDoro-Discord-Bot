@@ -57,6 +57,11 @@ class Session:
     #############
 
     async def start_session(self, member):
+        # close session so no one can join during work_time
+        asyncio.create_task(self.work_channel_pointer.set_permissions(self.dojo.guild.me,
+                                                                      connect=True))
+        asyncio.create_task(self.work_channel_pointer.set_permissions(self.dojo.guild.default_role,
+                                                                      connect=False, speak=False))
         # init session
         if member.guild_permissions.administrator:
             await member.edit(mute=True)
@@ -72,11 +77,6 @@ class Session:
         # rename session
         session_name = f"Session [ {self.timer.session_count} | {self.timer.repetitions} ]"
         await self.work_channel_pointer.edit(name=session_name)
-        # close session so no one can join during work_time
-        asyncio.create_task(self.work_channel_pointer.set_permissions(self.dojo.guild.me,
-                                                                      connect=True))
-        asyncio.create_task(self.work_channel_pointer.set_permissions(self.dojo.guild.default_role,
-                                                                      connect=False, speak=False))
         # move all members from lobby to session
         for member in self.lobby_channel_pointer.members:
             await member.move_to(self.work_channel_pointer)
