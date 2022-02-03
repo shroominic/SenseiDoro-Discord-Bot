@@ -5,45 +5,47 @@ from discord.ext import commands
 from src.cogs.slash_cmds import cmd_helper
 
 
-class AdminTools(commands.Cog):
+class DebugTools(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
-    async def cleanup(self, ctx):
-        """ Removes all Session environments from the bot. """
-        # cmd only for admins
-        # role = self.bot.dojos[ctx.guild.id].admin_role
-        # if role in ctx.author.roles:
-        # command feedback
-        title = "Okay sir I'll clean your room!"
-        asyncio.create_task(cmd_helper.feedback(ctx, title))
-        # get dojo reference
-        for category in ctx.guild.categories:
-            if "🍅" in category.name:
-                # delete all channels inside category
-                for vc in category.voice_channels:
-                    await vc.delete()
-                for tc in category.text_channels:
-                    await tc.delete()
-                # delete category
-                await category.delete()
-        # else:
-        #     title = "Missing Role"
-        #     feedback = "You are missing the admin role to run this command."
-        #     asyncio.create_task(cmd_helper.feedback(ctx, title, feedback))
+    @commands.group()
+    async def debug(self, ctx):
+        """ debug cmd group """
+        if ctx.invoked_subcommand is None:
+            title = "Wrong argument"
+            asyncio.create_task(cmd_helper.feedback(ctx, title))
 
-    @commands.command()
-    async def delete(self, ctx, to_delete=""):
-        """
-        Deletes all messages in the text channel where called.
-        :param ctx: context of command
-        :param to_delete: keyword argument
-        """
-        # cmd only for admins
-        # role = self.bot.dojos[ctx.guild.id].admin_role
-        # if role in ctx.author.roles:
-        if "messages" in to_delete:
+    @debug.group()
+    async def delete(self, ctx):
+        """ delete cmd group """
+        if ctx.invoked_subcommand is None:
+            title = "Wrong argument"
+            asyncio.create_task(cmd_helper.feedback(ctx, title))
+
+    @delete.command()
+    async def envs(self, ctx):
+        """ Removes all environments from the bot. """
+        # cmd only for me
+        if ctx.author.id == 302:
+            title = "Okay sir I'll clean your room!"
+            asyncio.create_task(cmd_helper.feedback(ctx, title))
+            # get dojo reference
+            for category in ctx.guild.categories:
+                if "🍅" in category.name:
+                    # delete all channels inside category
+                    for vc in category.voice_channels:
+                        await vc.delete()
+                    for tc in category.text_channels:
+                        await tc.delete()
+                    # delete category
+                    await category.delete()
+
+    @delete.command()
+    async def messages(self, ctx):
+        """ Removes all messages from the channel. """
+        # cmd only for me
+        if ctx.author.id == 302:
             # delete all messages inside message.channel
             async for msg in ctx.channel.history():
                 asyncio.create_task(msg.delete())
@@ -51,7 +53,11 @@ class AdminTools(commands.Cog):
             title = "Okay sir I'll delete your messages!"
             asyncio.create_task(cmd_helper.feedback(ctx, title))
 
-        elif "sessions" in to_delete:
+    @delete.command()
+    async def sessions(self, ctx):
+        """ Removes all Session environments from the bot. """
+        # cmd only for me
+        if ctx.author.id == 302:
             # command feedback
             title = "Okay sir I'll delete your sessions!"
             asyncio.create_task(cmd_helper.feedback(ctx, title))
@@ -60,21 +66,3 @@ class AdminTools(commands.Cog):
             # delete all sessions in ctx.guild
             for session in dojo.sessions.values():
                 asyncio.create_task(session.dispose())
-
-        else:
-            # error
-            title = "Wrong argument"
-            feedback = "Try '$delete <messages/sessions>'"
-            asyncio.create_task(cmd_helper.feedback(ctx, title, feedback))
-        # else:
-        #     # error
-        #     title = "Missing Role"
-        #     feedback = "You need to have the admin role to use this command."
-        #     asyncio.create_task(cmd_helper.feedback(ctx, title, feedback))
-
-    @commands.command()
-    async def unmute(self, ctx):
-        await ctx.author.edit(mute=False)
-        # command feedback
-        title = "I got you, mate!"
-        asyncio.create_task(cmd_helper.feedback(ctx, title))
