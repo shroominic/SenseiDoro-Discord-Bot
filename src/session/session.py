@@ -71,7 +71,7 @@ class Session:
         asyncio.create_task(self.update_info_embed())
         # rename session
         session_name = f"Session [ {self.timer.session_count} | {self.timer.repetitions} ]"
-        asyncio.create_task(self.work_channel_pointer.edit(name=session_name))
+        await self.work_channel_pointer.edit(name=session_name)
         # close session so no one can join during work_time
         asyncio.create_task(self.work_channel_pointer.set_permissions(self.dojo.guild.me,
                                                                       connect=True))
