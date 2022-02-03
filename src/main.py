@@ -26,7 +26,7 @@ def run():
     bot.add_cog(OnGuildJoin(bot))
     bot.add_cog(CommandErrHandler(bot))
     bot.add_cog(Create(bot))
-    bot.add_cog(AdminTools(bot))
+    bot.add_cog(DebugTools(bot))
 
     # overwrite help cmd
     bot.remove_command('help')
