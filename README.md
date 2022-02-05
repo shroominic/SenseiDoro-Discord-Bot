@@ -30,6 +30,10 @@ Features
 * The Sensei automatically mutes everyone during work time and the opposite during break time.
 * You can control the session with different `/session` commands
 
+Demo
+----
+![Giphy Gif](https://media.giphy.com/media/rFieX21uO4a97o8GTB/giphy.gif)
+
 Commands
 --------
 You can interact with the bot using discord `/` slash commands.  
