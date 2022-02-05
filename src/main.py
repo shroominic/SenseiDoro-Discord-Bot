@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import discord
 import os
 
+from src.dbm import setup
 from src.clients import SenseiClient
 from src.cogs import *
 
@@ -16,6 +17,9 @@ def run():
     # client can see all users
     intents = discord.Intents.default()
     intents.members = True
+
+    # init database
+    setup.main()
 
     # init bot client
     bot = SenseiClient(command_prefix="$", intents=intents)
