@@ -3,3 +3,5 @@ src/.env
 __pycache__/
 
 .DS_Store
+
+src/dbm/sensei.db
