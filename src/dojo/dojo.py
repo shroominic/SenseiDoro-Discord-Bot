@@ -1,7 +1,7 @@
 import asyncio
 import json
 
-from session import Session
+from src.session import Session
 
 
 class Dojo:
