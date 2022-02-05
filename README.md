@@ -35,7 +35,7 @@ Commands
 You can interact with the bot using discord `/` slash commands.  
 
 
-######Notation: `<required argument>` , `[optional arg]{default value}` , `<'subcommands'|'to'|'choose'|'from'>`   
+###### Notation: `<required argument>` , `[optional arg]{default value}` , `<'subcommands'|'to'|'choose'|'from'>`   
 
 ### Setup
 * Show help information: `/help [config]`   
