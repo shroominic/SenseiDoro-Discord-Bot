@@ -1,6 +1,8 @@
 import asyncio
+import sqlite3
 import sys
 import traceback
+from contextlib import closing
 
 import discord
 from discord import SlashCommandGroup, slash_command, ApplicationCommandInvokeError
@@ -20,7 +22,13 @@ class SetRole(SlashCommandGroup):
         # get dojo reference
         dojo = self.bot.dojos[ctx.guild.id]
         # change role
-        dojo.admin_role = role
+        dojo.admin_role_id = role.id
+        with closing(sqlite3.connect("src/dbm/sensei.db")) as conn:
+            c = conn.cursor()
+            c.execute("UPDATE dojos SET role_admin = :role_id WHERE id = :id",
+                      {"role_id": role.id, "id": ctx.guild.id})
+            conn.commit()
+        conn.close()
         # command feedback
         title = "Role was successfully set"
         asyncio.create_task(cmd_helper.feedback(ctx, title, ""))
@@ -31,7 +39,14 @@ class SetRole(SlashCommandGroup):
         # get dojo reference
         dojo = self.bot.dojos[ctx.guild.id]
         # change role
-        dojo.moderator_role = role
+        dojo.moderator_role_id = role.id
+        with closing(sqlite3.connect("src/dbm/sensei.db")) as conn:
+            c = conn.cursor()
+            c.execute("UPDATE dojos SET role_mod = :role_id WHERE id = :id",
+                      {"role_id": role.id, "id": ctx.guild.id})
+            conn.commit()
+        conn.close()
+
         # command feedback
         title = "Role was successfully set"
         asyncio.create_task(cmd_helper.feedback(ctx, title, ""))
@@ -40,6 +55,7 @@ class SetRole(SlashCommandGroup):
     @admin.error
     @moderator.error
     async def role_error(ctx, error):
+        print(error)
         if isinstance(error, ApplicationCommandInvokeError):
             title = "Missing Permissions"
             feedback = "You are missing Administrator permission to run this command."

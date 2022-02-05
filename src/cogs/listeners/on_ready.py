@@ -1,8 +1,7 @@
+import sqlite3
+from contextlib import closing
 from discord.ext.commands import Cog
-import asyncio
-import json
 
-from src.session import Session, env_manager
 from src.dojo import Dojo
 
 
@@ -16,46 +15,24 @@ class OnReady(Cog):
         Called when the client is done preparing the data received from Discord.
         Usually after login is successful and the Client.guilds and co. are filled up.
         """
-        for guild in self.bot.guilds:
-            dojo = Dojo(guild=guild, bot=self.bot)
-            self.bot.dojos[guild.id] = dojo
-        # serialize old session instances
-        for guild in self.bot.guilds:
-            for category in guild.categories:
-                if "🍅" in category.name:
-                    asyncio.create_task(self.serialize(category))
-
+        with closing(sqlite3.connect("src/dbm/sensei.db")) as conn:
+            c = conn.cursor()
+            for guild in self.bot.guilds:
+                # search in db for guild.id
+                c.execute(" SELECT * FROM dojos WHERE id=:id", {"id": guild.id})
+                result = c.fetchone()
+                # instantiate dojo from db entry
+                if result:
+                    dojo = Dojo.from_db(guild, self.bot, result[2], result[3], result[4])
+                    self.bot.dojos[guild.id] = dojo
+                # create new dojo (edge case so print smt in console)
+                else:
+                    dojo = Dojo.new_db_entry(guild, self.bot, c)
+                    conn.commit()
+                    self.bot.dojos[guild.id] = dojo
+        conn.close()
         # print all connected guilds
         all_guilds = [guild.name for guild in self.bot.guilds]
         print(f'{self.bot.user} is connected to the following guilds: \n{all_guilds}')
         print('READY\n')
 
-    # helper function to fetch old sessions
-    async def serialize(self, category):
-        """
-        Searches for all pomodoro sessions on the server
-        to reinitialize lost instances during a restart.
-
-        param category: category of session to serialize
-        """
-        # get dojo reference
-        dojo = self.bot.dojos[category.guild.id]
-        # find message with session config
-        for tc in category.text_channels:
-            if tc is not None:
-                if tc.name == Session.config_label:
-                    async for msg in tc.history():
-                        if msg.author == self.bot.user and msg.content.startswith('Session config:'):
-                            # parse string representation of json
-                            config_json = str(msg.content)[15::]
-                            config = json.loads(config_json)
-                            # create session instance from json
-                            Session(
-                                dojo=dojo,
-                                category=category,
-                                work_time=config["work_time"],
-                                break_time=config["pause_time"],
-                                repetitions=config["number_sessions"],
-                                session_name=config["name"],
-                                is_new_session=False
-                            )
