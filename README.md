@@ -1,13 +1,13 @@
 
 A Discord Bot that automatically manages your study group using the Pomodoro Technique.    
 If you enjoy my work, consider supporting me on [Ko-fi](https://ko-fi.com/shroominic) :)
-###[**Invite Sensei Doro**](https://discord.com/api/oauth2/authorize?client_id=928304609636794388&permissions=21048400&scope=bot%20applications.commands)  to your discord server!
+### [**Invite Sensei Doro**](https://discord.com/api/oauth2/authorize?client_id=928304609636794388&permissions=21048400&scope=bot%20applications.commands)  to your discord server!
 ###### Please keep in mind that the bot will not work properly if you do not accept all required permissions.
 
 The Idea
 --------
-The **Pomodoro Technique** is a time management method that has been used to boost productivity for students and workers since 1980.  
-A *Pomodoro* was typically `25 minutes of work` with `5 minutes break`, tracked using a *Pomodoro timer* (a tomato kitchen timer).   
+The **Pomodoro Technique** is a time management method that has been used to boost productivity for students and workers since 1980.
+A *Pomodoro* was typically `25 minutes of work` with `5 minutes break`, tracked using a *Pomodoro timer* (a tomato kitchen timer).
 After completing four Pomodoros, you would take an extended break (15-30 minutes) and begin the process again.
 
 
@@ -37,14 +37,14 @@ You can interact with the bot using discord `/` slash commands.
 
 ######Notation: `<required argument>` , `[optional arg]{default value}` , `<'subcommands'|'to'|'choose'|'from'>`   
 
-###Setup
+### Setup
 * Show help information: `/help [config]`   
 - General configuration: `/config <'mute_admins'| > <true/false>` (more coming soon)
 * Set your own roles to control command permissions: `/role <'admin'|'moderator'> <@your_role>`
 - Create a new pomodoro environment: `/create [name]{"Pomorodo"} [work_time]{25} [break_time]{5} [repetitions]{4}`   
 
 
-###Session
+### Session
 * Start a session: `click on *START SESSION*`
 - Edit the session: `/session edit <'name'|'work_time'|'break_time'|'repetitions'> <value>`
 * Force a break: `/session break`
