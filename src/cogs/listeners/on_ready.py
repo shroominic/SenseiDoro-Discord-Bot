@@ -30,7 +30,7 @@ class OnReady(Cog):
                     dojo = Dojo.new_db_entry(guild, self.bot, c)
                     conn.commit()
                     self.bot.dojos[guild.id] = dojo
-        conn.close()
+
         # print all connected guilds
         all_guilds = [guild.name for guild in self.bot.guilds]
         print(f'{self.bot.user} is connected to the following guilds: \n{all_guilds}')
