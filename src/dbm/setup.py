@@ -1,10 +1,11 @@
 import sqlite3
 import os
+from contextlib import closing
 
 
 def setup_database(db_file):
     """ some description """
-    with sqlite3.connect(db_file) as conn:
+    with closing(sqlite3.connect(db_file)) as conn:
         c = conn.cursor()
         c.execute("""CREATE TABLE dojos (
                     id integer,
@@ -13,6 +14,7 @@ def setup_database(db_file):
                     role_mod text,
                     cfg_mute_admins integer
                     )""")
+        conn.commit()
 
 
 def main():
