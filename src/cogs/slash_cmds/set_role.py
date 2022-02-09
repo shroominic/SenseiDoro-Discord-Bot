@@ -8,7 +8,7 @@ import discord
 from discord import SlashCommandGroup, slash_command, ApplicationCommandInvokeError
 from discord.ext.commands import has_permissions
 
-from src.cogs.slash_cmds import cmd_helper
+from src.cogs.better_response import response
 
 
 class SetRole(SlashCommandGroup):
@@ -29,9 +29,9 @@ class SetRole(SlashCommandGroup):
                       {"role_id": role.id, "id": ctx.guild.id})
             conn.commit()
         conn.close()
-        # command feedback
+        # command response
         title = "Role was successfully set"
-        asyncio.create_task(cmd_helper.feedback(ctx, title, ""))
+        asyncio.create_task(response(ctx, title, ""))
 
     @slash_command()
     @has_permissions(administrator=True)
@@ -47,9 +47,9 @@ class SetRole(SlashCommandGroup):
             conn.commit()
         conn.close()
 
-        # command feedback
+        # command response
         title = "Role was successfully set"
-        asyncio.create_task(cmd_helper.feedback(ctx, title, ""))
+        asyncio.create_task(response(ctx, title, ""))
 
     @staticmethod
     @admin.error
@@ -59,7 +59,7 @@ class SetRole(SlashCommandGroup):
         if isinstance(error, ApplicationCommandInvokeError):
             title = "Missing Permissions"
             feedback = "You are missing Administrator permission to run this command."
-            asyncio.create_task(cmd_helper.feedback(ctx, title, feedback))
+            asyncio.create_task(response(ctx, title, feedback))
         else:
             print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
             traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)

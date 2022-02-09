@@ -1,7 +1,7 @@
 from discord.ext import commands
 import asyncio
 
-from src.cogs.slash_cmds import cmd_helper
+from src.cogs.better_response import response
 from src.session import Session
 
 
@@ -28,7 +28,7 @@ class Create(commands.Cog):
             # error feedback
             title = "Session limit reached"
             feedback = "You can currently have only {dojo.session_limit} sessions on your server."
-            asyncio.create_task(cmd_helper.feedback(ctx, title, feedback, 10))
+            asyncio.create_task(response(ctx, title, feedback, 10))
             return
 
         # create new session
@@ -43,4 +43,4 @@ class Create(commands.Cog):
 
         # command feedback
         title = "Session successfully created"
-        asyncio.create_task(cmd_helper.feedback(ctx, title))
+        asyncio.create_task(response(ctx, title))
