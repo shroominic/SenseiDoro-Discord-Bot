@@ -8,6 +8,7 @@ import discord
 from discord import SlashCommandGroup, slash_command, ApplicationCommandInvokeError
 from discord.ext.commands import has_permissions
 
+from src.cogs.useful_decoration import default_feedback
 from src.cogs.better_response import response
 
 
@@ -18,6 +19,7 @@ class SetRole(SlashCommandGroup):
 
     @slash_command()
     @has_permissions(administrator=True)
+    @default_feedback(title="Role was successfully set")
     async def admin(self, ctx, role: discord.Role):
         # get dojo reference
         dojo = self.bot.dojos[ctx.guild.id]
@@ -28,13 +30,10 @@ class SetRole(SlashCommandGroup):
             c.execute("UPDATE dojos SET role_admin = :role_id WHERE id = :id",
                       {"role_id": role.id, "id": ctx.guild.id})
             conn.commit()
-        conn.close()
-        # command response
-        title = "Role was successfully set"
-        asyncio.create_task(response(ctx, title, ""))
 
     @slash_command()
     @has_permissions(administrator=True)
+    @default_feedback(title="Role was successfully set")
     async def moderator(self, ctx, role: discord.Role):
         # get dojo reference
         dojo = self.bot.dojos[ctx.guild.id]
@@ -45,11 +44,6 @@ class SetRole(SlashCommandGroup):
             c.execute("UPDATE dojos SET role_mod = :role_id WHERE id = :id",
                       {"role_id": role.id, "id": ctx.guild.id})
             conn.commit()
-        conn.close()
-
-        # command response
-        title = "Role was successfully set"
-        asyncio.create_task(response(ctx, title, ""))
 
     @staticmethod
     @admin.error

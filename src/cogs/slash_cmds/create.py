@@ -1,6 +1,7 @@
 from discord.ext import commands
 import asyncio
 
+from src.cogs.useful_decoration import default_feedback
 from src.cogs.better_response import response
 from src.session import Session
 
@@ -10,6 +11,7 @@ class Create(commands.Cog):
         self.bot = bot
 
     @commands.slash_command()
+    @default_feedback(title="Session successfully created")
     async def create(self, ctx, name: str = "Pomodoro", work_time: int = 25, break_time: int = 5, repetitions: int = 4):
         """
         Creates a new session environment with a session instance.
@@ -40,7 +42,3 @@ class Create(commands.Cog):
             repetitions=repetitions,
             session_name=name,
             is_new_session=True)
-
-        # command feedback
-        title = "Session successfully created"
-        asyncio.create_task(response(ctx, title))

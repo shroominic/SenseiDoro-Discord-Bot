@@ -1,8 +1,8 @@
 import asyncio
 
-import discord
 from discord import SlashCommandGroup, slash_command
 
+from src.cogs.useful_decoration import default_feedback
 from src.cogs.better_response import response
 from src.session import tools
 
@@ -13,24 +13,20 @@ class SessionCmd(SlashCommandGroup):
         self.bot = bot
 
     @slash_command()
+    @default_feedback(title="Session successfully deleted.")
     async def delete(self, ctx):
         """ Use this command to delete your 🍅 session."""
         # get session instance
         session = await tools.get_session(ctx.channel, self.bot)
         await session.dispose()
-        # feedback
-        title = "Session successfully deleted."
-        asyncio.create_task(response(ctx, title))
 
     @slash_command()
+    @default_feedback(title="Session successfully reset.")
     async def reset(self, ctx):
         """ Use this command to reset your 🍅 session. """
         # get session instance
         session = await tools.get_session(ctx.channel, self.bot)
         await session.reset_session()
-        # feedback
-        title = "Session successfully reset."
-        asyncio.create_task(response(ctx, title))
 
     @slash_command(name="break")
     async def _break(self, ctx, minutes: int = 420):
@@ -55,8 +51,8 @@ class SessionCmd(SlashCommandGroup):
     @slash_command()
     async def edit(self, ctx, to_edit: str, value: str):
         """ Use this command to edit your 🍅 session.
-            :parameter to_edit: you can edit: 'name', 'work_time', 'break_time' or 'repetitions'
-            :parameter value: new value of to_edit
+            :param to_edit: you can edit: 'name', 'work_time', 'break_time' or 'repetitions'
+            :param value: new value of to_edit
         """
         # get session reference
         session = await tools.get_session(ctx.channel, self.bot)
