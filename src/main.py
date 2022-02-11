@@ -31,7 +31,8 @@ def run():
     bot.add_cog(CommandErrHandler(bot))
     bot.add_cog(DebugTools(bot))
     # tasks
-    bot.add_cog(TopGGUpdate(bot))
+    bot.tgg = TopGGUpdate(bot)
+    bot.add_cog(bot.tgg)
     # overwrite help cmd
     bot.remove_command('help')
     bot.add_cog(Help(bot))

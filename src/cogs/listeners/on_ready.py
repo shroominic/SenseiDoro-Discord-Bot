@@ -36,3 +36,6 @@ class OnReady(Cog):
         print(f'{self.bot.user} is connected to the following guilds: \n{all_guilds}')
         print('READY\n')
 
+        # update top.gg
+        self.bot.tgg.update_stats.start()
+
