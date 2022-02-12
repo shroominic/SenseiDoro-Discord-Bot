@@ -17,11 +17,13 @@ class OnVSUpdate(Cog, name='OnVSUpdate module'):
         :param before: state before update
         :param after: state after update
         """
-        if before.channel is not None:
-            if before.channel.name == Session.start_button_label:
-                # only workaround?
+
+        if after.channel:
+            if before.channel and before.channel.name == Session.start_button_label:
+                # remove multiple calls from the same person
                 return
-        if after.channel is not None:
+
             if after.channel.name == Session.start_button_label:
-                session = await tools.get_session(after.channel, self.bot)
-                asyncio.create_task(session.start_session(member))
+                if len(after.channel.members) == 1:
+                    session = await tools.get_session(after.channel, self.bot)
+                    asyncio.create_task(session.start_session(member))
