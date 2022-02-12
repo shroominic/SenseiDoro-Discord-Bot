@@ -69,7 +69,10 @@ class Session:
         # start session timer
         asyncio.create_task(self.timer.start_timer())
         # start auto reset task
-        self.reset_if_empty.start()
+        if not self.reset_if_empty.is_running():
+            self.reset_if_empty.start()
+        else:
+            self.reset_if_empty.restart()
 
     ##################
     #   NAVIGATION   #
