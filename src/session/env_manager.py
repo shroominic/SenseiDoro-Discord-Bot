@@ -65,6 +65,9 @@ async def create_from_old_environment(session):
             session.info_channel_pointer = tc
         if session.config_label in channel_name:
             session.config_channel_pointer = tc
+    # changes to activ servers
+    if session.info_channel_pointer.name != session.information_label:
+        await session.info_channel_pointer.edit(name=session.information_label)
     # catch msg references
     async for msg in session.config_channel_pointer.history():
         if msg.author == session.dojo.bot.user and msg.content.startswith('Session config:'):
