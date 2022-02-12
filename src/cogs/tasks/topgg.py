@@ -16,7 +16,7 @@ class TopGGUpdate(commands.Cog):
 
     @tasks.loop(minutes=30)
     async def update_stats(self):
-        """This function runs every 30 minutes to automatically update your server count."""
+        """This function runs every 30 minutes to automatically update the server count."""
         if self.dbl_token == "DEBUG":
             print(f"DEBUG MODE: Posted server count ({self.bot.topggpy.guild_count})")
         else:
