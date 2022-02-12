@@ -1,4 +1,5 @@
 import discord
+from discord.ext import tasks
 
 from . import env_manager
 from .timer import Timer
@@ -10,8 +11,8 @@ import json
 class Session:
     # channel labels
     start_button_label = "START SESSION"
-    session_break_label = "Take a break, ma mate!"
-    information_label = "information"
+    break_time_label = "Break time!"
+    information_label = "info"
     config_label = "config"
     lobby_label = "Lobby"
     chat_label = "chat"
@@ -67,6 +68,8 @@ class Session:
             await member.edit(mute=True)
         # start session timer
         asyncio.create_task(self.timer.start_timer())
+        # start auto reset task
+        self.reset_if_empty.start()
 
     ##################
     #   NAVIGATION   #
@@ -86,7 +89,7 @@ class Session:
 
     async def take_a_break(self):
         # move members to lobby and unmute admins
-        label = self.session_break_label
+        label = self.break_time_label
         await self.reset_members_and_work_channel(label)
 
     async def force_break(self, minutes):
@@ -115,6 +118,7 @@ class Session:
     async def reset_session(self):
         # resets
         self.timer.reset()
+        self.reset_if_empty.stop()
         await self.reset_members_and_work_channel(self.start_button_label)
         # delete timer msg
         if self.timer.info_msg:
@@ -136,6 +140,22 @@ class Session:
     ###############
     #    TOOLS    #
     ###############
+
+    @property
+    def member_count(self) -> int:
+        return len(self.lobby_channel_pointer.members) + len(self.work_channel_pointer.members)
+
+    @property
+    async def is_empty(self) -> bool:
+        if self.member_count == 0:
+            await asyncio.sleep(10)
+            return self.member_count == 0
+        return False
+
+    @tasks.loop(minutes=1)
+    async def reset_if_empty(self):
+        if await self.is_empty:
+            asyncio.create_task(self.reset_session())
 
     async def reset_members_and_work_channel(self, work_channel_label):
         """ move all members back to lobby and unmute admins """

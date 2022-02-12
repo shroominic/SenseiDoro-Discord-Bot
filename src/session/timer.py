@@ -10,7 +10,7 @@ class Timer:
         self.session = session
         self.info_msg = None
         # settings
-        self.tick = 10
+        self.tick = 15
         self.work_time = work_time
         self.break_time = break_time
         self.repetitions = repetitions
@@ -48,8 +48,8 @@ class Timer:
     async def timer(self):
         next_call = time.time()
         while self.is_active:
-            # change tick size to 1 at the last 10 seconds
-            if self.seconds_left <= 10:
+            # change tick size to 1 at the last 15 seconds
+            if self.seconds_left <= 15:
                 tick = 1
             else:
                 tick = self.tick

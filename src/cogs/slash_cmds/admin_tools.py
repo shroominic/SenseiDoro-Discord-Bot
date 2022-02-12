@@ -2,7 +2,7 @@ import asyncio
 
 from discord.ext import commands
 
-from src.cogs.slash_cmds import cmd_helper
+from src.cogs.better_response import response
 
 
 class DebugTools(commands.Cog):
@@ -13,15 +13,17 @@ class DebugTools(commands.Cog):
     async def debug(self, ctx):
         """ debug cmd group """
         if ctx.invoked_subcommand is None:
+            # command response
             title = "Wrong argument"
-            asyncio.create_task(cmd_helper.feedback(ctx, title))
+            asyncio.create_task(response(ctx, title))
 
     @debug.group()
     async def delete(self, ctx):
         """ delete cmd group """
         if ctx.invoked_subcommand is None:
+            # command response
             title = "Wrong argument"
-            asyncio.create_task(cmd_helper.feedback(ctx, title))
+            asyncio.create_task(response(ctx, title))
 
     @delete.command()
     async def envs(self, ctx):
@@ -29,7 +31,7 @@ class DebugTools(commands.Cog):
         # cmd only for me
         if ctx.author.id == 302:
             title = "Okay sir I'll clean your room!"
-            asyncio.create_task(cmd_helper.feedback(ctx, title))
+            asyncio.create_task(response(ctx, title))
             # get dojo reference
             for category in ctx.guild.categories:
                 if "🍅" in category.name:
@@ -49,18 +51,18 @@ class DebugTools(commands.Cog):
             # delete all messages inside message.channel
             async for msg in ctx.channel.history():
                 asyncio.create_task(msg.delete())
-            # command feedback
+            # command response
             title = "Okay sir I'll delete your messages!"
-            asyncio.create_task(cmd_helper.feedback(ctx, title))
+            asyncio.create_task(response(ctx, title))
 
     @delete.command()
     async def sessions(self, ctx):
         """ Removes all Session environments from the bot. """
         # cmd only for me
         if ctx.author.id == 302:
-            # command feedback
+            # command response
             title = "Okay sir I'll delete your sessions!"
-            asyncio.create_task(cmd_helper.feedback(ctx, title))
+            asyncio.create_task(response(ctx, title))
             # get dojo reference
             dojo = self.bot.dojos[ctx.guild.id]
             # delete all sessions in ctx.guild

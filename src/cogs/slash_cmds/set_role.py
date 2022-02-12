@@ -8,7 +8,8 @@ import discord
 from discord import SlashCommandGroup, slash_command, ApplicationCommandInvokeError
 from discord.ext.commands import has_permissions
 
-from src.cogs.slash_cmds import cmd_helper
+from src.cogs.useful_decoration import default_feedback
+from src.cogs.better_response import response
 
 
 class SetRole(SlashCommandGroup):
@@ -18,6 +19,7 @@ class SetRole(SlashCommandGroup):
 
     @slash_command()
     @has_permissions(administrator=True)
+    @default_feedback(title="Role was successfully set")
     async def admin(self, ctx, role: discord.Role):
         # get dojo reference
         dojo = self.bot.dojos[ctx.guild.id]
@@ -28,13 +30,10 @@ class SetRole(SlashCommandGroup):
             c.execute("UPDATE dojos SET role_admin = :role_id WHERE id = :id",
                       {"role_id": role.id, "id": ctx.guild.id})
             conn.commit()
-        conn.close()
-        # command feedback
-        title = "Role was successfully set"
-        asyncio.create_task(cmd_helper.feedback(ctx, title, ""))
 
     @slash_command()
     @has_permissions(administrator=True)
+    @default_feedback(title="Role was successfully set")
     async def moderator(self, ctx, role: discord.Role):
         # get dojo reference
         dojo = self.bot.dojos[ctx.guild.id]
@@ -45,11 +44,6 @@ class SetRole(SlashCommandGroup):
             c.execute("UPDATE dojos SET role_mod = :role_id WHERE id = :id",
                       {"role_id": role.id, "id": ctx.guild.id})
             conn.commit()
-        conn.close()
-
-        # command feedback
-        title = "Role was successfully set"
-        asyncio.create_task(cmd_helper.feedback(ctx, title, ""))
 
     @staticmethod
     @admin.error
@@ -59,7 +53,7 @@ class SetRole(SlashCommandGroup):
         if isinstance(error, ApplicationCommandInvokeError):
             title = "Missing Permissions"
             feedback = "You are missing Administrator permission to run this command."
-            asyncio.create_task(cmd_helper.feedback(ctx, title, feedback))
+            asyncio.create_task(response(ctx, title, feedback))
         else:
             print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
             traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
