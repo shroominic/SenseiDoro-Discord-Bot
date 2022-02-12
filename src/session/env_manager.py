@@ -52,14 +52,16 @@ async def create_from_old_environment(session):
             session.lobby_channel_pointer = vc
         if session.start_button_label in channel_name \
                 or "Session" in channel_name \
-                or session.session_break_label in channel_name:
+                or session.break_time_label in channel_name\
+                or "Take a break" in channel_name:  # TODO only temp
             session.work_channel_pointer = vc
     # catch text_channels
     for tc in session.category_pointer.text_channels:
         channel_name = tc.name
         if session.chat_label in channel_name:
             session.chat_channel_pointer = tc
-        if session.information_label in channel_name:
+        if session.information_label in channel_name\
+                or "information" in channel_name:  # TODO only temp
             session.info_channel_pointer = tc
         if session.config_label in channel_name:
             session.config_channel_pointer = tc

@@ -10,8 +10,8 @@ import json
 class Session:
     # channel labels
     start_button_label = "START SESSION"
-    session_break_label = "Take a break, ma mate!"
-    information_label = "information"
+    break_time_label = "Break time!"
+    information_label = "info"
     config_label = "config"
     lobby_label = "Lobby"
     chat_label = "chat"
@@ -86,7 +86,7 @@ class Session:
 
     async def take_a_break(self):
         # move members to lobby and unmute admins
-        label = self.session_break_label
+        label = self.break_time_label
         await self.reset_members_and_work_channel(label)
 
     async def force_break(self, minutes):
