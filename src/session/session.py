@@ -59,10 +59,11 @@ class Session:
 
     async def start_session(self, member):
         # close session so no one can join during work_time
-        asyncio.create_task(self.work_channel_pointer.set_permissions(self.dojo.guild.me,
-                                                                      connect=True))
-        asyncio.create_task(self.work_channel_pointer.set_permissions(self.dojo.guild.default_role,
-                                                                      connect=False, speak=False))
+        # asyncio.create_task(self.work_channel_pointer.set_permissions(self.dojo.guild.me,
+        #                                                              connect=True))
+        # asyncio.create_task(self.work_channel_pointer.set_permissions(self.dojo.guild.default_role,
+        #                                                              connect=False, speak=False))
+
         # init session
         if member.guild_permissions.administrator and self.dojo.mute_admins:
             await member.edit(mute=True)

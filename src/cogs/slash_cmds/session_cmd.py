@@ -1,6 +1,6 @@
 import asyncio
 
-from discord import SlashCommandGroup, slash_command
+from discord import SlashCommandGroup, slash_command, Option
 
 from src.cogs.useful_decoration import default_feedback
 from src.cogs.better_response import response
@@ -49,7 +49,10 @@ class SessionCmd(SlashCommandGroup):
             asyncio.create_task(response(ctx, title, feedback, 10))
 
     @slash_command()
-    async def edit(self, ctx, to_edit: str, value: str):
+    async def edit(self, ctx, to_edit: Option(str,
+                                              "What you want to edit.",
+                                              choices=['name', 'work_time', 'break_time', 'repetitions']),
+                   value: str):
         """ Use this command to edit your 🍅 session.
             :param to_edit: you can edit: 'name', 'work_time', 'break_time' or 'repetitions'
             :param value: new value of to_edit
