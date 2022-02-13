@@ -33,7 +33,6 @@ Features
 * Sensei Doro shows a timer with your work/break time.
 * When you start a new study session, it starts automatically for all your peers waiting inside the lobby channel.
 * During work time, everyone is muted, during the break, you can talk with your study mates.
-* The Sensei automatically mutes everyone during work time and the opposite during break time.
 * You can control the session with different `/session` commands
 
 Demo
