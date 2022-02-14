@@ -27,7 +27,7 @@ class Help(commands.Cog):
                 discord.Embed(
                     title="Or help me :)",
                     description="""
-                        [✌ Invite](https://t.ly/fUKi) - [⬆ Vote](https://top.gg/bot/928304609636794388/vote) - [☕ Buy me a coffee](https://ko-fi.com/shroominic)
+                        [✌ Invite](https://discord.com/oauth2/authorize?client_id=928304609636794388&permissions=21048400&scope=bot%20applications.commands) - [⬆ Vote](https://top.gg/bot/928304609636794388/vote) - [☕ Buy me a coffee](https://ko-fi.com/shroominic)
                         """,
                     color=0x00ff00)],
             [
