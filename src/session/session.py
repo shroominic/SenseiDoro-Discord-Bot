@@ -74,6 +74,8 @@ class Session:
             self.reset_if_empty.start()
         else:
             self.reset_if_empty.restart()
+        # Logging
+        print(self.dojo.guild.name, "started a session with ", self.member_count, " members.")
 
     ##################
     #   NAVIGATION   #
@@ -120,6 +122,8 @@ class Session:
             asyncio.create_task(set_old_break_time())
 
     async def reset_session(self):
+        # Logging
+        print(self.dojo.guild.name, "reset a session with ", self.member_count, " members.")
         # resets
         self.timer.reset()
         self.reset_if_empty.stop()
