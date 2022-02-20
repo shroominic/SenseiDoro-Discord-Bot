@@ -4,6 +4,18 @@ import functools
 from src.cogs.better_response import slash_response
 
 
+def only_admin_debug(func):
+    @functools.wraps(func)
+    async def wrapper(*args, **kwargs):
+        ctx = args[1]
+        if ctx.author.id == 137925139621871616:
+            # function application
+            return await func(*args, **kwargs)
+        else:
+            print(ctx.author.name, "tried to access debug functions")
+    return wrapper
+
+
 def default_feedback(title, description="", seconds_visible=10):
     def _default_feedback(func):
         @functools.wraps(func)

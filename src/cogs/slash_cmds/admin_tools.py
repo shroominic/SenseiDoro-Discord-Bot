@@ -1,7 +1,9 @@
 import asyncio
 
+import discord
 from discord.ext import commands
 
+from cogs.useful_decoration import only_admin_debug
 from src.cogs.better_response import response
 
 
@@ -16,6 +18,32 @@ class DebugTools(commands.Cog):
             # command response
             title = "Wrong argument"
             asyncio.create_task(response(ctx, title))
+
+    @debug.group()
+    async def doro(self, ctx):
+        """ doro cmd group """
+        if ctx.invoked_subcommand is None:
+            # command response
+            title = "Wrong argument"
+            asyncio.create_task(response(ctx, title))
+
+    @doro.command()
+    @only_admin_debug
+    async def running_sessions(self, ctx):
+        msg = discord.Embed(title="Run Information")
+        active_sessions = 0
+        active_members = 0
+        for dojo in self.bot.dojos.values():
+            for session in dojo.sessions.values():
+                active_members += session.member_count
+                if session.timer.is_active:
+                    active_sessions += 1
+
+        msg.description = f"""
+            Active sessions: {active_sessions}
+            Active members : {active_members} 
+        """
+        await ctx.send(embed=msg)
 
     @debug.group()
     async def delete(self, ctx):
