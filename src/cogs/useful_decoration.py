@@ -1,7 +1,7 @@
 import asyncio
 import functools
 
-from src.cogs.better_response import response
+from src.cogs.better_response import slash_response
 
 
 def default_feedback(title, description="", seconds_visible=10):
@@ -12,7 +12,7 @@ def default_feedback(title, description="", seconds_visible=10):
             result = await func(*args, **kwargs)
             # feedback
             ctx = args[1]
-            asyncio.create_task(response(ctx, title, description, seconds_visible))
+            asyncio.create_task(slash_response(ctx, title, description, seconds_visible))
             # func return
             return result
         return wrapper
@@ -35,11 +35,11 @@ def admin_required(func):
         elif not role:
             title = "Admin role not set"
             feedback = "Type `/role admin @YOUR_ADMIN_ROLE` to use this command."
-            asyncio.create_task(response(ctx, title, feedback))
+            asyncio.create_task(slash_response(ctx, title, feedback))
         else:
             title = "Missing Role"
             feedback = f"Only user with @{role.name} can run this command."
-            asyncio.create_task(response(ctx, title, feedback))
+            asyncio.create_task(slash_response(ctx, title, feedback))
     return wrapper
 
 
@@ -59,9 +59,9 @@ def mod_required(func):
         elif not role:
             title = "Moderator role not set"
             feedback = "Type `/role moderator @YOUR_MOD_ROLE` to use this command."
-            asyncio.create_task(response(ctx, title, feedback))
+            asyncio.create_task(slash_response(ctx, title, feedback))
         else:
             title = "Missing Role"
             feedback = f"Only user with @{role.name} can run this command."
-            asyncio.create_task(response(ctx, title, feedback))
+            asyncio.create_task(slash_response(ctx, title, feedback))
     return wrapper
