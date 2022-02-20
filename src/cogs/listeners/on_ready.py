@@ -25,7 +25,7 @@ class OnReady(Cog):
                 if result:
                     dojo = Dojo.from_db(guild, self.bot, result[2], result[3], result[4])
                     self.bot.dojos[guild.id] = dojo
-                # create new dojo (edge case so print smt in console)
+                # create new dojo (uncommon)
                 else:
                     dojo = Dojo.new_db_entry(guild, self.bot, c)
                     conn.commit()
@@ -33,8 +33,7 @@ class OnReady(Cog):
 
         # print all connected guilds
         all_guilds = [guild.name for guild in self.bot.guilds]
-        print(f'{self.bot.user} is connected to the following guilds: \n{all_guilds}')
-        print('READY\n')
+        print(f'{self.bot.user} is ready and connected to the following guilds: \n{all_guilds}')
 
         # update top.gg
         self.bot.tgg.update_stats.start()
