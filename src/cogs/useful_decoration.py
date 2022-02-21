@@ -1,7 +1,6 @@
-import asyncio
 import functools
 
-from src.cogs.better_response import slash_response
+from .better_response import slash_response
 
 
 def only_admin_debug(func):

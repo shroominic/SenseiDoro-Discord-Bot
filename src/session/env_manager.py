@@ -52,22 +52,17 @@ async def create_from_old_environment(session):
             session.lobby_channel_pointer = vc
         if session.start_button_label in channel_name \
                 or "Session" in channel_name \
-                or session.break_time_label in channel_name\
-                or "Take a break" in channel_name:  # TODO only temp
+                or session.break_time_label in channel_name:
             session.work_channel_pointer = vc
     # catch text_channels
     for tc in session.category_pointer.text_channels:
         channel_name = tc.name
         if session.chat_label in channel_name:
             session.chat_channel_pointer = tc
-        if session.information_label in channel_name\
-                or "information" in channel_name:  # TODO only temp
+        if session.information_label in channel_name:
             session.info_channel_pointer = tc
         if session.config_label in channel_name:
             session.config_channel_pointer = tc
-    # changes to activ servers
-    if session.info_channel_pointer.name != session.information_label:
-        await session.info_channel_pointer.edit(name=session.information_label)
     # catch msg references
     async for msg in session.config_channel_pointer.history():
         if msg.author == session.dojo.bot.user and msg.content.startswith('Session config:'):

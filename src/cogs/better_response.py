@@ -13,7 +13,7 @@ async def _slash_response(context, title: str, description: str, seconds_until_d
     await context.respond(embed=embed_msg)
     # sleep until feedback gets removed again
     await asyncio.sleep(seconds_until_dispose)
-    if context:
+    if context.response:
         asyncio.create_task(context.delete())
 
 
@@ -23,17 +23,14 @@ def slash_response(context, title: str, description: str = "", seconds_until_dis
 
 
 # response
-async def _response(context, title: str, description: str, seconds_until_dispose: int):
+async def _response(context, title: str, description: str, delete_after: int):
     """ feedback in response to commands, both messages will automatically get removed """
     embed_msg = discord.Embed(title=title)
-    if description != "":
-        embed_msg.description = description
+    embed_msg.description = description if description != "" else None
+    # delete cmd msg
+    await context.message.delete()
     # send feedback message
-    await context.send(embed=embed_msg)
-    # sleep until feedback gets removed again
-    await asyncio.sleep(seconds_until_dispose)
-    if context:
-        asyncio.create_task(context.delete())
+    await context.send(embed=embed_msg, delete_after=delete_after)
 
 
 def response(context, title: str, description: str = "", seconds_until_dispose: int = 10):
