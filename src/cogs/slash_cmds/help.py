@@ -5,8 +5,12 @@ from discord.ext import commands, pages
 help1 = discord.Embed(
             title="Help",
             description="""
-                You can navigate through the help pages using the buttons below.
+                You can navigate through the help pages using the buttons below.    
                 
+                To get more help, give feedback or propose ideas:
+                [Join the Support Server](https://discord.gg/4gZxCAK9mb)
+                
+                A list of all commands available:
                 """,
             color=0x00ff00)
 help1.add_field(name="Setup", value="`/create`")
