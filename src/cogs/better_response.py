@@ -3,7 +3,8 @@ import asyncio
 import discord
 
 
-async def slash_response(context, title: str, description: str = "", seconds_until_dispose: int = 10):
+# slash response
+async def _slash_response(context, title: str, description: str, seconds_until_dispose: int):
     """ feedback in response to commands, both messages will automatically get removed """
     embed_msg = discord.Embed(title=title)
     if description != "":
@@ -16,7 +17,13 @@ async def slash_response(context, title: str, description: str = "", seconds_unt
         asyncio.create_task(context.delete())
 
 
-async def response(context, title: str, description: str = "", seconds_until_dispose: int = 10):
+def slash_response(context, title: str, description: str = "", seconds_until_dispose: int = 10):
+    """ async task wrapper for slash_response """
+    asyncio.create_task(_slash_response(context, title, description, seconds_until_dispose))
+
+
+# response
+async def _response(context, title: str, description: str, seconds_until_dispose: int):
     """ feedback in response to commands, both messages will automatically get removed """
     embed_msg = discord.Embed(title=title)
     if description != "":
@@ -27,3 +34,10 @@ async def response(context, title: str, description: str = "", seconds_until_dis
     await asyncio.sleep(seconds_until_dispose)
     if context:
         asyncio.create_task(context.delete())
+
+
+def response(context, title: str, description: str = "", seconds_until_dispose: int = 10):
+    """ async task wrapper for response """
+    asyncio.create_task(_response(context, title, description, seconds_until_dispose))
+
+

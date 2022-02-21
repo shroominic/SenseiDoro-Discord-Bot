@@ -1,5 +1,4 @@
 import traceback
-import asyncio
 import sys
 
 from discord.ext.commands import Cog, CommandNotFound
@@ -23,7 +22,7 @@ class CommandErrHandler(Cog):
             # command response
             title = "Command not found"
             feedback = "Sorry, I do not know this command."
-            asyncio.create_task(slash_response(ctx, title, feedback, 10))
+            slash_response(ctx, title, feedback, 10)
         else:
             print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
             traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)

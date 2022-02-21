@@ -17,7 +17,7 @@ class DebugTools(commands.Cog):
         if ctx.invoked_subcommand is None:
             # command response
             title = "Wrong argument"
-            asyncio.create_task(response(ctx, title))
+            response(ctx, title)
 
     @debug.group()
     async def doro(self, ctx):
@@ -25,7 +25,7 @@ class DebugTools(commands.Cog):
         if ctx.invoked_subcommand is None:
             # command response
             title = "Wrong argument"
-            asyncio.create_task(response(ctx, title))
+            response(ctx, title)
 
     @doro.command()
     @only_admin_debug
@@ -51,7 +51,7 @@ class DebugTools(commands.Cog):
         if ctx.invoked_subcommand is None:
             # command response
             title = "Wrong argument"
-            asyncio.create_task(response(ctx, title))
+            response(ctx, title)
 
     @delete.command()
     async def envs(self, ctx):
@@ -59,7 +59,7 @@ class DebugTools(commands.Cog):
         # cmd only for me
         if ctx.author.id == 302:
             title = "Okay sir I'll clean your room!"
-            asyncio.create_task(response(ctx, title))
+        response(ctx, title)
             # get dojo reference
             for category in ctx.guild.categories:
                 if "🍅" in category.name:
@@ -90,7 +90,7 @@ class DebugTools(commands.Cog):
         if ctx.author.id == 302:
             # command response
             title = "Okay sir I'll delete your sessions!"
-            asyncio.create_task(response(ctx, title))
+        response(ctx, title)
             # get dojo reference
             dojo = self.bot.dojos[ctx.guild.id]
             # delete all sessions in ctx.guild
