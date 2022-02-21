@@ -1,9 +1,7 @@
-import asyncio
-
 from discord import SlashCommandGroup, slash_command, Option
 
 from src.cogs.useful_decoration import default_feedback
-from src.cogs.better_response import response
+from src.cogs.better_response import slash_response
 from src.session import tools
 
 
@@ -41,12 +39,12 @@ class SessionCmd(SlashCommandGroup):
             # feedback
             title = "Current work session is reset."
             feedback = f"You now have a {session.timer.break_time} minutes break"
-            asyncio.create_task(response(ctx, title, feedback, 10))
+            slash_response(ctx, title, feedback, 10)
         else:
             # feedback
             title = "No active session."
             feedback = f"Dude, you can't have a break if you're not working!"
-            asyncio.create_task(response(ctx, title, feedback, 10))
+            slash_response(ctx, title, feedback, 10)
 
     @slash_command()
     async def edit(self, ctx, to_edit: Option(str,
@@ -65,36 +63,36 @@ class SessionCmd(SlashCommandGroup):
                 session.name = value
                 # feedback
                 title = "Name changed"
-                asyncio.create_task(response(ctx, title))
+                slash_response(ctx, title)
             else:
                 # error
                 title = "String required"
                 feedback = "Please input session name as a string."
-                asyncio.create_task(response(ctx, title, feedback))
+                slash_response(ctx, title, feedback)
         elif "work_time" in to_edit:
             if value.isnumeric():
                 work_time = int(value)
                 session.timer.work_time = work_time
                 # feedback
                 title = "Work time changed"
-                asyncio.create_task(response(ctx, title))
+                slash_response(ctx, title)
             else:
                 # error
                 title = "Integer required"
                 feedback = "Please input your work time in minutes."
-                asyncio.create_task(response(ctx, title, feedback))
+                slash_response(ctx, title, feedback)
         elif "break_time" in to_edit:
             if value.isnumeric():
                 break_time = int(value)
                 session.timer.break_time = break_time
                 # feedback
                 title = "Break time changed"
-                asyncio.create_task(response(ctx, title))
+                slash_response(ctx, title)
             else:
                 # error
                 title = "Integer required"
                 feedback = "Please input your break time in minutes."
-                asyncio.create_task(response(ctx, title, feedback))
+                slash_response(ctx, title, feedback)
         elif "repetitions" in to_edit:
             # get session instance
             session = await tools.get_session(ctx.channel, self.bot)
@@ -103,18 +101,18 @@ class SessionCmd(SlashCommandGroup):
                 session.timer.repetitions = repetitions
                 # feedback
                 title = "Repetitions changed"
-                asyncio.create_task(response(ctx, title))
+                slash_response(ctx, title)
             else:
                 # error
                 title = "Integer required"
                 feedback = "Please input the number of your repetitions."
-                asyncio.create_task(response(ctx, title, feedback))
+                slash_response(ctx, title, feedback)
             await session.update_edit()
         else:
             # error
             title = "Wrong argument"
             feedback = "Try /session edit <name/work_time/break_time/repetitions>"
-            asyncio.create_task(response(ctx, title, feedback))
+            slash_response(ctx, title, feedback)
         await session.update_edit()
 
     @staticmethod
@@ -125,4 +123,4 @@ class SessionCmd(SlashCommandGroup):
     async def session_error(ctx, error):
         title = "Wrong environment"
         feedback = "Please use this command only inside a session category."
-        asyncio.create_task(response(ctx, title, feedback))
+        slash_response(ctx, title, feedback)

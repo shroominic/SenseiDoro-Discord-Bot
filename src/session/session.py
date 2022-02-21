@@ -123,7 +123,7 @@ class Session:
 
     async def reset_session(self):
         # Logging
-        print(self.dojo.guild.name, "reset a session with ", self.member_count, " members.")
+        print("Session RESET - ", self.member_count, " members - ", self.dojo.guild.name)
         # resets
         self.timer.reset()
         self.reset_if_empty.stop()

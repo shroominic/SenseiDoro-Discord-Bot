@@ -1,7 +1,19 @@
 import asyncio
 import functools
 
-from src.cogs.better_response import response
+from src.cogs.better_response import slash_response
+
+
+def only_admin_debug(func):
+    @functools.wraps(func)
+    async def wrapper(*args, **kwargs):
+        ctx = args[1]
+        if ctx.author.id == 137925139621871616:
+            # function application
+            return await func(*args, **kwargs)
+        else:
+            print(ctx.author.name, "tried to access debug functions")
+    return wrapper
 
 
 def default_feedback(title, description="", seconds_visible=10):
@@ -12,7 +24,7 @@ def default_feedback(title, description="", seconds_visible=10):
             result = await func(*args, **kwargs)
             # feedback
             ctx = args[1]
-            asyncio.create_task(response(ctx, title, description, seconds_visible))
+            slash_response(ctx, title, description, seconds_visible)
             # func return
             return result
         return wrapper
@@ -35,11 +47,11 @@ def admin_required(func):
         elif not role:
             title = "Admin role not set"
             feedback = "Type `/role admin @YOUR_ADMIN_ROLE` to use this command."
-            asyncio.create_task(response(ctx, title, feedback))
+            slash_response(ctx, title, feedback)
         else:
             title = "Missing Role"
             feedback = f"Only user with @{role.name} can run this command."
-            asyncio.create_task(response(ctx, title, feedback))
+            slash_response(ctx, title, feedback)
     return wrapper
 
 
@@ -59,9 +71,9 @@ def mod_required(func):
         elif not role:
             title = "Moderator role not set"
             feedback = "Type `/role moderator @YOUR_MOD_ROLE` to use this command."
-            asyncio.create_task(response(ctx, title, feedback))
+            slash_response(ctx, title, feedback)
         else:
             title = "Missing Role"
             feedback = f"Only user with @{role.name} can run this command."
-            asyncio.create_task(response(ctx, title, feedback))
+            slash_response(ctx, title, feedback)
     return wrapper
