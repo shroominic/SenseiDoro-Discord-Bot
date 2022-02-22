@@ -115,6 +115,22 @@ class SessionCmd(SlashCommandGroup):
             slash_response(ctx, title, feedback)
         await session.update_edit()
 
+    @slash_command()
+    async def config(self, ctx, to_edit: str, value: bool):
+        """ Session configuration """
+        # get session reference
+        session = await tools.get_session(ctx.channel, self.bot)
+        if "mute_members" in to_edit:
+            session.config.mute_members = value
+        elif "mute_admins" in to_edit:
+            session.config.mute_admins = value
+        else:
+            # error
+            title = "Wrong argument"
+            feedback = "Try /session config <mute_members/mute_admins>"
+            slash_response(ctx, title, feedback)
+        await session.update_edit()
+
     @staticmethod
     @delete.error
     @reset.error

@@ -2,6 +2,7 @@ import discord
 from discord.ext import tasks
 
 from . import env_manager
+from .session_config import SessionConfig
 from .timer import Timer
 import asyncio
 import json
@@ -28,6 +29,7 @@ class Session:
                  ):
         self.name = session_name
         self.label = f"🍅 {self.name}"
+        self.config = SessionConfig()
         # references
         self.dojo = dojo
         self.category_pointer = category
@@ -59,8 +61,6 @@ class Session:
 
     async def start_session(self, member):
         # close session so no one can join during work_time
-        # asyncio.create_task(self.work_channel_pointer.set_permissions(self.dojo.guild.me,
-        #                                                              connect=True))
         # asyncio.create_task(self.work_channel_pointer.set_permissions(self.dojo.guild.default_role,
         #                                                              connect=False, speak=False))
 
@@ -180,7 +180,8 @@ class Session:
         if self.work_channel_pointer:
             await self.work_channel_pointer.delete()
         work_ow = {
-            self.dojo.guild.default_role: discord.PermissionOverwrite(speak=False)
+            self.dojo.guild.me: discord.PermissionOverwrite(connect=True),
+            self.dojo.guild.default_role: discord.PermissionOverwrite(speak=not self.config.mute_members)
         }
         self.work_channel_pointer = await self.dojo.guild.create_voice_channel(
             work_channel_label,
