@@ -3,8 +3,8 @@ title:       Sensei Doro Privacy Policy
 description: This page covers the Privacy Policy (Policy) of the Discord Bot "Sensei Doro".
 ---
 
-[Sensei's Terms of Service]: https://github.com/to_do_sensei_doro_tos
-[Sensei's Privacy Policy]:   https://github.com/to_do_sensei_doro_pp
+[Sensei's Terms of Service]: https://github.com/shroominic/SenseiDoro-Pomodoro-Discord-Bot/blob/master/legal/Sensei_Doro_Terms_of_Service.md
+[Sensei's Privacy Policy]:   https://github.com/shroominic/SenseiDoro-Pomodoro-Discord-Bot/blob/master/legal/Sensei_Doro_Privacy_Policy.md
 [support]:                   https://discord.gg/4gZxCAK9mb
 
 Privacy Policy

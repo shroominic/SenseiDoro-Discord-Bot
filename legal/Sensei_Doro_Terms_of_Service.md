@@ -9,8 +9,8 @@ description: This page covers the Terms of Service (Terms) of the Discord Bot "S
 [Discord's Terms of Service]: https://discord.com/terms
 [Community Guidelines]:       https://discord.com/guidelines
 [language]:                   https://discord.com/developers/docs/dispatch/field-values#predefined-field-values-accepted-locales
-[Sensei's Terms of Service]:  https://github.com/to_do_sensei_doro_tos
-[Sensei's Privacy Policy]:    https://github.com/to_do_sensei_doro_pp
+[Sensei's Terms of Service]:  https://github.com/shroominic/SenseiDoro-Pomodoro-Discord-Bot/blob/master/legal/Sensei_Doro_Terms_of_Service.md
+[Sensei's Privacy Policy]:    https://github.com/shroominic/SenseiDoro-Pomodoro-Discord-Bot/blob/master/legal/Sensei_Doro_Privacy_Policy.md
 
 Terms of Service
 ----------------
