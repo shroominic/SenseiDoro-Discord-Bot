@@ -42,7 +42,9 @@ class Dojo:
 
     @property
     def mod_role(self):
-        return self.guild.get_role(self.moderator_role_id)
+        if self.moderator_role_id:
+            return self.guild.get_role(int(self.moderator_role_id))
+        return self.guild.default_role
 
     async def serialize_sessions(self):
         """ Searches for all pomodoro sessions on the server
