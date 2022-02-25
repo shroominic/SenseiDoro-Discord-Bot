@@ -13,8 +13,10 @@ async def _slash_response(context, title: str, description: str, seconds_until_d
     await context.respond(embed=embed_msg)
     # sleep until feedback gets removed again
     await asyncio.sleep(seconds_until_dispose)
-    if context.response:
-        asyncio.create_task(context.delete())
+    try:
+        await context.delete()
+    except:
+        pass
 
 
 def slash_response(context, title: str, description: str = "", seconds_until_dispose: int = 10):
