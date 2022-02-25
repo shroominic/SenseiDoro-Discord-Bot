@@ -7,7 +7,7 @@ Sensei Doro
 A Discord Bot that automatically manages your study group using the Pomodoro Technique.    
 If you enjoy my work, consider supporting me on [Ko-fi](https://ko-fi.com/shroominic) :)
 
-### [**Invite Sensei Doro**](https://discord.com/api/oauth2/authorize?client_id=928304609636794388&permissions=21048400&scope=bot%20applications.commands)  to your discord server!
+### [**Invite Sensei Doro**](https://discord.com/api/oauth2/authorize?client_id=928304609636794388&permissions=21048400&scope=bot%20applications.commands)  to your discord server and get started with `/help`.
 ###### Please keep in mind that the bot will not work properly if you do not accept all required permissions.
 
 The Idea

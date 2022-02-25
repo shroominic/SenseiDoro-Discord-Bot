@@ -1,7 +1,7 @@
 from discord import SlashCommandGroup, slash_command, Option
 
-from src.cogs.useful_decoration import default_feedback
-from src.cogs.better_response import slash_response
+from src.cogs.useful_decoration import default_feedback, mod_required
+from src.cogs.better_response import slash_response, response
 from src.session import tools
 
 
@@ -11,6 +11,7 @@ class SessionCmd(SlashCommandGroup):
         self.bot = bot
 
     @slash_command()
+    @mod_required
     @default_feedback(title="Session successfully deleted.")
     async def delete(self, ctx):
         """ Use this command to delete your 🍅 session."""
@@ -47,6 +48,7 @@ class SessionCmd(SlashCommandGroup):
             slash_response(ctx, title, feedback, 10)
 
     @slash_command()
+    @mod_required
     async def edit(self, ctx, to_edit: Option(str,
                                               "What you want to edit.",
                                               choices=['name', 'work_time', 'break_time', 'repetitions']),
@@ -114,6 +116,33 @@ class SessionCmd(SlashCommandGroup):
             feedback = "Try /session edit <name/work_time/break_time/repetitions>"
             slash_response(ctx, title, feedback)
         await session.update_edit()
+
+    @slash_command()
+    @mod_required
+    async def config(self, ctx, to_edit: str = "", value: bool = True):
+        """ Session configuration """
+        # get session reference
+        session = await tools.get_session(ctx.channel, self.bot)
+        if "" == to_edit:
+            self.show_config(ctx, session)
+        if "mute_members" in to_edit:
+            session.config.mute_members = value
+        elif "mute_admins" in to_edit:
+            session.config.mute_admins = value
+        else:
+            # error
+            title = "Wrong argument"
+            feedback = "Try /session config <mute_members/mute_admins>"
+            slash_response(ctx, title, feedback)
+        await session.update_edit()
+
+    @staticmethod
+    def show_config(ctx, session):
+        title = "Current Configuration"
+        description = f"""
+            mute_members : {session.config.mute_members}
+            mute_admins  : {session.config.mute_admins} """
+        response(ctx, title, description)
 
     @staticmethod
     @delete.error

@@ -22,6 +22,7 @@ async def create_new_environment(session):
         guild.me: discord.PermissionOverwrite(send_messages=True)
     }
     work_ow = {
+        guild.me: discord.PermissionOverwrite(connect=True),
         guild.default_role: discord.PermissionOverwrite(speak=False)
     }
     # create session category
