@@ -1,7 +1,7 @@
 from discord import SlashCommandGroup, slash_command, Option
 
-from src.cogs.useful_decoration import default_feedback
-from src.cogs.better_response import slash_response
+from src.cogs.useful_decoration import default_feedback, mod_required
+from src.cogs.better_response import slash_response, response
 from src.session import tools
 
 
@@ -11,6 +11,7 @@ class SessionCmd(SlashCommandGroup):
         self.bot = bot
 
     @slash_command()
+    @mod_required
     @default_feedback(title="Session successfully deleted.")
     async def delete(self, ctx):
         """ Use this command to delete your 🍅 session."""
@@ -47,6 +48,7 @@ class SessionCmd(SlashCommandGroup):
             slash_response(ctx, title, feedback, 10)
 
     @slash_command()
+    @mod_required
     async def edit(self, ctx, to_edit: Option(str,
                                               "What you want to edit.",
                                               choices=['name', 'work_time', 'break_time', 'repetitions']),
@@ -116,7 +118,7 @@ class SessionCmd(SlashCommandGroup):
         await session.update_edit()
 
     @slash_command()
-    async def config(self, ctx, to_edit: str, value: bool):
+    @mod_required
     async def config(self, ctx, to_edit: str = "", value: bool = True):
         """ Session configuration """
         # get session reference

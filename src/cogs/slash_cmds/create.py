@@ -1,6 +1,6 @@
 from discord.ext import commands
 
-from src.cogs.useful_decoration import default_feedback
+from src.cogs.useful_decoration import default_feedback, mod_required
 from src.cogs.better_response import slash_response
 from src.session import Session
 
@@ -10,6 +10,7 @@ class Create(commands.Cog):
         self.bot = bot
 
     @commands.slash_command()
+    @mod_required
     @default_feedback(title="Session successfully created")
     async def create(self, ctx, name: str = "Pomodoro", work_time: int = 25, break_time: int = 5, repetitions: int = 4):
         """
