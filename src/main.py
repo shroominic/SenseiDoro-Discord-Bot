@@ -17,7 +17,6 @@ def run():
 
     # client can see all users
     intents = discord.Intents.default()
-    intents.members = True
 
     # init database
     setup.main()
