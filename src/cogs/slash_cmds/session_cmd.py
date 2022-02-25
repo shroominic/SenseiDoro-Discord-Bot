@@ -117,9 +117,12 @@ class SessionCmd(SlashCommandGroup):
 
     @slash_command()
     async def config(self, ctx, to_edit: str, value: bool):
+    async def config(self, ctx, to_edit: str = "", value: bool = True):
         """ Session configuration """
         # get session reference
         session = await tools.get_session(ctx.channel, self.bot)
+        if "" == to_edit:
+            self.show_config(ctx, session)
         if "mute_members" in to_edit:
             session.config.mute_members = value
         elif "mute_admins" in to_edit:
@@ -130,6 +133,14 @@ class SessionCmd(SlashCommandGroup):
             feedback = "Try /session config <mute_members/mute_admins>"
             slash_response(ctx, title, feedback)
         await session.update_edit()
+
+    @staticmethod
+    def show_config(ctx, session):
+        title = "Current Configuration"
+        description = f"""
+            mute_members : {session.config.mute_members}
+            mute_admins  : {session.config.mute_admins} """
+        response(ctx, title, description)
 
     @staticmethod
     @delete.error
