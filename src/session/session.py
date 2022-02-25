@@ -75,7 +75,7 @@ class Session:
         else:
             self.reset_if_empty.restart()
         # Logging
-        print(self.dojo.guild.name, "started a session with ", self.member_count, " members.")
+        print("Session STARTED - with", self.member_count, "members on guild:", self.dojo.guild.name)
 
     ##################
     #   NAVIGATION   #
