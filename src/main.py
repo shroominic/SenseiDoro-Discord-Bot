@@ -13,6 +13,7 @@ def run():
     # load token from .env
     load_dotenv()
     token = os.getenv('DISCORD_TOKEN')
+    shard_count = os.getenv('SHARD_COUNT')
 
     # client can see all users
     intents = discord.Intents.default()
@@ -22,7 +23,7 @@ def run():
     setup.main()
 
     # init bot client
-    bot = SenseiClient(command_prefix="$", intents=intents)
+    bot = SenseiClient(shard_count=int(shard_count), command_prefix="$", intents=intents)
 
     # adding cogs
     bot.add_cog(OnReady(bot))
