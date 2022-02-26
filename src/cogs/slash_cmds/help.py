@@ -77,7 +77,11 @@ class Help(commands.Cog):
                             `/config <'mute_admins'| > <true/false> (more coming)`
                             
                         - **Set your guild roles for command permissions:** 
-                            `/role <'admin'|'moderator'> <@your_role>` """,
+                            `/role <'admin'|'moderator'> <@your_role>` 
+                            
+                        - **Delete/Reset all data Sensei Doro knows about this guild:** 
+                            `/data <'delete'|'reset'>`
+                    """,
                     color=0x00ff00)],
         ]
 
