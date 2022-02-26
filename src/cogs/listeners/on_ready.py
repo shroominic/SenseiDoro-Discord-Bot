@@ -15,11 +15,25 @@ class OnReady(Cog):
         Called when the client is done preparing the data received from Discord.
         Usually after login is successful and the Client.guilds and co. are filled up.
         """
+        # delete all data from unused guilds
+        with closing(sqlite3.connect("src/dbm/sensei.db")) as conn:
+            c = conn.cursor()
+            c.execute("SELECT id FROM dojos")
+            result = [id_tuple[0] for id_tuple in c.fetchall()]
+            active_guild_ids = [guild.id for guild in self.bot.guilds]
+
+            unused_guilds = list(set(result) - set(active_guild_ids))
+            print(unused_guilds, "not active anymore, will get deleted")
+            for guild_id in unused_guilds:
+                c.execute("DELETE FROM dojos WHERE id=:id", {"id": guild_id})
+            conn.commit()
+
+        # create dojo instances for all active guilds
         with closing(sqlite3.connect("src/dbm/sensei.db")) as conn:
             c = conn.cursor()
             for guild in self.bot.guilds:
                 # search in db for guild.id
-                c.execute(" SELECT * FROM dojos WHERE id=:id", {"id": guild.id})
+                c.execute("SELECT * FROM dojos WHERE id=:id", {"id": guild.id})
                 result = c.fetchone()
                 # instantiate dojo from db entry
                 if result:
@@ -28,8 +42,8 @@ class OnReady(Cog):
                 # create new dojo (uncommon)
                 else:
                     dojo = Dojo.new_db_entry(guild, self.bot, c)
-                    conn.commit()
                     self.bot.dojos[guild.id] = dojo
+            conn.commit()
 
         # print all connected guilds
         all_guilds = [guild.name for guild in self.bot.guilds]
