@@ -1,5 +1,7 @@
 import asyncio
 import json
+import sqlite3
+from contextlib import closing
 
 from src.session import Session
 
@@ -71,3 +73,24 @@ class Dojo:
                                         repetitions=config["number_sessions"],
                                         session_name=config["name"],
                                         is_new_session=False)
+
+    async def dispose(self):
+        # delete all sessions
+        for session in self.sessions.values():
+            await session.dispose()
+        # delete the database entry and leave the guild
+        await self.guild.leave()
+
+    async def reset_data(self):
+        # delete data
+        with closing(sqlite3.connect("src/dbm/sensei.db")) as conn:
+            c = conn.cursor()
+            # search in db for guild.id
+            c.execute(" DELETE FROM dojos WHERE id=:id", {"id": self.guild.id})
+            c.execute("INSERT INTO dojos VALUES (:id, :name, NULL, NULL, :cfg_mute_admins)",
+                      {"id": self.guild.id,
+                       "name": self.guild.name,
+                       "cfg_mute_admins": self.mute_admins})
+            conn.commit()
+        # console info
+        print(f"Guild data reset : {self.guild.name}")

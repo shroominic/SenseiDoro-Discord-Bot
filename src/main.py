@@ -28,6 +28,7 @@ def run():
     bot.add_cog(OnReady(bot))
     bot.add_cog(OnVSUpdate(bot))
     bot.add_cog(OnGuildJoin(bot))
+    bot.add_cog(OnGuildRemove(bot))
     bot.add_cog(CommandErrHandler(bot))
     bot.add_cog(DebugTools(bot))
     # tasks
@@ -39,6 +40,7 @@ def run():
 
     # adding slash cmds
     bot.add_cog(Create(bot))
+    bot.add_application_command(Data(bot))
     bot.add_application_command(Config(bot))
     bot.add_application_command(SetRole(bot))
     bot.add_application_command(SessionCmd(bot))

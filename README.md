@@ -43,13 +43,10 @@ Commands
 --------
 You can interact with the bot using discord `/` slash commands.  
 
-
 ###### Notation: `<required argument>` , `[optional arg]{default value}` , `<'subcommands'|'to'|'choose'|'from'>`   
 
 ### Setup
-* Show help information: `/help [config]`   
-- General configuration: `/config <'mute_admins'| > <true/false>` (more coming soon)
-* Set your own roles to control command permissions: `/role <'admin'|'moderator'> <@your_role>`
+* Show help information: `/help`   
 - Create a new pomodoro environment: `/create [name]{"Pomorodo"} [work_time]{25} [break_time]{5} [repetitions]{4}`   
 
 
@@ -60,3 +57,7 @@ You can interact with the bot using discord `/` slash commands.
 - Delete a session environment: `/session delete`
 * Reset a session to the initial state: `/session reset`
 
+### Admin
+- General configuration: `/config <'mute_admins'| > <true/false>` (more coming soon)
+* Set your own roles to control command permissions: `/role <'admin'|'moderator'> <@your_role>`
+- Delete/Reset all data Sensei Doro knows about this guild: `/data <'delete'|'reset'>`
