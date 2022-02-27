@@ -5,7 +5,6 @@ Sensei Doro
 [![Discord Bots](https://top.gg/api/widget/upvotes/928304609636794388.svg?noavatar=true)](https://top.gg/bot/928304609636794388)
 
 A Discord Bot that automatically manages your study group using the Pomodoro Technique.    
-If you enjoy my work, consider supporting me on [Ko-fi](https://ko-fi.com/shroominic) :)
 
 ### [**Invite Sensei Doro**](https://discord.com/api/oauth2/authorize?client_id=928304609636794388&permissions=21048400&scope=bot%20applications.commands)  to your discord server and get started with `/help`.
 ###### Please keep in mind that the bot will not work properly if you do not accept all required permissions.
@@ -61,3 +60,7 @@ You can interact with the bot using discord `/` slash commands.
 - General configuration: `/config <'mute_admins'| > <true/false>` (more coming soon)
 * Set your own roles to control command permissions: `/role <'admin'|'moderator'> <@your_role>`
 - Delete/Reset all data Sensei Doro knows about this guild: `/data <'delete'|'reset'>`
+
+Support this project
+--------------------
+If you enjoy my work, consider supporting me on [Ko-fi](https://ko-fi.com/shroominic) :)
