@@ -21,7 +21,7 @@ class OnReady(Cog):
             c.execute("SELECT id FROM dojos")
             result = [id_tuple[0] for id_tuple in c.fetchall()]
             active_guild_ids = [guild.id for guild in self.bot.guilds]
-
+            # calculate unused guilds
             unused_guilds = list(set(result) - set(active_guild_ids))
             print(unused_guilds, "not active anymore, will get deleted")
             for guild_id in unused_guilds:
