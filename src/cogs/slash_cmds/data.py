@@ -2,7 +2,7 @@ import asyncio
 
 from discord import SlashCommandGroup, slash_command
 
-from cogs.better_response import slash_response
+from src.cogs.better_response import slash_response
 from src.cogs.useful_decoration import admin_required, default_feedback
 
 
