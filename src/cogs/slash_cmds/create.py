@@ -24,7 +24,6 @@ class Create(commands.Cog):
         """
         # get dojo reference
         dojo = self.bot.dojos[ctx.guild.id]
-
         # checks for session limit
         if len(dojo.sessions) >= dojo.session_limit:
             # error feedback
@@ -32,13 +31,5 @@ class Create(commands.Cog):
             feedback = "You can currently have only {dojo.session_limit} sessions on your server."
             slash_response(ctx, title, feedback, 10)
             return
-
         # create new session
-        Session(
-            dojo=dojo,
-            category=None,
-            work_time=work_time,
-            break_time=break_time,
-            repetitions=repetitions,
-            session_name=name,
-            is_new_session=True)
+        Session.new_session(self.bot, ctx.guild.id, name, work_time, break_time, repetitions)

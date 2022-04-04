@@ -12,8 +12,8 @@ from src.cogs import *
 def run():
     # load token from .env
     load_dotenv()
-    token = os.getenv('DISCORD_TOKEN')
-    shard_count = os.getenv('SHARD_COUNT')
+    token = os.getenv('DISCORD_TOKEN') or "0"
+    shard_count = os.getenv('SHARD_COUNT') or "1"
 
     # client can see all users
     intents = discord.Intents.default()

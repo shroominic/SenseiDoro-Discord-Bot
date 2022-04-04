@@ -1,14 +1,14 @@
 from datetime import timedelta
+from dotenv import load_dotenv
+import discord
 import asyncio
 import time
-
-import discord
+import os
 
 
 class Timer:
     def __init__(self, session, work_time, break_time, repetitions):
         self.session = session
-        self.info_msg = None
         # settings
         self.tick = 15
         self.work_time = work_time
@@ -27,9 +27,9 @@ class Timer:
         self.reset()
         # setup timing message
         timer_embed = self.get_timer_embed()
-        self.info_msg = await self.session.info_channel_pointer.send(embed=timer_embed)
+        self.session.env.info_msg = await self.session.env.info_channel.send(embed=timer_embed)
         # create timer thread
-        self.is_active = True
+        self.is_active = self.check_token()
         asyncio.create_task(self.timer())
         # start next session
         self.increase_session_count()
@@ -70,7 +70,7 @@ class Timer:
         # format time to string
         timer_embed = self.get_timer_embed()
         # edit timer message
-        asyncio.create_task(self.info_msg.edit(embed=timer_embed))
+        asyncio.create_task(self.session.env.info_msg.edit(embed=timer_embed))
 
     def get_timer_embed(self):
         # format seconds_left to [min]:[sec]
@@ -102,6 +102,18 @@ class Timer:
         else:
             self.stop_timer()
             asyncio.create_task(self.session.reset_session())
+
+    @staticmethod
+    def check_token() -> bool:
+        token = None
+        try:
+            load_dotenv()
+            token = os.getenv('TOP_GG_TOKEN')
+        except:
+            pass
+        if token:
+            return True
+        return False
 
     def increase_session_count(self):
         self.session_count += 1

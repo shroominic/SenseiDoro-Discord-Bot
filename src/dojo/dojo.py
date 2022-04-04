@@ -4,6 +4,7 @@ import sqlite3
 from contextlib import closing
 
 from src.session import Session
+from src.session.env_manager import SessionEnvironment
 
 
 class Dojo:
@@ -49,7 +50,7 @@ class Dojo:
         return self.guild.default_role
 
     async def serialize_sessions(self):
-        """ Searches for all pomodoro sessions on the server
+        """ Searches for old pomodoro sessions on the server
             to reinitialize lost instances during a restart.
         """
         # serialize old session instances
@@ -58,21 +59,23 @@ class Dojo:
                 # find message with session config
                 for tc in category.text_channels:
                     if tc is not None:
-                        if tc.name == Session.config_label:
+                        if tc.name == "config":
                             async for msg in tc.history():
                                 if msg.author == self.bot.user and msg.content.startswith('Session config:'):
                                     # parse string representation of json
                                     config_json = str(msg.content)[15::]
                                     config = json.loads(config_json)
                                     # create session instance from json
-                                    Session(
-                                        dojo=self,
-                                        category=category,
-                                        work_time=config["work_time"],
-                                        break_time=config["pause_time"],
-                                        repetitions=config["number_sessions"],
-                                        session_name=config["name"],
-                                        is_new_session=False)
+                                    temp = Session(self.bot,
+                                                   config["name"],
+                                                   self.guild.id,
+                                                   config["work_time"],
+                                                   config["pause_time"],
+                                                   config["number_sessions"],
+                                                   category_id=category.id,
+                                                   env=SessionEnvironment.match_from_category(category, self.bot))
+                                    temp.create_db_entry()
+                                    # temp.env.update_environment()
 
     async def dispose(self):
         # delete all sessions

@@ -23,9 +23,10 @@ class OnReady(Cog):
             active_guild_ids = [guild.id for guild in self.bot.guilds]
             # calculate unused guilds
             unused_guilds = list(set(result) - set(active_guild_ids))
-            print(unused_guilds, "not active anymore, will get deleted")
-            for guild_id in unused_guilds:
-                c.execute("DELETE FROM dojos WHERE id=:id", {"id": guild_id})
+            if unused_guilds:
+                print(unused_guilds, "not active anymore, will get deleted")
+                for guild_id in unused_guilds:
+                    c.execute("DELETE FROM dojos WHERE id=:id", {"id": guild_id})
             conn.commit()
 
         # create dojo instances for all active guilds
@@ -49,6 +50,6 @@ class OnReady(Cog):
         all_guilds = [guild.name for guild in self.bot.guilds]
         print(f'{self.bot.user} is ready and connected to the following guilds: \n{all_guilds}')
 
-        # update top.gg
+        # start top.gg update task
         self.bot.tgg.update_stats.start()
 
