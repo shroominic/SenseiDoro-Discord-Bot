@@ -2,7 +2,6 @@ Sensei Doro
 -----------
 [![Discord Bots](https://top.gg/api/widget/status/928304609636794388.svg)](https://top.gg/bot/928304609636794388)
 [![Discord Bots](https://top.gg/api/widget/servers/928304609636794388.svg?noavatar=true)](https://top.gg/bot/928304609636794388)
-[![Discord Bots](https://top.gg/api/widget/upvotes/928304609636794388.svg?noavatar=true)](https://top.gg/bot/928304609636794388)
 
 A Discord Bot that automatically manages your study group using the Pomodoro Technique.    
 
