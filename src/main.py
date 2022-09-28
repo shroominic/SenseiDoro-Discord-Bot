@@ -46,7 +46,6 @@ def run():
     bot.add_cog(Data(bot))
     bot.add_cog(Config(bot))
     bot.add_cog(SetRoles(bot))
-    bot.add_cog(SessionControl(bot))
 
     bot.run(token)
 

@@ -4,4 +4,3 @@ from .help import Help
 from .data import Data
 from .set_role import SetRoles
 from .admin_tools import DebugTools
-from .session_control import SessionControl
