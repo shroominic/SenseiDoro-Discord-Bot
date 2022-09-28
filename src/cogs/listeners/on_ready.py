@@ -2,7 +2,7 @@ import sqlite3
 from contextlib import closing
 from discord.ext.commands import Cog
 
-from src.dojo import Dojo
+from dojo import Dojo
 
 
 class OnReady(Cog):
@@ -44,7 +44,15 @@ class OnReady(Cog):
                 else:
                     dojo = Dojo.new_db_entry(guild, self.bot, c)
                     self.bot.dojos[guild.id] = dojo
-            conn.commit()
+
+        with closing(sqlite3.connect("src/dbm/sensei.db")) as conn:
+            c = conn.cursor()
+            c.execute("SELECT lobby_channel_id, guild_id FROM sessions")
+            result = c.fetchall()
+            print(result)
+            for lobby_id, guild_id in result:
+                dojo = self.bot.get_dojo(guild_id)
+                dojo.lobby_ids.append(lobby_id)
 
         # print all connected guilds
         all_guilds = [guild.name for guild in self.bot.guilds]

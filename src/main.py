@@ -4,9 +4,9 @@ from dotenv import load_dotenv
 import discord
 import os
 
-from src.dbm import setup
-from src.clients import SenseiClient
-from src.cogs import *
+import dbm
+from clients import SenseiClient
+from cogs import *
 
 
 def run():
@@ -19,10 +19,13 @@ def run():
     intents = discord.Intents.default()
 
     # init database
-    setup.main()
+    dbm.setup.main()
 
     # init bot client
-    bot = SenseiClient(shard_count=int(shard_count), command_prefix="$", intents=intents)
+    bot = SenseiClient(shard_count=int(shard_count),
+                       command_prefix="$",
+                       intents=intents,
+                       debug_guilds=[933389956246802483])
 
     # adding cogs
     bot.add_cog(OnReady(bot))
@@ -40,10 +43,10 @@ def run():
 
     # adding slash cmds
     bot.add_cog(Create(bot))
-    bot.add_application_command(Data(bot))
-    bot.add_application_command(Config(bot))
-    bot.add_application_command(SetRole(bot))
-    bot.add_application_command(SessionCmd(bot))
+    bot.add_cog(Data(bot))
+    bot.add_cog(Config(bot))
+    bot.add_cog(SetRoles(bot))
+    bot.add_cog(SessionControl(bot))
 
     bot.run(token)
 

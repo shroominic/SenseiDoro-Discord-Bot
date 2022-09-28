@@ -1,8 +1,8 @@
 from discord.ext import commands
 
-from src.cogs.useful_decoration import default_feedback, mod_required
-from src.cogs.better_response import slash_response
-from src.session import Session
+from cogs.useful_decoration import default_feedback, mod_required
+from cogs.better_response import slash_response
+from session import Session
 
 
 class Create(commands.Cog):
@@ -25,7 +25,7 @@ class Create(commands.Cog):
         # get dojo reference
         dojo = self.bot.dojos[ctx.guild.id]
         # checks for session limit
-        if len(dojo.sessions) >= dojo.session_limit:
+        if len(dojo.active_sessions) >= dojo.session_limit:
             # error feedback
             title = "Session limit reached"
             feedback = "You can currently have only {dojo.session_limit} sessions on your server."

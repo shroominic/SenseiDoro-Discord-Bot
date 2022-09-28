@@ -10,7 +10,7 @@ class Timer:
     def __init__(self, session, work_time, break_time, repetitions):
         self.session = session
         # settings
-        self.tick = 15
+        self.tick = 5
         self.work_time = work_time
         self.break_time = break_time
         self.repetitions = repetitions
@@ -27,7 +27,7 @@ class Timer:
         self.reset()
         # setup timing message
         timer_embed = self.get_timer_embed()
-        self.session.env.info_msg = await self.session.env.info_channel.send(embed=timer_embed)
+        self.session.env.timer_msg = await self.session.env.info_channel.send(embed=timer_embed)
         # create timer thread
         self.is_active = self.check_token()
         asyncio.create_task(self.timer())
@@ -70,7 +70,7 @@ class Timer:
         # format time to string
         timer_embed = self.get_timer_embed()
         # edit timer message
-        asyncio.create_task(self.session.env.info_msg.edit(embed=timer_embed))
+        asyncio.create_task(self.session.env.timer_msg.edit(embed=timer_embed))
 
     def get_timer_embed(self):
         # format seconds_left to [min]:[sec]
@@ -97,11 +97,11 @@ class Timer:
             elif "Work" in self.session_state:
                 self.set_time_left(self.break_time)
                 self.session_state = "Pause"
-                asyncio.create_task(self.session.take_a_break())
+                asyncio.create_task(self.session.session_break())
         # reset when session is over
         else:
             self.stop_timer()
-            asyncio.create_task(self.session.reset_session())
+            asyncio.create_task(self.session.stop_session())
 
     @staticmethod
     def check_token() -> bool:
@@ -109,8 +109,8 @@ class Timer:
         try:
             load_dotenv()
             token = os.getenv('TOP_GG_TOKEN')
-        except:
-            pass
+        except Exception as e:
+            print("topgg error:", e)
         if token:
             return True
         return False

@@ -3,7 +3,7 @@ import sys
 
 from discord.ext.commands import Cog, CommandNotFound
 
-from src.cogs.better_response import slash_response
+from cogs.better_response import slash_response
 
 
 class CommandErrHandler(Cog):

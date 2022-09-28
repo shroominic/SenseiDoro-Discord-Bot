@@ -9,4 +9,7 @@ class SenseiClient(commands.AutoShardedBot, ABC):
         super().__init__(*args, **kwargs)
         # stores all dojos of connected guilds
         self.dojos = {}
-        self.active_sessions = {}
+
+    def get_dojo(self, guild_id):
+        return self.dojos.get(guild_id, None)
+

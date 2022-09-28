@@ -31,6 +31,3 @@ def setup_database(db_file):
 def main():
     setup_database("src/dbm/sensei.db")
 
-
-if __name__ == '__main__':
-    main()

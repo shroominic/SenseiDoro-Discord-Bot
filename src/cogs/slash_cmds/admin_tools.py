@@ -2,8 +2,8 @@ import asyncio
 
 from discord.ext import commands
 
-from src.cogs.useful_decoration import only_admin_debug
-from src.cogs.better_response import response
+from cogs.useful_decoration import only_admin_debug
+from cogs.better_response import response
 
 
 class DebugTools(commands.Cog):

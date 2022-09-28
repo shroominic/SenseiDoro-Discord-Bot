@@ -3,8 +3,8 @@ import json
 import sqlite3
 from contextlib import closing
 
-from src.session import Session
-from src.session.env_manager import SessionEnvironment
+from session import Session
+from session.session_env import SessionEnvironment
 
 
 class Dojo:
@@ -12,8 +12,12 @@ class Dojo:
         # references
         self.guild = guild
         self.bot = bot
-        self.sessions = {}
-        # roles
+        # session instances
+        self.active_sessions = {}
+        # button listener ids
+        self.lobby_ids = []
+        self.start_ids = []
+        # role ids
         self.admin_role_id: int = kwargs.get("admin_role_id", None)
         self.moderator_role_id: int = kwargs.get("mod_role_id", None)
         # configuration
@@ -74,12 +78,12 @@ class Dojo:
                                                    config["number_sessions"],
                                                    category_id=category.id,
                                                    env=SessionEnvironment.match_from_category(category, self.bot))
-                                    temp.create_db_entry()
-                                    # temp.env.update_environment()
+                                    await temp.create_db_entry()
+                                    await temp.env.update_environment()
 
     async def dispose(self):
-        # delete all sessions
-        for session in self.sessions.values():
+        # delete all session environments
+        for session in self.active_sessions.values():
             await session.dispose()
         # delete the database entry and leave the guild
         await self.guild.leave()
