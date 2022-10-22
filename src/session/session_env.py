@@ -113,7 +113,6 @@ class SessionEnvironment:
     async def remove_old_env_on_bot_restart(self):
         # delete old unused voice channels
         for vc in self.category.voice_channels:
-            print(f"start channel deleted in {self.guild.id}")
             if self.start_label in vc.name:
                 await vc.delete()
             if "Session [" in vc.name:

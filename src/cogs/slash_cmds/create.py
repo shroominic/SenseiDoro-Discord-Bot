@@ -25,7 +25,7 @@ class Create(commands.Cog):
         # get dojo reference
         dojo = self.bot.dojos[ctx.guild.id]
         # checks for session limit
-        if len(dojo.active_sessions) >= dojo.session_limit:
+        if len(dojo.lobby_ids) >= dojo.session_limit:
             # error feedback
             title = "Session limit reached"
             feedback = "You can currently have only {dojo.session_limit} sessions on your server."
