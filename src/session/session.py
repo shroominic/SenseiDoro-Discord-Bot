@@ -6,7 +6,7 @@ from contextlib import closing
 from .session_dashboard import SessionDashboard
 from .session_env import SessionEnvironment
 from .session_config import SessionConfig
-from .timer import Timer
+from .session_timer import SessionTimer
 import asyncio
 
 
@@ -21,7 +21,7 @@ class Session:
         self.id = kwargs.get("category_id", None)
         self.guild_id = guild_id
         # timer
-        self.timer = Timer(self, work_time, break_time, repetitions)
+        self.timer = SessionTimer(self, work_time, break_time, repetitions)
         # user interface
         self.dashboard = SessionDashboard(self)
         # async init

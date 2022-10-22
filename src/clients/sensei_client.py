@@ -1,3 +1,4 @@
+import asyncio
 from abc import ABC
 
 from discord.ext import commands
@@ -27,3 +28,16 @@ class SenseiClient(commands.AutoShardedBot, ABC):
     @property
     def active_users(self):
         return sum([dojo.active_users for dojo in self.dojos.values()])
+
+    async def close(self):
+        """ exit the whole application safely """
+        print("Shutdown Sensei Doro... ")
+        if self.topgg:
+            self.topgg.update_stats.stop()
+        if self.log:
+            self.log.update_stats.stop()
+        # todo: close all active sessions and notify users about shutdown
+        # todo: cleanup session environments
+        await super().close()
+        await asyncio.sleep(1)
+

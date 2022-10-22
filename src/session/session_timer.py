@@ -1,12 +1,10 @@
 from datetime import timedelta
-from dotenv import load_dotenv
 import discord
 import asyncio
 import time
-import os
 
 
-class Timer:
+class SessionTimer:
     def __init__(self, session, work_time, break_time, repetitions):
         self.session = session
         # settings
@@ -19,6 +17,8 @@ class Timer:
         self.seconds_left = 0
         self.session_state = "Work"
         self.session_count = 0
+        # controls
+        self.buttons = None
         # set time left
         self.set_time_left(self.work_time)
 
@@ -26,10 +26,10 @@ class Timer:
         # reset timer
         self.reset()
         # setup timing message
-        timer_embed = self.get_timer_embed()
+        timer_embed = self.build_timer_embed()
         self.session.env.timer_msg = await self.session.env.info_channel.send(embed=timer_embed)
         # create timer thread
-        self.is_active = self.check_token()
+        self.is_active = True
         asyncio.create_task(self.timer())
         # start next session
         self.increase_session_count()
@@ -67,12 +67,16 @@ class Timer:
                 await asyncio.sleep(next_call - time.time())
 
     def display_update(self):
-        # format time to string
-        timer_embed = self.get_timer_embed()
-        # edit timer message
-        asyncio.create_task(self.session.env.timer_msg.edit(embed=timer_embed))
+        """ Update tne timer message/embed"""
+        # buttons
+        if self.buttons is None:
+            self.buttons = TimerView(self.session)
+        # create embed
+        timer_embed = self.build_timer_embed()
+        # edit message
+        asyncio.create_task(self.session.env.timer_msg.edit(embed=timer_embed, view=self.buttons))
 
-    def get_timer_embed(self):
+    def build_timer_embed(self):
         # format seconds_left to [min]:[sec]
         str_time = str(timedelta(seconds=self.seconds_left))[2::]
         # create timer embed
@@ -89,31 +93,42 @@ class Timer:
         # check if session is over
         if self.session_count < self.repetitions:
             # check for session_state and switch between <Work/Pause>
-            if "Pause" in self.session_state:
+            if "Break" in self.session_state:
                 self.set_time_left(self.work_time)
                 self.session_state = "Work"
                 self.increase_session_count()
                 asyncio.create_task(self.session.next_session())
             elif "Work" in self.session_state:
                 self.set_time_left(self.break_time)
-                self.session_state = "Pause"
+                self.session_state = "Break"
                 asyncio.create_task(self.session.session_break())
         # reset when session is over
         else:
             self.stop_timer()
             asyncio.create_task(self.session.stop_session())
 
-    @staticmethod
-    def check_token() -> bool:
-        token = None
-        try:
-            load_dotenv()
-            token = os.getenv('TOP_GG_TOKEN')
-        except Exception as e:
-            pass
-        if token:
-            return True
-        return False
-
     def increase_session_count(self):
         self.session_count += 1
+
+
+class TimerView(discord.ui.View):
+    def __init__(self, session):
+        super().__init__(timeout=None)
+        self.bot = session.bot
+        self.session = session
+
+    @discord.ui.button(label="☕️ Break", style=discord.ButtonStyle.gray)
+    async def second_button_callback(self, _, interaction):
+        """ Use this command to pause your session. """
+        if self.session.timer.is_active:
+            # todo add custom minutes
+            await self.session.force_break(minutes=5)
+            # todo show ui feedback
+        await interaction.response.edit_message(view=self)
+
+    @discord.ui.button(label="◽️ Stop", style=discord.ButtonStyle.danger)
+    async def stop_button_callback(self, _, interaction):
+        """ Use this command to stop and reset your session. """
+        # stops session and timer
+        await self.session.stop_session()
+        await interaction.response.edit_message(view=self)

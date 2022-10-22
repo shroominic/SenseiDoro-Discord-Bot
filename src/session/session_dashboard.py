@@ -38,17 +38,15 @@ class SessionDashboard:
                                                                                  view=session_controls)
 
     async def cleanup(self):
-        """ todo write cleanup methode """
+        """ clears you dashboard  """
         await self.search_old_messages()
         if self.session.env.info_channel:
             async for msg in self.session.env.info_channel.history():
-                if msg == self.session.env.info_msg or msg == self.session.env.timer_msg:
-                    continue
-                else:
+                if msg != self.session.env.info_msg and msg != self.session.env.timer_msg:
                     await msg.delete()
 
     async def search_old_messages(self):
-        """ todo write msg fetching methode """
+        """ fetches old messages from the dashboard channel """
         if self.session.env.info_channel:
             async for msg in self.session.env.info_channel.history():
                 if msg.embeds:
@@ -63,28 +61,22 @@ class SessionDashboard:
 
 class DashboardView(discord.ui.View):
     def __init__(self, session):
-        super().__init__()
+        super().__init__(timeout=None)
         self.bot = session.bot
         self.session = session
 
-    @discord.ui.button(label="Stop", style=discord.ButtonStyle.primary)
-    async def first_button_callback(self, _, interaction):
-        """ Use this command to reset your session. """
-        # stop
-        await self.session.stop_session()
-        await interaction.response.edit_message(view=self)
+    @discord.ui.button(label="🚀 Start", style=discord.ButtonStyle.green)
+    async def start(self, button: discord.ui.Button, interaction: discord.Interaction):
+        await self.session.start_session()
+        await interaction.response.edit_message(view=None)
 
-    @discord.ui.button(label="Break", style=discord.ButtonStyle.primary)
-    async def second_button_callback(self, _, interaction):
-        """ Use this command to reset your session. """
-        # stop
-        if self.session.timer.is_active:
-            # todo add custom minutes
-            await self.session.force_break(minutes=5)
-            # todo show ui feedback
-        await interaction.response.edit_message(view=self)
+    @discord.ui.button(label="✏️ Edit", style=discord.ButtonStyle.primary)
+    async def forth_button_callback(self, _, interaction):
+        """ Use this command to edit your session. """
+        # open edit form session
+        await interaction.response.send_message(embed=discord.Embed(title="Session Editor"))
 
-    @discord.ui.button(label="Delete", style=discord.ButtonStyle.primary)
+    @discord.ui.button(label="🗑 Delete", style=discord.ButtonStyle.danger)
     async def third_button_callback(self, _, interaction):
         """ Use this command to delete your session. """
         # delete session
@@ -93,23 +85,3 @@ class DashboardView(discord.ui.View):
         for child in self.children:  # loop through all children of the view
             child.disabled = True
         await interaction.response.edit_message(view=self)
-
-    @discord.ui.button(label="Edit", style=discord.ButtonStyle.primary)
-    async def forth_button_callback(self, _, interaction):
-        """ Use this command to edit your session. """
-        # open edit form session
-        await interaction.response.send_message(embed=discord.Embed(title="Session Editor"),
-                                                view="")
-
-
-class TimerView(discord.ui.View):
-    def __init__(self, session):
-        super().__init__()
-        self.bot = session.bot
-        self.session = session
-
-    @discord.ui.button(label="Stop", style=discord.ButtonStyle.primary)
-    async def stop_button_callback(self, _, interaction):
-        """ Use this command to stop and reset your session. """
-        # stops session and timer
-        await self.session.stop_session()

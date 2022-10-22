@@ -135,7 +135,7 @@ class SessionEnvironment:
                    self.guild.me:           discord.PermissionOverwrite(send_messages=True, view_channel=True)}
         self.info_channel = await self.guild.create_text_channel(self.info_label, category=category, overwrites=info_ow)
         self.lobby_channel = await self.guild.create_voice_channel(self.lobby_label, category=category)
-        # load env ids to database - create whole new entry?
+        # load env ids to database - create whole new entry? todo
         with closing(sqlite3.connect("src/dbm/sensei.db")) as conn:
             c = conn.cursor()
             print("database update")
