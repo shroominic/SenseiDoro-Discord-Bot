@@ -1,13 +1,13 @@
 from discord import SlashCommandGroup, slash_command, Option
 
-from src.cogs.useful_decoration import default_feedback, mod_required
-from src.cogs.better_response import slash_response, response
-from src.session import tools
+from cogs.useful_decoration import default_feedback, mod_required
+from cogs.better_response import slash_response, response
+from session import tools
 
 
 class SessionCmd(SlashCommandGroup):
     def __init__(self, bot):
-        super().__init__(name="session", description="Session configuration")
+        super().__init__(name="sessionold", description="Session configuration")
         self.bot = bot
 
     @slash_command()
@@ -21,17 +21,19 @@ class SessionCmd(SlashCommandGroup):
 
     @slash_command()
     @default_feedback(title="Session successfully reset.")
-    async def reset(self, ctx):
+    async def stop(self, ctx):
         """ Use this command to reset your 🍅 session. """
         # get session instance
+        print("session stop context: ", ctx.channel)
         session = await tools.get_session(ctx.channel, self.bot)
-        await session.reset_session()
+        await session.stop_session()
 
     @slash_command(name="break")
     async def _break(self, ctx, minutes: int = 420):
         """ Use this command force a break and quit your current work session.
             :param minutes: break duration
         """
+        print("before tools.get_session at session_cmd.py in _break methode")
         # get session instance
         session = await tools.get_session(ctx.channel, self.bot)
 
@@ -54,6 +56,7 @@ class SessionCmd(SlashCommandGroup):
                                               choices=['name', 'work_time', 'break_time', 'repetitions']),
                    value: str):
         """ Use this command to edit your 🍅 session.
+            :param ctx: message context (discord)
             :param to_edit: you can edit: 'name', 'work_time', 'break_time' or 'repetitions'
             :param value: new value of to_edit
         """
@@ -144,12 +147,12 @@ class SessionCmd(SlashCommandGroup):
             mute_admins  : {session.config.mute_admins} """
         response(ctx, title, description)
 
-    @staticmethod
     @delete.error
-    @reset.error
+    @stop.error
     @_break.error
     @edit.error
-    async def session_error(ctx, error):
+    async def session_error(self, ctx, error):
+        print("[session_cmd_error]: ", error)
         title = "Wrong environment"
         feedback = "Please use this command only inside a session category."
         slash_response(ctx, title, feedback)

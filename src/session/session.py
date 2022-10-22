@@ -1,108 +1,148 @@
+import sqlite3
 import discord
 from discord.ext import tasks
+from contextlib import closing
 
-from . import env_manager
+from .session_dashboard import SessionDashboard
+from .session_env import SessionEnvironment
 from .session_config import SessionConfig
-from .timer import Timer
+from .session_timer import SessionTimer
 import asyncio
-import json
 
 
 # Pomodoro Session Class
 class Session:
-    # channel labels
-    start_button_label = "START SESSION"
-    break_time_label = "Break time!"
-    information_label = "info"
-    config_label = "config"
-    lobby_label = "Lobby"
-    chat_label = "chat"
-
-    def __init__(self,
-                 dojo,
-                 category,
-                 work_time,
-                 break_time,
-                 repetitions,
-                 is_new_session,
-                 session_name="Pomodoro"
-                 ):
-        self.name = session_name
-        self.label = f"🍅 {self.name}"
-        self.config = SessionConfig()
-        # references
-        self.dojo = dojo
-        self.category_pointer = category
-        self.info_channel_pointer = None
-        self.chat_channel_pointer = None
-        self.work_channel_pointer = None
-        self.lobby_channel_pointer = None
-        self.config_channel_pointer = None
-        self.info_msg_embed = None
-        self.config_msg = None
-        # timer settings
-        self.timer = Timer(self, work_time, break_time, repetitions)
+    def __init__(self, bot, name, guild_id, work_time, break_time, repetitions, env, **kwargs):
+        self.bot = bot
+        self.name = name
+        self.config = kwargs.get("config", SessionConfig())
+        self.env = env
+        # ids
+        self.id = kwargs.get("category_id", None)
+        self.guild_id = guild_id
+        # timer
+        self.timer = SessionTimer(self, work_time, break_time, repetitions)
+        # user interface
+        self.dashboard = SessionDashboard(self)
         # async init
-        asyncio.create_task(self.init(is_new_session))
+        asyncio.create_task(self.async_init())
 
-    async def init(self, is_new_session):
-        # initializes the session category and channels
-        await env_manager.create_environment(is_new_session, self)
+    async def async_init(self):
+        # wait until environment is fully created
+        while not self.env.category:
+            await asyncio.sleep(5)
+        # set session id
+        self.id = self.env.category.id
         # list session instance inside dojo.sessions dict
-        self.dojo.sessions[self.category_pointer.id] = self
+        self.dojo.active_sessions[self.id] = self
+        # setup session env
+        await self.env.session_setup()
+        self.dojo.start_ids.append(self.env.start_channel_id)
         # creates information embed
-        if not self.info_msg_embed:
-            info_embed = self.get_info_embed()
-            self.info_msg_embed = await self.info_channel_pointer.send(embed=info_embed)
+        await asyncio.sleep(5)
+        if not self.env.info_msg:
+            self.env.info_msg = await self.env.info_channel.send(embed=discord.Embed(title=self.name))
+            await self.update_dashboard()
+        # start auto reset task
+        if not self.close_session_if_empty.is_running():
+            self.close_session_if_empty.start()
+        else:
+            self.close_session_if_empty.restart()
 
-    #############
-    #   START   #
-    #############
+    @classmethod
+    def new_session(cls, bot, guild_id, name, work_time, break_time, repetitions):
+        env = SessionEnvironment.create_new(bot.get_guild(guild_id), name)
+        session_instance = cls(bot, name, guild_id, work_time, break_time, repetitions, env)
+        asyncio.create_task(session_instance.create_db_entry())
+        return session_instance
 
-    async def start_session(self, member):
-        # close session so no one can join during work_time
-        # asyncio.create_task(self.work_channel_pointer.set_permissions(self.dojo.guild.default_role,
-        #                                                              connect=False, speak=False))
+    @classmethod
+    def from_db(cls, session_id, bot):
+        with closing(sqlite3.connect("src/dbm/sensei.db")) as conn:
+            c = conn.cursor()
+            # check if session is in database
+            c.execute("SELECT * FROM sessions WHERE id=:id", {"id": session_id})
+            result = c.fetchone()
+            # return None if session is not in database
+            if result:
+                # create session instance from database entry and map args
+                env = SessionEnvironment.from_database(session_id, bot)
+                session_instance = cls(bot, result[1], result[2], result[5], result[6], result[7], env,
+                                       category_id=result[0],
+                                       config=SessionConfig(mute_admins=result[8]))  # todo mute_members=result[9]))
+                return session_instance
 
-        # init session
-        if member.guild_permissions.administrator and self.dojo.mute_admins:
-            await member.edit(mute=True)
+    async def create_db_entry(self):
+        while not self.id:
+            await asyncio.sleep(2)
+        with closing(sqlite3.connect("src/dbm/sensei.db")) as conn:
+            c = conn.cursor()
+            c.execute("SELECT * FROM sessions WHERE id=:id", {"id": self.id})
+            result = c.fetchone()
+            # check if session already exists
+            if not result:
+                c.execute("""INSERT INTO sessions VALUES (
+                             :id, :name, :guild_id, :info_channel_id, :lobby_channel_id,
+                             :work_time, :break_time, :repetitions, :cfg_mute_admins
+                         )""",    {"id": self.id,
+                                   "name": self.name,
+                                   "guild_id": self.guild_id,
+                                   "info_channel_id": self.env.info_channel_id,
+                                   "lobby_channel_id": self.env.lobby_channel_id,
+                                   "work_time": self.timer.work_time,
+                                   "break_time": self.timer.break_time,
+                                   "repetitions": self.timer.repetitions,
+                                   "cfg_mute_admins": self.config.mute_admins})
+            conn.commit()
+
+    @property
+    def dojo(self):
+        return self.bot.dojos[self.guild_id]
+
+    # START
+
+    async def start_session(self):
         # start session timer
         asyncio.create_task(self.timer.start_timer())
-        # start auto reset task
-        if not self.reset_if_empty.is_running():
-            self.reset_if_empty.start()
-        else:
-            self.reset_if_empty.restart()
         # Logging
-        print("Session STARTED - with", self.member_count, "members on guild:", self.dojo.guild.name)
+        # self.bot.log.send_log("session started", f"guild: {self.dojo.guild.name}\n{self.member_count} members")
 
-    ##################
-    #   NAVIGATION   #
-    ##################
+    # NAVIGATION
 
     async def next_session(self):
-        asyncio.create_task(self.update_info_embed())
-        # rename session
-        session_name = f"Session [ {self.timer.session_count} | {self.timer.repetitions} ]"
-        await self.work_channel_pointer.edit(name=session_name)
-        # move all members from lobby to session
-        for member in self.lobby_channel_pointer.members:
-            await member.move_to(self.work_channel_pointer)
+        asyncio.create_task(self.update_dashboard())
+        await self.env.create_work_channel()
+        # move all members to work_channel
+        for member in self.env.lobby_channel.members:
+            await member.move_to(self.env.work_channel)
             # admins do not get muted automatically
             if member.guild_permissions.administrator and self.dojo.mute_admins:
                 await member.edit(mute=True)
+        for member in self.env.work_channel.members:
+            await member.move_to(self.env.work_channel)
+            # admins do not get muted automatically
+            if member.guild_permissions.administrator and self.dojo.mute_admins:
+                await member.edit(mute=True)
+        for member in self.env.start_channel.members:
+            await member.move_to(self.env.work_channel)
+            # admins do not get muted automatically
+            if member.guild_permissions.administrator and self.dojo.mute_admins:
+                await member.edit(mute=True)
+        # rename session
+        session_label = f"Session [ {self.timer.session_count} | {self.timer.repetitions} ]"
+        await self.env.work_channel.edit(name=session_label)
+        # delete start button
+        await self.env.start_channel.delete()
 
-    async def take_a_break(self):
+    async def session_break(self):
         # move members to lobby and unmute admins
-        label = self.break_time_label
-        await self.reset_members_and_work_channel(label)
+        await self.reset_members_and_work_channel()
 
     async def force_break(self, minutes):
         # current session don't count
         if self.timer.session_count > 0:
             self.timer.session_count -= 1
-        asyncio.create_task(self.update_info_embed())
+        asyncio.create_task(self.update_dashboard())
         # self.timer.break_time as default value
         if minutes > 120:
             # start normal break
@@ -117,41 +157,39 @@ class Session:
             async def set_old_break_time():
                 await asyncio.sleep(self.timer.tick)
                 self.timer.break_time = temp
-                asyncio.create_task(self.update_info_embed())
+                asyncio.create_task(self.update_dashboard())
 
             asyncio.create_task(set_old_break_time())
 
-    async def reset_session(self):
+    async def stop_session(self):
         # Logging
-        print("Session RESET - ", self.member_count, " members - ", self.dojo.guild.name)
+        # self.bot.log.send_log("session stopped", f"{self.member_count} members\nguild: {self.dojo.guild.name}")
         # resets
         self.timer.reset()
-        self.reset_if_empty.stop()
-        await self.reset_members_and_work_channel(self.start_button_label)
+        await self.reset_members_and_work_channel()
         # delete timer msg
-        if self.timer.info_msg:
-            await self.timer.info_msg.delete()
-            self.timer.info_msg = None
+        if self.env.timer_msg:
+            await self.env.timer_msg.delete()
+            self.env.timer_msg = None
         # clear info_channel
-        async for msg in self.info_channel_pointer.history():
-            if msg == self.info_msg_embed:
+        async for msg in self.env.info_channel.history():
+            if msg == self.env.info_msg:
                 continue
             else:
                 await msg.delete()
         # edit/create info embed
-        info_embed = self.get_info_embed()
-        if self.info_msg_embed:
-            await self.info_msg_embed.edit(embed=info_embed)
-        else:
-            self.info_msg_embed = await self.info_channel_pointer.send(embed=info_embed)
+        await self.update_dashboard()
 
-    ###############
-    #    TOOLS    #
-    ###############
+    # TOOLS
 
     @property
     def member_count(self) -> int:
-        return len(self.lobby_channel_pointer.members) + len(self.work_channel_pointer.members)
+        member_count = 0
+        if self.env.lobby_channel:
+            member_count += len(self.env.lobby_channel.members)
+        if self.env.work_channel:
+            member_count += len(self.env.work_channel.members)
+        return member_count
 
     @property
     async def is_empty(self) -> bool:
@@ -160,77 +198,80 @@ class Session:
             return self.member_count == 0
         return False
 
-    @tasks.loop(minutes=1)
-    async def reset_if_empty(self):
-        if await self.is_empty:
-            asyncio.create_task(self.reset_session())
+    @tasks.loop(seconds=5)
+    async def close_session_if_empty(self):
+        session_is_empty = await self.is_empty
+        if session_is_empty:
+            asyncio.create_task(self.close_session())
 
-    async def reset_members_and_work_channel(self, work_channel_label):
+    async def reset_members_and_work_channel(self):
         """ move all members back to lobby and unmute admins """
-        for member in self.work_channel_pointer.members:
-            await member.move_to(self.lobby_channel_pointer)
+        for member in self.env.work_channel.members:
+            await member.move_to(self.env.lobby_channel)
             # admins do not get unmuted automatically
             if member.guild_permissions.administrator:
                 await member.edit(mute=False)
         # only relevant if admin leaves the session early
-        for member in self.lobby_channel_pointer.members:
+        for member in self.env.lobby_channel.members:
             if member.guild_permissions.administrator:
                 await member.edit(mute=False)
+        # todo move this code to sEnv
         # reset work_channel
-        if self.work_channel_pointer:
-            await self.work_channel_pointer.delete()
-        work_ow = {
-            self.dojo.guild.me: discord.PermissionOverwrite(connect=True),
-            self.dojo.guild.default_role: discord.PermissionOverwrite(speak=not self.config.mute_members)
-        }
-        self.work_channel_pointer = await self.dojo.guild.create_voice_channel(
-            work_channel_label,
-            category=self.category_pointer,
-            overwrites=work_ow
-        )
+        if self.env.work_channel:
+            await self.env.work_channel.delete()
+        # rebuild started session
+        await self.env.session_setup()
+        self.dojo.start_ids.append(self.env.start_channel_id)
 
-    def get_info_embed(self):
-        """ return info_embed: creates an embed with session information """
-        info_embed = discord.Embed(title=self.name)
-        info_embed.add_field(name="work time", value=f"{self.timer.work_time} min")
-        info_embed.add_field(name="break time", value=f"{self.timer.break_time} min")
-        info_embed.add_field(name="session", value=f"[ {self.timer.session_count} | {self.timer.repetitions} ]")
-        return info_embed
-
-    async def update_info_embed(self):
-        """ updates the information message """
-        info_embed = self.get_info_embed()
-        await self.info_msg_embed.edit(embed=info_embed)
+    async def update_dashboard(self):
+        """ just pass trough - todo implement this better """
+        await self.dashboard.update()
 
     async def update_edit(self):
-        self.label = f"🍅 {self.name}"
-        if self.category_pointer.name != self.label:
-            await self.category_pointer.edit(name=self.label)
-        await self.update_info_embed()
-        # update config
-        await self.config_msg.edit(f"Session config: {self.to_json()}")
+        if self.env.category.name != self.name:
+            await self.env.category.edit(name=self.name)
+        await self.update_dashboard()
+
+    async def close_session(self):
+        # turn timer off
+        self.close_session_if_empty.stop()
+        self.timer.is_active = False
+        # disconnect all members and delete channels
+        try:
+            # work_channel
+            for member in self.env.work_channel.members:
+                await member.move_to(None)
+            await self.env.work_channel.delete()
+        except Exception as e:
+            self.bot.log.exception("close_session", e)
+        try:
+            # lobby_channel
+            await self.env.start_channel.delete()
+            for member in self.env.lobby_channel.members:
+                await member.move_to(None)
+        except Exception as e:
+            self.bot.log.exception("close_session", e)
+        # remove active session reference
+        del self.dojo.active_sessions[self.id]
 
     async def dispose(self):
-        # turn timer off
-        self.timer.is_active = False
-        # delete channels
-        for vc in self.category_pointer.voice_channels:
-            await vc.delete()
-        for tc in self.category_pointer.text_channels:
-            await tc.delete()
-        del self.dojo.sessions[self.category_pointer.id]
-        await self.category_pointer.delete()
-
-    def to_json(self):
-        """
-        serializes important information to json string
-        """
-        return json.dumps({
-            "name": self.name,
-            "work_time": self.timer.work_time,
-            "pause_time": self.timer.break_time,
-            "number_sessions": self.timer.repetitions
-        })
+        await self.close_session()
+        # remove db entry
+        with closing(sqlite3.connect("src/dbm/sensei.db")) as conn:
+            c = conn.cursor()
+            c.execute("DELETE FROM sessions WHERE id=:id", {"id": self.id})
+            conn.commit()
+        # remove listener ids
+        try:
+            self.dojo.lobby_ids.remove(self.env.lobby_channel.id)
+        except Exception as e:
+            self.bot.log.exception("dispose", e)
+        try:
+            self.dojo.start_ids.remove(self.env.start_channel_id)
+        except Exception as e:
+            self.bot.log.exception("dispose", e)
+        # dispose environment
+        await self.env.dispose()
 
     def __eq__(self, other):
-        return self.name == other.name
+        return self.id == other.id

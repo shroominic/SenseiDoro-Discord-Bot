@@ -4,25 +4,28 @@ from dotenv import load_dotenv
 import discord
 import os
 
-from src.dbm import setup
-from src.clients import SenseiClient
-from src.cogs import *
+import dbm
+from clients import SenseiClient
+from cogs import *
 
 
 def run():
     # load token from .env
     load_dotenv()
-    token = os.getenv('DISCORD_TOKEN')
-    shard_count = os.getenv('SHARD_COUNT')
+    token = os.getenv('DISCORD_TOKEN') or "0"
+    shard_count = os.getenv('SHARD_COUNT') or "1"
 
     # client can see all users
     intents = discord.Intents.default()
 
     # init database
-    setup.main()
+    dbm.setup.main()
 
     # init bot client
-    bot = SenseiClient(shard_count=int(shard_count), command_prefix="$", intents=intents)
+    bot = SenseiClient(shard_count=int(shard_count),
+                       command_prefix="$",
+                       intents=intents,
+                       debug_guilds=[933389956246802483])
 
     # adding cogs
     bot.add_cog(OnReady(bot))
@@ -32,7 +35,9 @@ def run():
     bot.add_cog(CommandErrHandler(bot))
     bot.add_cog(DebugTools(bot))
     # tasks
+    bot.log = Logging(bot)
     bot.tgg = TopGGUpdate(bot)
+    bot.add_cog(bot.log)
     bot.add_cog(bot.tgg)
     # overwrite help cmd
     bot.remove_command('help')
@@ -40,10 +45,9 @@ def run():
 
     # adding slash cmds
     bot.add_cog(Create(bot))
-    bot.add_application_command(Data(bot))
-    bot.add_application_command(Config(bot))
-    bot.add_application_command(SetRole(bot))
-    bot.add_application_command(SessionCmd(bot))
+    bot.add_cog(Data(bot))
+    bot.add_cog(Config(bot))
+    bot.add_cog(SetRoles(bot))
 
     bot.run(token)
 

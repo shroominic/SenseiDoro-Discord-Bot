@@ -2,7 +2,7 @@ import sqlite3
 from contextlib import closing
 from discord.ext.commands import Cog
 
-from src.dojo import Dojo
+from dojo import Dojo
 
 
 class OnReady(Cog):
@@ -23,9 +23,10 @@ class OnReady(Cog):
             active_guild_ids = [guild.id for guild in self.bot.guilds]
             # calculate unused guilds
             unused_guilds = list(set(result) - set(active_guild_ids))
-            print(unused_guilds, "not active anymore, will get deleted")
-            for guild_id in unused_guilds:
-                c.execute("DELETE FROM dojos WHERE id=:id", {"id": guild_id})
+            if unused_guilds:
+                print(unused_guilds, "not active anymore, will get deleted")
+                for guild_id in unused_guilds:
+                    c.execute("DELETE FROM dojos WHERE id=:id", {"id": guild_id})
             conn.commit()
 
         # create dojo instances for all active guilds
@@ -43,12 +44,21 @@ class OnReady(Cog):
                 else:
                     dojo = Dojo.new_db_entry(guild, self.bot, c)
                     self.bot.dojos[guild.id] = dojo
-            conn.commit()
+
+        with closing(sqlite3.connect("src/dbm/sensei.db")) as conn:
+            c = conn.cursor()
+            c.execute("SELECT lobby_channel_id, guild_id FROM sessions")
+            result = c.fetchall()
+            print(result)
+            for lobby_id, guild_id in result:
+                dojo = self.bot.get_dojo(guild_id)
+                dojo.lobby_ids.append(lobby_id)
 
         # print all connected guilds
         all_guilds = [guild.name for guild in self.bot.guilds]
         print(f'{self.bot.user} is ready and connected to the following guilds: \n{all_guilds}')
 
-        # update top.gg
+        # start top.gg update task
         self.bot.tgg.update_stats.start()
+        self.bot.log.update_stats.start()
 

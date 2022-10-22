@@ -3,7 +3,7 @@ from contextlib import closing
 
 from discord.ext.commands import Cog
 
-from src.dojo import Dojo
+from dojo import Dojo
 
 
 class OnGuildJoin(Cog):
