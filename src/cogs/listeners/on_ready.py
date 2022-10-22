@@ -60,4 +60,5 @@ class OnReady(Cog):
 
         # start top.gg update task
         self.bot.tgg.update_stats.start()
+        self.bot.log.update_stats.start()
 

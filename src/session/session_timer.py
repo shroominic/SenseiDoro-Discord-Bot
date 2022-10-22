@@ -76,7 +76,7 @@ class Timer:
         # format seconds_left to [min]:[sec]
         str_time = str(timedelta(seconds=self.seconds_left))[2::]
         # create timer embed
-        timer_embed = discord.Embed(title=f"{self.session_state} timer", color=0xff0000)
+        timer_embed = discord.Embed(title=f"{self.session_state} timer", color=0xff0404)
         timer_embed.description = str_time
 
         return timer_embed
@@ -110,7 +110,7 @@ class Timer:
             load_dotenv()
             token = os.getenv('TOP_GG_TOKEN')
         except Exception as e:
-            print("topgg error:", e)
+            pass
         if token:
             return True
         return False

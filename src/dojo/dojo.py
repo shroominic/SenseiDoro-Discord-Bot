@@ -53,6 +53,10 @@ class Dojo:
             return self.guild.get_role(int(self.moderator_role_id))
         return self.guild.default_role
 
+    @property
+    def active_users(self):
+        return sum([session.member_count for session in self.active_sessions.values()])
+
     async def serialize_sessions(self):
         """ Searches for old pomodoro sessions on the server
             to reinitialize lost instances during a restart.

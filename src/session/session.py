@@ -105,7 +105,7 @@ class Session:
         # start session timer
         asyncio.create_task(self.timer.start_timer())
         # Logging
-        print("Session STARTED - with", self.member_count, "members on guild:", self.dojo.guild.name)
+        # self.bot.log.send_log("session started", f"guild: {self.dojo.guild.name}\n{self.member_count} members")
 
     # NAVIGATION
 
@@ -163,7 +163,7 @@ class Session:
 
     async def stop_session(self):
         # Logging
-        print("Session STOPPED - ", self.member_count, " members - ", self.dojo.guild.name)
+        # self.bot.log.send_log("session stopped", f"{self.member_count} members\nguild: {self.dojo.guild.name}")
         # resets
         self.timer.reset()
         await self.reset_members_and_work_channel()
@@ -243,14 +243,14 @@ class Session:
                 await member.move_to(None)
             await self.env.work_channel.delete()
         except Exception as e:
-            print(e)
+            self.bot.log.exception("close_session", e)
         try:
             # lobby_channel
             await self.env.start_channel.delete()
             for member in self.env.lobby_channel.members:
                 await member.move_to(None)
         except Exception as e:
-            print(e)
+            self.bot.log.exception("close_session", e)
         # remove active session reference
         del self.dojo.active_sessions[self.id]
 
@@ -265,11 +265,11 @@ class Session:
         try:
             self.dojo.lobby_ids.remove(self.env.lobby_channel.id)
         except Exception as e:
-            print(e)
+            self.bot.log.exception("dispose", e)
         try:
             self.dojo.start_ids.remove(self.env.start_channel_id)
         except Exception as e:
-            print(e)
+            self.bot.log.exception("dispose", e)
         # dispose environment
         await self.env.dispose()
 
