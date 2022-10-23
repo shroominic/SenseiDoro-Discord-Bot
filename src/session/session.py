@@ -1,5 +1,6 @@
 import sqlite3
-import discord
+
+import discord.errors
 from discord.ext import tasks
 from contextlib import closing
 
@@ -183,19 +184,21 @@ class Session:
 
     async def reset_members_and_work_channel(self):
         """ move all members back to lobby and unmute admins """
-        for member in self.env.work_channel.members:
-            await member.move_to(self.env.lobby_channel)
-            # admins do not get unmuted automatically
-            if member.guild_permissions.administrator:
-                await member.edit(mute=False)
+        if self.env.work_channel:
+            for member in self.env.work_channel.members:
+                await member.move_to(self.env.lobby_channel)
+                # admins do not get unmuted automatically
+                if member.guild_permissions.administrator:
+                    await member.edit(mute=False)
         # only relevant if admin leaves the session early
         for member in self.env.lobby_channel.members:
             if member.guild_permissions.administrator:
                 await member.edit(mute=False)
         # todo move this code to sEnv
         # reset work_channel
-        if self.env.work_channel:
-            await self.env.work_channel.delete()
+        try:
+            if self.env.work_channel:
+                await self.env.work_channel.delete()
                 self.env.work_channel = None
         except discord.errors.NotFound:
             pass
@@ -212,9 +215,11 @@ class Session:
         # disconnect all members and delete channels
         try:
             # work_channel
-            for member in self.env.work_channel.members:
-                await member.move_to(None)
-            await self.env.work_channel.delete()
+            if self.env.work_channel:
+                for member in self.env.work_channel.members:
+                    await member.move_to(None)
+                await self.env.work_channel.delete()
+                self.env.work_channel = None
         except Exception as e:
             self.bot.log.exception("close_session", e)
         try:
