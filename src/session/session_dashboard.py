@@ -90,11 +90,33 @@ class DashboardView(discord.ui.View):
         # update dashboard
         await interaction.response.edit_message(view=self)
 
-    @discord.ui.button(label="✏️ Edit", style=discord.ButtonStyle.primary)
-    async def forth_button_callback(self, _, interaction):
-        """ Use this command to edit your session. """
-        # open edit form session
-        await interaction.response.send_message(embed=discord.Embed(title="Session Editor"))
+    @discord.ui.button(label="❖ More", style=discord.ButtonStyle.secondary)
+    async def show_more_button(self, _: discord.ui.Button, interaction: discord.Interaction):
+        """ Use this button to edit your session. """
+        await interaction.response.edit_message(view=EditSessionView(session=self.session, parent_view=self))
+
+
+class EditSessionView(discord.ui.View):
+    """ edit buttons """
+    def __init__(self, session, parent_view):
+        super().__init__(timeout=None)
+        self.bot = session.bot
+        self.session = session
+        self.parent_view = parent_view
+
+    @discord.ui.button(label="⬅︎", style=discord.ButtonStyle.secondary)
+    async def back(self, _: discord.ui.Button, interaction: discord.Interaction):
+        """ Use this button to go back to the dashboard. """
+        # move back to dashboard view
+        await interaction.response.edit_message(view=self.parent_view)
+
+    @discord.ui.button(emoji="✏️", label="Edit", style=discord.ButtonStyle.primary)
+    async def edit_session(self, _: discord.ui.Button, interaction: discord.Interaction):
+        """ Use this button to change the session name. """
+        # input dialog
+        modal = EditSessionModal(title="Edit Session", session=self.session)
+        # update dashboard
+        await interaction.response.send_modal(modal)
 
     @discord.ui.button(label="🗑 Delete", style=discord.ButtonStyle.danger)
     async def third_button_callback(self, _: discord.ui.Button, interaction: discord.Interaction):
