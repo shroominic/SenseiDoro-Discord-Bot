@@ -37,11 +37,6 @@ class Session:
         self.dojo.active_sessions[self.id] = self
         # setup dashboard
         await self.dashboard.update()
-        # creates information embed
-        await asyncio.sleep(5)
-        if not self.env.info_msg:
-            self.env.info_msg = await self.env.info_channel.send(embed=discord.Embed(title=self.name))
-            await self.update_dashboard()
         # start auto reset task
         if not self.close_session_if_empty.is_running():
             self.close_session_if_empty.start()
@@ -109,7 +104,7 @@ class Session:
     # NAVIGATION
 
     async def next_session(self):
-        asyncio.create_task(self.update_dashboard())
+        asyncio.create_task(self.dashboard.update())
         await self.env.create_work_channel()
         # move all members to work_channel
         for member in self.env.lobby_channel.members:
@@ -134,7 +129,7 @@ class Session:
         # current session don't count
         if self.timer.session_count > 0:
             self.timer.session_count -= 1
-        asyncio.create_task(self.update_dashboard())
+        asyncio.create_task(self.dashboard.update())
         # self.timer.break_time as default value
         if minutes > 120:
             # start normal break
@@ -149,28 +144,18 @@ class Session:
             async def set_old_break_time():
                 await asyncio.sleep(self.timer.tick)
                 self.timer.break_time = temp
-                asyncio.create_task(self.update_dashboard())
+                asyncio.create_task(self.dashboard.update())
 
             asyncio.create_task(set_old_break_time())
 
     async def stop_session(self):
         # Logging
-        # self.bot.log.send_log("session stopped", f"{self.member_count} members\nguild: {self.dojo.guild.name}")
+        # self.bot.log.send_log("session stopped", f"{self.member_count} members\n guild: {self.dojo.guild.name}")
         # resets
-        self.timer.reset()
         await self.reset_members_and_work_channel()
-        # delete timer msg
-        if self.env.timer_msg:
-            await self.env.timer_msg.delete()
-            self.env.timer_msg = None
-        # clear info_channel
-        async for msg in self.env.info_channel.history():
-            if msg == self.env.info_msg:
-                continue
-            else:
-                await msg.delete()
+        self.timer.reset()
         # edit/create info embed
-        await self.update_dashboard()
+        await self.dashboard.update()
 
     # TOOLS
 
@@ -215,14 +200,10 @@ class Session:
         except discord.errors.NotFound:
             pass
 
-    async def update_dashboard(self):
-        """ just pass trough - todo implement this better """
-        await self.dashboard.update()
-
     async def update_edit(self):
         if self.env.category.name != self.name:
             await self.env.category.edit(name=self.name)
-        await self.update_dashboard()
+        await self.dashboard.update()
 
     async def close_session(self):
         # turn timer off
