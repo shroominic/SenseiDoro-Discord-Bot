@@ -127,3 +127,41 @@ class EditSessionView(discord.ui.View):
         self.disable_all_items()
         # update view
         await interaction.response.edit_message(view=self)
+
+
+class EditSessionModal(discord.ui.Modal):
+    def __init__(self, session, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.session = session
+
+        self.add_item(discord.ui.InputText(label="Session Name"))
+        self.add_item(discord.ui.InputText(label="Work Time"))
+        self.add_item(discord.ui.InputText(label="Break Time"))
+        self.add_item(discord.ui.InputText(label="Repetitions"))
+
+    async def callback(self, interaction: discord.Interaction):
+        """ callback for the modal """
+        session_name = a if (a := self.children[0].value) == "" else None
+        work_time = a if (a := self.children[1].value) == "" else None
+        break_time = a if (a := self.children[2].value) == "" else None
+        repetitions = a if (a := self.children[3].value) == "" else None
+        # check if input is valid
+        try:
+            if work_time:
+                self.session.timer.work_time = int(work_time)
+        except ValueError:
+            await interaction.channel.send_message("Invalid work time please use a number")
+        try:
+            if break_time:
+                self.session.timer.break_time = int(break_time)
+        except ValueError:
+            await interaction.channel.send_message("Invalid break time please use a number")
+        try:
+            if repetitions:
+                self.session.timer.repetitions = int(repetitions)
+        except ValueError:
+            await interaction.channel.send_message("Invalid repetitions please use a number")
+
+        # response
+        embed = discord.Embed(title="Edit Successful", color=discord.Color.green())
+        await interaction.response.send_message(embed=embed, delete_after=5)
