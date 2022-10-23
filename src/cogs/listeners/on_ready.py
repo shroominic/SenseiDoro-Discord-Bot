@@ -58,7 +58,14 @@ class OnReady(Cog):
         all_guilds = [guild.name for guild in self.bot.guilds]
         print(f'{self.bot.user} is ready and connected to the following guilds: \n{all_guilds}')
 
-        # start top.gg update task
-        self.bot.tgg.update_stats.start()
-        self.bot.log.update_stats.start()
+        # re/start top.gg api
+        if self.bot.tgg.update_stats.is_running():
+            self.bot.tgg.update_stats.restart()
+        else:
+            self.bot.tgg.update_stats.start()
+        # re/start logging
+        if self.bot.log.update_stats.is_running():
+            self.bot.log.update_stats.restart()
+        else:
+            self.bot.log.update_stats.start()
 
