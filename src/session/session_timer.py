@@ -80,7 +80,7 @@ class SessionTimer:
         # format seconds_left to [min]:[sec]
         str_time = str(timedelta(seconds=self.seconds_left))[2::]
         # create timer embed
-        timer_embed = discord.Embed(title=f"{self.session_state} timer", color=0xff0404)
+        timer_embed = discord.Embed(title=f"{self.session_state} Timer", color=0xff0404)
         timer_embed.description = str_time
 
         return timer_embed
