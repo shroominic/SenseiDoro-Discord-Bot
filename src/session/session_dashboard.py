@@ -5,17 +5,21 @@ from discord import Embed
 
 
 class SessionDashboard:
-    def __init__(self, parent_session):
-        self.session = parent_session
-        self.embed_msg = None
+    def __init__(self, session):
+        self.session = session
+        # dashboard buttons
+        self.buttons_view = None
+        # dashboard embed
+        # todo store dashboard embed references here
 
     def build_dashboard_embed(self) -> Embed:
+        """ builds the dashboard embed """
         embed = Embed(title=f"{self.session.name} Dashboard")
-        embed.add_field(name="work time",
+        embed.add_field(name="🛠 work ",
                              value=f"{self.session.timer.work_time} min")
-        embed.add_field(name="break time",
+        embed.add_field(name="☕️ break ",
                              value=f"{self.session.timer.break_time} min")
-        embed.add_field(name="reps",
+        embed.add_field(name="♻️ reps ",
                              value=f"[ {self.session.timer.session_count} | {self.session.timer.repetitions} ]")
         return embed
 
@@ -27,17 +31,20 @@ class SessionDashboard:
         """ creates/updates the dashboard """
         await self.cleanup()
         # dashboard buttons
-        session_controls = DashboardView(session=self.session)
+        self.buttons_view = DashboardView(session=self.session)
         # disable buttons if session is not active
         if self.session.timer.is_active:
             self.buttons_view.disable_all_items()
+        # check if dashboard message exists
         if self.session.env.info_msg:
+            # update dashboard
             await self.session.env.info_msg.edit(embed=self.build_dashboard_embed(),
-                                                 view=session_controls)
-        # create dashboard
+                                                 view=self.buttons_view)
         else:
+            # create dashboard
             self.session.env.info_msg = await self.session.env.info_channel.send(embed=self.build_dashboard_embed(),
-                                                                                 view=session_controls)
+                                                                                 view=self.buttons_view)
+
     async def disable_buttons(self):
         """ disables all dashboard buttons """
         if self.buttons_view:
@@ -68,15 +75,20 @@ class SessionDashboard:
 
 
 class DashboardView(discord.ui.View):
+    """ dashboard buttons """
     def __init__(self, session):
         super().__init__(timeout=None)
         self.bot = session.bot
         self.session = session
 
-    @discord.ui.button(label="🚀 Start", style=discord.ButtonStyle.green)
-    async def start(self, button: discord.ui.Button, interaction: discord.Interaction):
+    @discord.ui.button(emoji="🚀", label="Start", style=discord.ButtonStyle.green)
+    async def start_button(self, _: discord.ui.Button, interaction: discord.Interaction):
+        """ Use this button to start your session. """
         await self.session.start_session()
-        await interaction.response.edit_message(view=None)
+        # deactivate dashboard during session
+        self.disable_all_items()
+        # update dashboard
+        await interaction.response.edit_message(view=self)
 
     @discord.ui.button(label="✏️ Edit", style=discord.ButtonStyle.primary)
     async def forth_button_callback(self, _, interaction):
@@ -85,11 +97,11 @@ class DashboardView(discord.ui.View):
         await interaction.response.send_message(embed=discord.Embed(title="Session Editor"))
 
     @discord.ui.button(label="🗑 Delete", style=discord.ButtonStyle.danger)
-    async def third_button_callback(self, _, interaction):
-        """ Use this command to delete your session. """
+    async def third_button_callback(self, _: discord.ui.Button, interaction: discord.Interaction):
+        """ Use this button to delete your session. """
         # delete session
         asyncio.create_task(self.session.dispose())
         # disable buttons
-        for child in self.children:  # loop through all children of the view
-            child.disabled = True
+        self.disable_all_items()
+        # update view
         await interaction.response.edit_message(view=self)
