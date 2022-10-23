@@ -44,6 +44,8 @@ class SessionTimer:
         self.session_count = 0
         self.session_state = "Work"
         self.set_time_left(self.work_time)
+        # delete timer message
+        self.delete_timer_embed()
 
     async def timer(self):
         next_call = time.time()
@@ -84,6 +86,11 @@ class SessionTimer:
         timer_embed.description = str_time
 
         return timer_embed
+
+    def delete_timer_embed(self):
+        if self.session.env.timer_msg:
+            asyncio.create_task(self.session.env.timer_msg.delete())
+            self.session.env.timer_msg = None
 
     def set_time_left(self, minutes_left):
         # format from minutes and set seconds_left
@@ -130,5 +137,5 @@ class TimerView(discord.ui.View):
     async def stop_button_callback(self, _, interaction):
         """ Use this command to stop and reset your session. """
         # stops session and timer
-        await self.session.stop_session()
+        asyncio.create_task(self.session.stop_session())
         await interaction.response.edit_message(view=self)

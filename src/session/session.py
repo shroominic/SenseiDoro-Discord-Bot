@@ -211,8 +211,10 @@ class Session:
     async def close_session(self):
         # turn timer off
         self.close_session_if_empty.stop()
-        self.timer.is_active = False
-        # disconnect all members and delete channels
+        self.timer.reset()
+        # deactivate buttons
+        await self.dashboard.disable_buttons()
+        # disconnect all members and delete channels todo this should be done in sEnv
         try:
             # work_channel
             if self.env.work_channel:

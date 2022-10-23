@@ -28,7 +28,9 @@ class SessionDashboard:
         await self.cleanup()
         # dashboard buttons
         session_controls = DashboardView(session=self.session)
-        # update dashboard
+        # disable buttons if session is not active
+        if self.session.timer.is_active:
+            self.buttons_view.disable_all_items()
         if self.session.env.info_msg:
             await self.session.env.info_msg.edit(embed=self.build_dashboard_embed(),
                                                  view=session_controls)
@@ -36,6 +38,11 @@ class SessionDashboard:
         else:
             self.session.env.info_msg = await self.session.env.info_channel.send(embed=self.build_dashboard_embed(),
                                                                                  view=session_controls)
+    async def disable_buttons(self):
+        """ disables all dashboard buttons """
+        if self.buttons_view:
+            self.buttons_view.disable_all_items()
+            self.session.env.info_msg = await self.session.env.info_msg.edit(view=self.buttons_view)
 
     async def cleanup(self):
         """ clears you dashboard  """
