@@ -51,10 +51,8 @@ class SessionDashboard:
             async for msg in self.session.env.info_channel.history():
                 if msg.embeds:
                     for embed in msg.embeds:
-                        if embed.fields:
-                            for field in embed.fields:
-                                if "Dashboard" in field.name:
-                                    self.session.env.info_msg = msg
+                        if "Dashboard" in embed.title:
+                            self.session.env.info_msg = msg
                         if "timer" in embed.title:
                             self.session.env.timer_msg = msg
 
