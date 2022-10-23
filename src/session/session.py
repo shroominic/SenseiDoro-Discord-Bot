@@ -35,9 +35,8 @@ class Session:
         self.id = self.env.category.id
         # list session instance inside dojo.sessions dict
         self.dojo.active_sessions[self.id] = self
-        # setup session env
-        await self.env.session_setup()
-        self.dojo.start_ids.append(self.env.start_channel_id)
+        # setup dashboard
+        await self.dashboard.update()
         # creates information embed
         await asyncio.sleep(5)
         if not self.env.info_msg:
@@ -123,16 +122,9 @@ class Session:
             # admins do not get muted automatically
             if member.guild_permissions.administrator and self.dojo.mute_admins:
                 await member.edit(mute=True)
-        for member in self.env.start_channel.members:
-            await member.move_to(self.env.work_channel)
-            # admins do not get muted automatically
-            if member.guild_permissions.administrator and self.dojo.mute_admins:
-                await member.edit(mute=True)
         # rename session
         session_label = f"Session [ {self.timer.session_count} | {self.timer.repetitions} ]"
         await self.env.work_channel.edit(name=session_label)
-        # delete start button
-        await self.env.start_channel.delete()
 
     async def session_break(self):
         # move members to lobby and unmute admins
@@ -219,9 +211,9 @@ class Session:
         # reset work_channel
         if self.env.work_channel:
             await self.env.work_channel.delete()
-        # rebuild started session
-        await self.env.session_setup()
-        self.dojo.start_ids.append(self.env.start_channel_id)
+                self.env.work_channel = None
+        except discord.errors.NotFound:
+            pass
 
     async def update_dashboard(self):
         """ just pass trough - todo implement this better """
@@ -246,7 +238,6 @@ class Session:
             self.bot.log.exception("close_session", e)
         try:
             # lobby_channel
-            await self.env.start_channel.delete()
             for member in self.env.lobby_channel.members:
                 await member.move_to(None)
         except Exception as e:
@@ -264,10 +255,6 @@ class Session:
         # remove listener ids
         try:
             self.dojo.lobby_ids.remove(self.env.lobby_channel.id)
-        except Exception as e:
-            self.bot.log.exception("dispose", e)
-        try:
-            self.dojo.start_ids.remove(self.env.start_channel_id)
         except Exception as e:
             self.bot.log.exception("dispose", e)
         # dispose environment

@@ -24,12 +24,6 @@ class OnVSUpdate(Cog, name='OnVSUpdate module'):
                 #  dojo.activate_session(after.channel)
                 session = await tools.get_session(after.channel, dojo)
                 # todo differentiate between get_session and init_session
-            # START button
-            if after.channel.id in dojo.start_ids:
-                if len(after.channel.members) == 1:
-                    session_id = await tools.get_session_id(after.channel, dojo)
-                    session = dojo.active_sessions[session_id]
-                    asyncio.create_task(session.start_session())
         else:
             # todo (not important)
             # some code that unmute admins if they leave

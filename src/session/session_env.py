@@ -10,7 +10,6 @@ class SessionEnvironment:
     info_label = "📋dashboard"
     lobby_label = "☕️ lobby"
     work_label = "⏳ focus"
-    start_label = "🚀 START SESSION"
 
     def __init__(self, guild, **kwargs):
         self.guild = guild
@@ -19,7 +18,6 @@ class SessionEnvironment:
         # voice channels
         self.lobby_channel = kwargs.get("lobby_channel", None)
         self.work_channel = kwargs.get("work_channel", None)
-        self.start_channel = kwargs.get("start_channel", None)
         # chat channels
         self.info_channel = kwargs.get("info_channel", None)
         self.chat_channel = kwargs.get("chat_channel", None)  # should get removed soon
@@ -91,8 +89,6 @@ class SessionEnvironment:
         if self.config_channel:
             print("config channel exists")
             return
-        # create channels
-        await self.create_start_button()
 
     async def create_work_channel(self):
         """ Creates a work channel for the session """
@@ -102,30 +98,15 @@ class SessionEnvironment:
                                                                   category=self.category,
                                                                   overwrites=work_ow)
 
-    async def create_start_button(self):
-        """ Creates a start button (channel) for the session"""
-        start_ow = {self.guild.me: discord.PermissionOverwrite(connect=True, view_channel=True),
-                    self.guild.default_role: discord.PermissionOverwrite(speak=False, view_channel=True)}
-        self.start_channel = await self.guild.create_voice_channel(self.start_label,
-                                                                   category=self.category,
-                                                                   overwrites=start_ow)
-
     async def remove_old_env_on_bot_restart(self):
         # delete old unused voice channels
         for vc in self.category.voice_channels:
-            if self.start_label in vc.name:
-                await vc.delete()
             if "Session [" in vc.name:
                 await vc.delete()
         # remove old timer message
         if self.timer_msg:
             await self.timer_msg.delete()
-
-    async def update_started_session_env(self):
-        # hide start button
-        start_ow = {self.guild.me: discord.PermissionOverwrite(connect=True, view_channel=True),
-                    self.guild.default_role: discord.PermissionOverwrite(speak=False, view_channel=False)}
-        await self.start_channel.edit(overwites=start_ow)
+            self.timer_msg = None
 
     async def async_create_new(self, session_name):
         # create session category
@@ -169,7 +150,6 @@ class SessionEnvironment:
         await self.work_channel.edit(name=self.work_label)
         await self.chat_channel.delete()
         await self.config_channel.delete()
-        self.start_channel = await self.guild.create_voice_channel(self.start_label)
 
     async def dispose(self):
         # delete all channels
@@ -184,9 +164,5 @@ class SessionEnvironment:
     @property
     def lobby_channel_id(self):
         return self.lobby_channel.id if self.lobby_channel else None
-
-    @property
-    def start_channel_id(self):
-        return self.start_channel.id if self.start_channel else None
 
     # todo cmd to create old env for testing

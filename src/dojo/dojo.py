@@ -16,7 +16,6 @@ class Dojo:
         self.active_sessions = {}
         # button listener ids
         self.lobby_ids = []
-        self.start_ids = []
         # role ids
         self.admin_role_id: int = kwargs.get("admin_role_id", None)
         self.moderator_role_id: int = kwargs.get("mod_role_id", None)
