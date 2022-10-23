@@ -50,7 +50,10 @@ class SessionDashboard:
         if self.session.env.info_channel:
             async for msg in self.session.env.info_channel.history():
                 if msg != self.session.env.info_msg and msg != self.session.env.timer_msg:
-                    await msg.delete()
+                    try:
+                        await msg.delete()
+                    except discord.errors.NotFound:
+                        pass
 
     async def search_old_messages(self):
         """ fetches old messages from the dashboard channel """
