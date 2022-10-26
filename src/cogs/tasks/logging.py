@@ -45,10 +45,25 @@ class Logging(commands.Cog):
     def sensei_stats_embed(self):
         """ creates a embed for all sensei stats """
         embed = Embed(title="Sensei Stats")
+        # number of dojos
+        embed.add_field(name="Total Dojos",
+                        value=f"{self.bot.total_dojos}")
+        # number of all created sessions
+        embed.add_field(name="Total Sessions",
+                        value=f"{self.bot.total_sessions}")
+        # number of running sessions
         embed.add_field(name="Active Sessions",
-                        value=f"{self.bot.session_count}")
-        embed.add_field(name="User Count",
-                        value=f"{self.bot.active_users}")
+                        value=f"{self.bot.total_active_sessions}")
+        # number of users inside active sessions
+        embed.add_field(name="Active Users",
+                        value=f"{self.bot.total_active_users}")
+        # number of sessions running in the last 24 hours
+        embed.add_field(name="Sessions per 24h",
+                        value=f"{self.bot.total_sessions_24h}")
+        # number of active users in the last 24 hours
+        embed.add_field(name="Users per 24h",
+                        value=f"{self.bot.total_active_users_24h}")
+        # todo add more stats
         return embed
 
     async def manage_sensei_stats(self):
