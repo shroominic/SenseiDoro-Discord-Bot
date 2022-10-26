@@ -13,7 +13,7 @@ class OnVSUpdate(Cog, name='OnVSUpdate module'):
     async def on_voice_state_update(self, _, before, after):
         """ This function gets called, when something changes in voice channels. """
         if after.channel:
-            if before.channel and before.channel.name == after.channel.name:
+            if before.channel and before.channel.id == after.channel.id:
                 # ignore multiple calls from the same channel
                 return
             dojo = self.bot.dojos[after.channel.guild.id]
