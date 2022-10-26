@@ -28,7 +28,7 @@ class Create(commands.Cog):
         if len(dojo.lobby_ids) >= dojo.session_limit:
             # error feedback
             title = "Session limit reached"
-            feedback = "You can currently have only {dojo.session_limit} sessions on your server."
+            feedback = f"You can currently have only {dojo.session_limit} sessions on your server."
             slash_response(ctx, title, feedback, 10)
             return
         # create new session
