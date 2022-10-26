@@ -75,8 +75,6 @@ class SessionEnvironment:
                 references["config_channel"] = tc
         # create environment
         env = cls(category.guild, **references)
-        # asynchronous message matching
-        asyncio.create_task(env.async_match_messages(bot.user))
         # information for aborted active sessions
         if references["work_channel"].name != "START SESSION":
             embed = discord.Embed(title="Session Aborted")
