@@ -23,10 +23,6 @@ class SessionDashboard:
                              value=f"[ {self.session.timer.session_count} | {self.session.timer.repetitions} ]")
         return embed
 
-    def build_timer_embed(self):
-        """ todo write timer embed methode """
-        pass
-
     async def update(self):
         """ creates/updates the dashboard """
         await self.cleanup()
@@ -61,6 +57,13 @@ class SessionDashboard:
                         await msg.delete()
                     except discord.errors.NotFound:
                         pass
+
+    async def disable_session(self):
+        """ disables the session """
+        await self.disable_buttons()
+        # session offline embed
+        embed = Embed(title=f"{self.session.name} Dashboard (offline)", description="Join ☕️lobby to activate.")
+        await self.session.env.info_msg.edit(embed=embed, view=None)
 
     async def search_old_messages(self):
         """ fetches old messages from the dashboard channel """
@@ -118,7 +121,7 @@ class EditSessionView(discord.ui.View):
         # update dashboard
         await interaction.response.send_modal(modal)
 
-    @discord.ui.button(label="🗑 Delete", style=discord.ButtonStyle.danger)
+    @discord.ui.button(emoji="🗑", label="Delete", style=discord.ButtonStyle.danger)
     async def third_button_callback(self, _: discord.ui.Button, interaction: discord.Interaction):
         """ Use this button to delete your session. """
         # delete session
