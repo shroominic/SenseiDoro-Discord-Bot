@@ -1,6 +1,5 @@
 
 from discord.ext.commands import Cog
-import asyncio
 
 from session import tools
 
@@ -20,10 +19,7 @@ class OnVSUpdate(Cog, name='OnVSUpdate module'):
             # init session if some1 joins LOBBY
             if after.channel.id in dojo.lobby_ids:
                 # session gets activated
-                # todo init session in a better way
-                #  dojo.activate_session(after.channel)
-                session = await tools.get_session(after.channel, dojo)
-                # todo differentiate between get_session and init_session
+                await tools.activate_session(after.channel, dojo)
         else:
             # todo (not important)
             # some code that unmute admins if they leave

@@ -26,7 +26,7 @@ async def create_session_from_db(session_id, dojo):
     return session
 
 
-async def get_session(some_channel, dojo):
+async def activate_session(some_channel, dojo):
     # get session id
     session_id = some_channel.category.id
     # if session is active
@@ -41,6 +41,5 @@ async def get_session(some_channel, dojo):
             if result:
                 session = Session.from_db(session_id, dojo.bot)
                 dojo.active_sessions[session_id] = session
-                return session
 
 
