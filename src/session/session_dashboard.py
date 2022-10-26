@@ -137,34 +137,44 @@ class EditSessionModal(discord.ui.Modal):
         super().__init__(*args, **kwargs)
         self.session = session
 
-        self.add_item(discord.ui.InputText(label="Session Name"))
-        self.add_item(discord.ui.InputText(label="Work Time"))
-        self.add_item(discord.ui.InputText(label="Break Time"))
-        self.add_item(discord.ui.InputText(label="Repetitions"))
+        self.add_item(discord.ui.InputText(label="Session Name",
+                                           placeholder=self.session.name,
+                                           required=False))
+        self.add_item(discord.ui.InputText(label="Work Time",
+                                           placeholder=str(self.session.timer.work_time),
+                                           required=False))
+        self.add_item(discord.ui.InputText(label="Break Time",
+                                           placeholder=str(self.session.timer.break_time),
+                                           required=False))
+        self.add_item(discord.ui.InputText(label="Repetitions",
+                                           placeholder=str(self.session.timer.repetitions),
+                                           required=False))
 
     async def callback(self, interaction: discord.Interaction):
         """ callback for the modal """
-        session_name = a if (a := self.children[0].value) == "" else None
-        work_time = a if (a := self.children[1].value) == "" else None
-        break_time = a if (a := self.children[2].value) == "" else None
-        repetitions = a if (a := self.children[3].value) == "" else None
-        # check if input is valid
+        to_edit = {}
+        # get input values
         try:
-            if work_time:
-                self.session.timer.work_time = int(work_time)
+            to_edit["name"] = str(a) if (a := self.children[0].value) != "" else None
+            to_edit["work_time"] = int(a) if (a := self.children[1].value) != "" else None
+            to_edit["break_time"] = int(a) if (a := self.children[2].value) != "" else None
+            to_edit["repetitions"] = int(a) if (a := self.children[3].value) != "" else None
         except ValueError:
-            await interaction.channel.send_message("Invalid work time please use a number")
-        try:
-            if break_time:
-                self.session.timer.break_time = int(break_time)
-        except ValueError:
-            await interaction.channel.send_message("Invalid break time please use a number")
-        try:
-            if repetitions:
-                self.session.timer.repetitions = int(repetitions)
-        except ValueError:
-            await interaction.channel.send_message("Invalid repetitions please use a number")
+            await interaction.response.send_message(
+                embed=Embed(title="Invalid Input", description="Only text and numbers are allowed."),
+                ephemeral=True,
+                delete_after=5)
+            return
+        # check if nothing is inputted
+        if not any(to_edit.values()):
+            await interaction.response.send_message(
+                embeds=Embed(title="Invalid Input",
+                             description="Please enter at least one value"),
+                ephemeral=True)
+            return
+        # edit session
+        await self.session.edit_session(**to_edit)
 
         # response
         embed = discord.Embed(title="Edit Successful", color=discord.Color.green())
-        await interaction.response.send_message(embed=embed, delete_after=5)
+        await interaction.response.send_message(embed=embed, delete_after=5, ephemeral=True)
