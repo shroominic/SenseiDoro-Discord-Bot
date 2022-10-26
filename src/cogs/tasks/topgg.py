@@ -12,16 +12,18 @@ class TopGGUpdate(commands.Cog):
         load_dotenv()
         self.dbl_token = os.getenv('TOP_GG_TOKEN')
 
-        bot.topggpy = topgg.DBLClient(bot, self.dbl_token)
-
     @tasks.loop(minutes=30)
     async def update_stats(self):
         """This function runs every 30 minutes to automatically update the server count."""
         if self.dbl_token == "DEBUG":
-            print(f"\nDEBUG MODE: Posted server count ({self.bot.topggpy.guild_count})\n")
+            pass
         else:
-            try:
-                await self.bot.topggpy.post_guild_count()
-                print(f"\nPosted server count ({self.bot.topggpy.guild_count})\n")
-            except Exception as e:
-                print(f"Failed to post server count\n{e.__class__.__name__}: {e}")
+            with topgg.DBLClient(self.bot, self.dbl_token) as client:
+                try:
+                    await self.bot.topggpy.post_guild_count()
+                except Exception as e:
+                    self.bot.log.exception("TopGGUpdate", f"Failed to post server count\n{e.__class__.__name__}: {e}")
+
+    def close(self):
+        self.bot.topggpy.close()
+        print("TopGGUpdate closed.")
