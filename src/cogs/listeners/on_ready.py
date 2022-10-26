@@ -59,13 +59,7 @@ class OnReady(Cog):
         print(f'{self.bot.user} is ready and connected to the following guilds: \n{all_guilds}')
 
         # re/start top.gg api
-        if self.bot.tgg.update_stats.is_running():
-            self.bot.tgg.update_stats.restart()
-        else:
-            self.bot.tgg.update_stats.start()
+        tgg.restart() if (tgg := self.bot.tgg.update_stats).is_running() else tgg.start()
         # re/start logging
-        if self.bot.log.update_stats.is_running():
-            self.bot.log.update_stats.restart()
-        else:
-            self.bot.log.update_stats.start()
+        arf.restart() if (arf := self.bot.log.auto_refresh).is_running() else arf.start()
 
