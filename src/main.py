@@ -24,8 +24,7 @@ def run():
     # init bot client
     bot = SenseiClient(shard_count=int(shard_count),
                        command_prefix="$",
-                       intents=intents,
-                       debug_guilds=[933389956246802483])
+                       intents=intents)
 
     # adding cogs
     bot.add_cog(OnReady(bot))
