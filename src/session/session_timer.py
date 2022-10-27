@@ -8,7 +8,7 @@ class SessionTimer:
     def __init__(self, session, work_time, break_time, repetitions):
         self.session = session
         # settings
-        self.tick = 5
+        self.tick = 20
         self.work_time = work_time
         self.break_time = break_time
         self.repetitions = repetitions
@@ -50,8 +50,8 @@ class SessionTimer:
     async def timer(self):
         next_call = time.time()
         while self.is_active:
-            # change tick size to 1 at the last 15 seconds
-            if self.seconds_left <= 15:
+            # change tick size to 1 at the last 20 seconds
+            if self.seconds_left <= 20:
                 tick = 1
             else:
                 tick = self.tick
