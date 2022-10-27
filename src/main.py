@@ -32,7 +32,6 @@ def run():
     bot.add_cog(OnGuildJoin(bot))
     bot.add_cog(OnGuildRemove(bot))
     bot.add_cog(CommandErrHandler(bot))
-    bot.add_cog(DebugTools(bot))
     # tasks
     bot.log = Logging(bot)
     bot.tgg = TopGGUpdate(bot)

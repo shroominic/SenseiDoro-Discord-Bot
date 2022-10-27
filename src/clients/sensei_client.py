@@ -20,7 +20,7 @@ class SenseiClient(commands.AutoShardedBot, ABC):
         print("Shutdown Sensei Doro... ")
         # close all active sessions
         for dojo in self.dojos.values():
-            for session in dojo.active_sessions.values():
+            for session in list(dojo.active_sessions.values()):
                 try:
                     await session.close()
                     session.send_notification("Session closed due to bot shutdown.",

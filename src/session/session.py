@@ -160,6 +160,10 @@ class Session:
 
     # TOOLS
 
+    def send_notification(self, title, message, delete_after=None):
+        notification_embed = discord.Embed(title=title, description=message, color=0xff0808)
+        asyncio.create_task(self.env.info_channel.send(embed=notification_embed, delete_after=delete_after))
+
     @property
     def member_count(self) -> int:
         member_count = 0
@@ -180,7 +184,7 @@ class Session:
     async def close_session_if_empty(self):
         session_is_empty = await self.is_empty
         if session_is_empty:
-            asyncio.create_task(self.close_session())
+            asyncio.create_task(self.close())
 
     async def reset_members_and_work_channel(self):
         """ move all members back to lobby and unmute admins """
@@ -203,17 +207,42 @@ class Session:
         except discord.errors.NotFound:
             pass
 
-    async def update_edit(self):
-        if self.env.category.name != self.name:
-            await self.env.category.edit(name=self.name)
+    async def edit_session(self, **kwargs):
+        """ edit session values """
+        new_name = kwargs.get("name")
+        new_work_time = kwargs.get("work_time")
+        new_break_time = kwargs.get("break_time")
+        new_repetitions = kwargs.get("repetitions")
+        # edit name
+        if new_name:
+            self.name = new_name
+            # change category name
+            if self.env.category.name != self.name:
+                await self.env.category.edit(name=self.name)
+        # edit work_time
+        if new_work_time:
+            self.timer.work_time = new_work_time
+        # edit break_time
+        if new_break_time:
+            self.timer.break_time = new_break_time
+        # edit repetitions
+        if new_repetitions:
+            self.timer.repetitions = new_repetitions
+        # update database
+        with closing(sqlite3.connect("src/dbm/sensei.db")) as conn:
+            c = conn.cursor()
+            c.execute("UPDATE sessions SET name = ?, work_time = ?, break_time = ?, repetitions = ? WHERE id = ?",
+                      (self.name, self.timer.work_time, self.timer.break_time, self.timer.repetitions, self.id))
+            conn.commit()
+        # update dashboard
         await self.dashboard.update()
 
-    async def close_session(self):
+    async def close(self):
         # turn timer off
         self.close_session_if_empty.stop()
         self.timer.reset()
-        # deactivate buttons
-        await self.dashboard.disable_buttons()
+        # edit embed and deactivate buttons
+        await self.dashboard.disable_session()
         # disconnect all members and delete channels todo this should be done in sEnv
         try:
             # work_channel
@@ -234,7 +263,7 @@ class Session:
         del self.dojo.active_sessions[self.id]
 
     async def dispose(self):
-        await self.close_session()
+        await self.close()
         # remove db entry
         with closing(sqlite3.connect("src/dbm/sensei.db")) as conn:
             c = conn.cursor()

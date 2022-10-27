@@ -90,7 +90,7 @@ class SessionEnvironment:
 
     async def create_work_channel(self):
         """ Creates a work channel for the session """
-        work_ow = {self.guild.me: discord.PermissionOverwrite(connect=True, view_channel=True),
+        work_ow = {self.guild.self_role: discord.PermissionOverwrite(connect=True, view_channel=True),
                    self.guild.default_role: discord.PermissionOverwrite(speak=False, view_channel=False)}
         self.work_channel = await self.guild.create_voice_channel(self.work_label,
                                                                   category=self.category,
@@ -110,8 +110,10 @@ class SessionEnvironment:
         # create session category
         category = await self.guild.create_category_channel(session_name)
         # create initial channels
-        info_ow = {self.guild.default_role: discord.PermissionOverwrite(send_messages=False),
-                   self.guild.me:           discord.PermissionOverwrite(send_messages=True, view_channel=True)}
+        info_ow = {
+            self.guild.self_role: discord.PermissionOverwrite(send_messages=True, view_channel=True),
+            self.guild.default_role: discord.PermissionOverwrite(send_messages=False),
+        }
         self.info_channel = await self.guild.create_text_channel(self.info_label, category=category, overwrites=info_ow)
         self.lobby_channel = await self.guild.create_voice_channel(self.lobby_label, category=category)
         # load env ids to database - create whole new entry? todo

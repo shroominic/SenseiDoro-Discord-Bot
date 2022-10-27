@@ -1,8 +1,10 @@
+import asyncio
 import sqlite3
 from contextlib import closing
 from discord.ext.commands import Cog
 
 from dojo import Dojo
+from ..tasks.logging import AdminDashboardView, MoreADView
 
 
 class OnReady(Cog):
@@ -63,3 +65,9 @@ class OnReady(Cog):
         # re/start logging
         arf.restart() if (arf := self.bot.log.auto_refresh).is_running() else arf.start()
 
+        # init admin control panel buttons
+        adv = AdminDashboardView(self.bot.log)
+        self.bot.add_view(adv)
+        self.bot.add_view(MoreADView(adv))
+        # send control panel msg
+        await self.bot.log.manage_sensei_stats()
