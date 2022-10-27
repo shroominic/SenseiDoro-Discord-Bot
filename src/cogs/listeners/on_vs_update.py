@@ -21,7 +21,7 @@ class OnVSUpdate(Cog, name='OnVSUpdate module'):
                 # session gets activated
                 await tools.activate_session(after.channel, dojo)
         else:
-            # todo (not important)
+            # todo
             # some code that unmute admins if they leave
             # check if before.channel.category is a active session
             # if so check if the member (_) was in this session
