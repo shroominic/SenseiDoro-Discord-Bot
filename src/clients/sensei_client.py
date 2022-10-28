@@ -23,11 +23,8 @@ class SenseiClient(commands.AutoShardedBot, ABC):
             for session in list(dojo.active_sessions.values()):
                 try:
                     await session.close()
-                    session.send_notification("Session closed due to bot shutdown.",
-                                              "Sorry for the inconvenience. "
-                                              "Due to server maintenance,"
-                                              "we had to shut down all currently running sessions. "
-                                              "Sensei Doro will be back online soon :)")
+                    session.send_notification("🚧 Session closed due to server maintenance 🛠",
+                                              "Sorry for the inconvenience, 🚁 we're back online soon!")
                 except Exception as e:
                     self.log.exception(f"failed to close session", e)
         # stop all tasks
@@ -39,7 +36,7 @@ class SenseiClient(commands.AutoShardedBot, ABC):
         await super().close()
         print("Shutdown complete.")
 
-    # statistics
+    # statistics todo: move to different place
     @property
     def total_dojos(self):
         return len(self.dojos)
