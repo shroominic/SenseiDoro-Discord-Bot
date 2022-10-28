@@ -253,17 +253,17 @@ class Session:
                 self.env.work_channel = None
         except Exception as e:
             self.bot.log.exception("close_session", e)
-        try:
-            # lobby_channel
-            for member in self.env.lobby_channel.members:
-                await member.move_to(None)
-        except Exception as e:
-            self.bot.log.exception("close_session", e)
         # remove active session reference
         del self.dojo.active_sessions[self.id]
 
     async def dispose(self):
         await self.close()
+        # kick members from lobby
+        try:
+            for member in self.env.lobby_channel.members:
+                await member.move_to(None)
+        except Exception as e:
+            self.bot.log.exception("close_session", e)
         # remove db entry
         with closing(sqlite3.connect("src/dbm/sensei.db")) as conn:
             c = conn.cursor()
