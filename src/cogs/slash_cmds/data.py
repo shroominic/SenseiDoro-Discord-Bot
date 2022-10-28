@@ -11,7 +11,7 @@ class Data(commands.Cog):
         self.bot = bot
 
     @commands.slash_command()
-    @admin_required
+    @commands.has_permissions(administrator=True)
     async def data(self, ctx):
         """
         Use this command to get information about the data of the bot.
