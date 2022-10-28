@@ -110,7 +110,10 @@ class AdminDashboardView(discord.ui.View):
         """ Refreshes the stats embed """
         await self.parent.update_stats()
         # update dashboard
-        await interaction.response.edit_message(view=self)
+        try:
+            await interaction.response.edit_message(view=self)
+        except discord.NotFound:
+            pass
 
     @discord.ui.button(label="❖ More", style=discord.ButtonStyle.secondary, custom_id="more")
     async def show_more_button(self, _: discord.ui.Button, interaction: discord.Interaction):
