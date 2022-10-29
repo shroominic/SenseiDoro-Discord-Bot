@@ -12,6 +12,7 @@ class SessionTimer:
         self.work_time = work_time
         self.break_time = break_time
         self.repetitions = repetitions
+        self.initial_time = 0
         # state
         self.is_active = False
         self.seconds_left = 0
@@ -49,13 +50,26 @@ class SessionTimer:
         self.delete_timer_embed()
 
     async def timer(self):
+        tick = self.tick
         next_call = time.time()
         while self.is_active:
-            # change tick size to 1 at the last 20 seconds
-            if self.seconds_left <= 20:
+            # normal tick size
+            if 30 < self.seconds_left <= self.initial_time-30:
+                tick = 30
+            # change tick size at start of timer
+            elif self.seconds_left > self.initial_time-3:
                 tick = 1
-            else:
-                tick = self.tick
+            elif self.seconds_left > self.initial_time-15:
+                tick = 3
+            elif self.seconds_left > self.initial_time-30:
+                tick = 5
+            # change tick size at end of timer
+            elif self.seconds_left <= 3:
+                tick = 1
+            elif self.seconds_left <= 15:
+                tick = 3
+            elif self.seconds_left <= 30:
+                tick = 5
             # check if timer is over
             if self.seconds_left < 1:
                 self.display_update()
@@ -96,6 +110,7 @@ class SessionTimer:
     def set_time_left(self, minutes_left):
         # format from minutes and set seconds_left
         self.seconds_left = minutes_left * 60
+        self.initial_time = int(self.seconds_left)
 
     def manage_session(self):
         # check if session is over
