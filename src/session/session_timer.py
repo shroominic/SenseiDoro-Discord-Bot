@@ -37,6 +37,7 @@ class SessionTimer:
 
     def stop_timer(self):
         self.is_active = False
+        self.buttons = None
 
     def reset(self):
         # reset session state
@@ -72,7 +73,7 @@ class SessionTimer:
         """ Update tne timer message/embed"""
         # buttons
         if self.buttons is None:
-            self.buttons = TimerView(self.session)
+            self.buttons = TimerView(self.session) if self.session_state == "Work" else BreakView(self.session)
         # create embed
         timer_embed = self.build_timer_embed()
         # edit message
@@ -104,11 +105,13 @@ class SessionTimer:
                 self.set_time_left(self.work_time)
                 self.session_state = "Work"
                 self.increase_session_count()
+                self.buttons = None
                 asyncio.create_task(self.session.next_session())
             elif "Work" in self.session_state:
                 self.set_time_left(self.break_time)
                 self.session_state = "Break"
                 asyncio.create_task(self.session.session_break())
+                self.buttons = None
         # reset when session is over
         else:
             self.stop_timer()
@@ -125,12 +128,11 @@ class TimerView(discord.ui.View):
         self.session = session
 
     @discord.ui.button(label="☕️ Break", style=discord.ButtonStyle.gray)
-    async def second_button_callback(self, _, interaction):
+    async def break_button_callback(self, _, interaction):
         """ Use this command to pause your session. """
         if self.session.timer.is_active:
-            # todo add custom minutes
             await self.session.force_break(minutes=5)
-            # todo show ui feedback
+            self.disable_all_items()
         await interaction.response.edit_message(view=self)
 
     @discord.ui.button(label="◽️ Stop", style=discord.ButtonStyle.danger)
@@ -139,3 +141,30 @@ class TimerView(discord.ui.View):
         # stops session and timer
         asyncio.create_task(self.session.stop_session())
         await interaction.response.edit_message(view=self)
+
+
+class BreakView(discord.ui.View):
+    def __init__(self, session):
+        super().__init__(timeout=None)
+        self.bot = session.bot
+        self.session = session
+
+    @discord.ui.button(label="⏩️ Skip", style=discord.ButtonStyle.primary)
+    async def skip_button_callback(self, _, interaction):
+        """ Use this command to stop and reset your session. """
+        # skips break
+        self.session.timer.seconds_left = 0
+        self.disable_all_items()
+        await interaction.response.edit_message(view=self)
+
+    @discord.ui.button(emoji="⏳", label="+1", style=discord.ButtonStyle.gray)
+    async def add3_button_callback(self, _, interaction):
+        """ Use this command to pause your session. """
+        if self.session.timer.session_state == "Break":
+            self.session.timer.seconds_left += 60
+            self.session.timer.initial_time += 60
+            self.session.timer.display_update()
+        await interaction.response.edit_message(view=self)
+
+
+
