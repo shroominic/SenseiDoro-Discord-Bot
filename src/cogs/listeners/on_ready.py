@@ -51,18 +51,16 @@ class OnReady(Cog):
             c = conn.cursor()
             c.execute("SELECT lobby_channel_id, guild_id FROM sessions")
             result = c.fetchall()
-            print(result)
             for lobby_id, guild_id in result:
                 dojo = self.bot.get_dojo(guild_id)
                 dojo.lobby_ids.append(lobby_id)
 
-        # print all connected guilds
-        all_guilds = [guild.name for guild in self.bot.guilds]
-        print(f'{self.bot.user} is ready and connected to the following guilds: \n{all_guilds}')
+        # startup message
+        print(f'{self.bot.user} is ready and connected to {len(self.bot.guilds)} guilds.\n')
 
         # re/start top.gg api
         tgg.restart() if (tgg := self.bot.tgg.update_stats).is_running() else tgg.start()
-        # re/start logging
+        # re/start logging task
         arf.restart() if (arf := self.bot.log.auto_refresh).is_running() else arf.start()
 
         # init admin control panel buttons
