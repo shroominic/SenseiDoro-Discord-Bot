@@ -132,6 +132,12 @@ class MoreADView(discord.ui.View):
         """ Use this button to go back to the parent view. """
         await interaction.response.edit_message(view=self.parent_view)
 
+    @discord.ui.button(label="Run Migration", style=discord.ButtonStyle.green, custom_id="migration")
+    async def run_migration(self, _: discord.ui.Button, interaction: discord.Interaction):
+        """ Use this button to run a migration. """
+        await self.parent_view.parent.bot.migration(channel=interaction.channel)
+        await interaction.response.edit_message(view=self.parent_view)
+
     @discord.ui.button(label="Clear", style=discord.ButtonStyle.red, custom_id="clear")
     async def clear_button(self, _: discord.ui.Button, interaction: discord.Interaction):
         """ Use this button to clear the chat. """
