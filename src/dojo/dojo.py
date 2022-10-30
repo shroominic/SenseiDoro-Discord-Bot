@@ -21,7 +21,7 @@ class Dojo:
         self.moderator_role_id: int = kwargs.get("mod_role_id", None)
         # configuration
         self.mute_admins = kwargs.get("mute_admins", True)
-        self.session_limit = kwargs.get("session_limit", 2)
+        self.session_limit = kwargs.get("session_limit", 3)
         # async init
         asyncio.create_task(self.serialize_sessions())
 
