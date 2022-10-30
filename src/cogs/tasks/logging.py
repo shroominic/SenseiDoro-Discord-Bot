@@ -48,11 +48,11 @@ class Logging(commands.Cog):
                 control_panel_embed = Embed(title="Control Panel", color=0x0f0fff)
                 asyncio.create_task(self.manager_id.send(embed=control_panel_embed, view=AdminDashboardView(self)))
 
-    def send_log(self, title, body="", color=0xffffff):
+    def send_log(self, title, body="", color=0xffffff, delete_after=None):
         """ sends a log to the logging channel """
         if self.manager_id:
             embed = Embed(title=title, description=body, color=color)
-            asyncio.create_task(self.manager_id.send(embed=embed))
+            asyncio.create_task(self.manager_id.send(embed=embed, delete_after=delete_after))
 
     def exception(self, exception_ctx, exception_body, color=0xff0000):
         """ sends an exception to the logging channel """
