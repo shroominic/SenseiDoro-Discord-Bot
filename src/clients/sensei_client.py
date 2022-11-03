@@ -23,6 +23,7 @@ class SenseiClient(commands.AutoShardedBot, ABC):
     async def migration(self):
         """ run the bot """
         sessions_to_migrate = []
+        previous_len_of_sessions_to_migrate = len(sessions_to_migrate)
         self.log.send_log("Collecting sessions to migrate...", delete_after=5)
         # search for dojos to migrate
         for dojo in self.dojos.values():
@@ -44,7 +45,7 @@ class SenseiClient(commands.AutoShardedBot, ABC):
                                         # add session to list
                                         sessions_to_migrate.append(session_config)
             # todo maybe to many logs?
-            self.log.send_log(f"Found {len(sessions_to_migrate)} sessions to migrate in {dojo.guild.name}", delete_after=5)
+            self.log.send_log(f"Found {len(sessions_to_migrate) - previous_len_of_sessions_to_migrate} sessions to migrate in {dojo.guild.name}", delete_after=5)
             # search for old text and voice channel names
             for session_dict in sessions_to_migrate:
                 for tc in session_dict["category"].text_channels:
@@ -154,6 +155,8 @@ class SenseiClient(commands.AutoShardedBot, ABC):
             # register lobby_id to dojo instance
             dojo = self.get_dojo(session_dict["category"].guild.id)
             dojo.lobby_ids.append(session_dict["lobby_channel"].id)
+            # log migrated session
+            self.log.send_log(f"Session {session_dict['category'].name} successfully migrated.")
         # send migration finished message
         self.log.send_log(f"Migration finished!", delete_after=15)
 

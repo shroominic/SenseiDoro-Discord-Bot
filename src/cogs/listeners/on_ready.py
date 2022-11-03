@@ -3,7 +3,7 @@ import sqlite3
 from contextlib import closing
 from discord.ext.commands import Cog
 
-from dojo import Dojo
+from ...dojo import Dojo
 from ..tasks.logging import AdminDashboardView, MoreADView
 
 

@@ -1,8 +1,8 @@
 from discord.ext import commands
 
-from cogs.useful_decoration import default_feedback, mod_required
-from cogs.better_response import slash_response
-from session import Session
+from ..useful_decoration import default_feedback, mod_required
+from ..better_response import slash_response
+from ...session import Session
 
 
 class Create(commands.Cog):
