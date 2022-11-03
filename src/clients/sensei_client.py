@@ -7,8 +7,6 @@ import discord
 from discord.ext import commands
 from discord import Embed
 
-from cogs import Logging
-
 
 # Bot Client Class
 class SenseiClient(commands.AutoShardedBot, ABC):
@@ -17,12 +15,12 @@ class SenseiClient(commands.AutoShardedBot, ABC):
         # stores all dojos of connected guilds
         self.dojos = {}
         self.topgg = None
-        self.log :Logging = None
+        self.log = None
 
     def get_dojo(self, guild_id):
         return self.dojos.get(guild_id, None)
 
-    async def migration(self, **kwargs):
+    async def migration(self):
         """ run the bot """
         sessions_to_migrate = []
         self.log.send_log("Collecting sessions to migrate...", delete_after=5)
@@ -46,7 +44,7 @@ class SenseiClient(commands.AutoShardedBot, ABC):
                                         # add session to list
                                         sessions_to_migrate.append(session_config)
             # todo maybe to many logs?
-            self.log.send_log(f"Found {len(sessions_to_migrate)} sessions to migrate in {dojo.guild.name}")
+            self.log.send_log(f"Found {len(sessions_to_migrate)} sessions to migrate in {dojo.guild.name}", delete_after=5)
             # search for old text and voice channel names
             for session_dict in sessions_to_migrate:
                 for tc in session_dict["category"].text_channels:
@@ -62,9 +60,10 @@ class SenseiClient(commands.AutoShardedBot, ABC):
                         elif vc.name == "START SESSION":
                             session_dict["start_channel"] = vc
         # list these dojos
-        self.log.send_log(f"Found {len(self.dojos)} dojos to migrate")
-        self.log.send_log(f"Migration started...")
+        self.log.send_log(f"Found {len(self.dojos)} dojos to migrate", delete_after=5)
+        self.log.send_log(f"Migration started...", delete_after=15)
         # migrate... (todo check for permissions)
+        global migration_msg_instance
         for session_dict in sessions_to_migrate:
             # send message to all migrating sessions
             migration_msg = Embed(title="Migrate session to new version ...",
@@ -73,13 +72,11 @@ class SenseiClient(commands.AutoShardedBot, ABC):
                                               "which will change this session environment.\n"
                                               "If something goes wrong, please contact me in the support server.\n"
                                               "https://discord.gg/4gZxCAK9mb")
-            if session_dict["info_channel"] is not None:
-                await session_dict["info_channel"].send(embed=migration_msg)
-            elif session_dict["chat_channel"] is not None:
-                await session_dict["chat_channel"].send(embed=migration_msg)
+            if c := (session_dict["info_channel"] or session_dict["chat_channel"]):
+                migration_msg_instance = await c.send(embed=migration_msg)
             else:
                 self.log.send_log(f"Could not send migration message to {session_dict['category'].name}"
-                                  f"inside {session_dict['category'].guild.name}")
+                                  f"inside {session_dict['category'].guild.name}", delete_after=60*60)
             # migrate current session
 
             # delete old unused channels if they are empty if not then rename them and send info message
@@ -114,38 +111,51 @@ class SenseiClient(commands.AutoShardedBot, ABC):
                 await session_dict["category"].guild.create_text_channel(name="📋dashboard",
                                                                          category=session_dict["category"],
                                                                          overwrites=info_ow)
-            if session_dict["lobby_channel"] is not None:
+            if session_dict["lobby_channel"]:
                 try:
                     await session_dict["lobby_channel"].edit(name="☕️ lobby")
                 except Exception as e:
                     self.log.exception(f"Failed to rename channel {session_dict['lobby_channel'].name}", e)
             else:
-                await session_dict["category"].guild.create_voice_channel(name="☕️ lobby",
-                                                                          category=session_dict["category"])
+                session_dict["lobby_channel"] = await session_dict["category"].guild.create_voice_channel(
+                    name="☕️ lobby",
+                    category=session_dict["category"])
+            # delete previous migration message
+            if msg := migration_msg_instance:
+                await msg.delete()
             # write migration information msg to dashboard channel
+            if c := (session_dict["info_channel"] or session_dict["lobby_channel"]):
+                # tell users that the session has been migrated
+                embed = discord.Embed(title="Session updated!",
+                                      description="This session has been updated to the new version of Sensei Doro.\n"
+                                                  "If you have any questions, problems or feedback, \n"
+                                                  "please contact me [here](https://discord.gg/4gZxCAK9mb) :)")
+                await c.send(embed=embed)
             # and if everything went fine
             # create db entry for new session
             with closing(sqlite3.connect("src/dbm/sensei.db")) as conn:
                 c = conn.cursor()
-                c.execute("SELECT * FROM sessions WHERE id=:id", {"id": self.id})
+                c.execute("SELECT * FROM sessions WHERE id=:id", {"id": session_dict["category"].id})
                 result = c.fetchone()
-                # check if session already exists
                 if not result:
                     c.execute("""INSERT INTO sessions VALUES (
                                  :id, :name, :guild_id, :info_channel_id, :lobby_channel_id,
                                  :work_time, :break_time, :repetitions, :cfg_mute_admins
-                             )""", {"id": self.id,
-                                    "name": self.name,
-                                    "guild_id": self.guild_id,
-                                    "info_channel_id": self.env.info_channel_id,
-                                    "lobby_channel_id": self.env.lobby_channel_id,
-                                    "work_time": self.timer.work_time,
-                                    "break_time": self.timer.break_time,
-                                    "repetitions": self.timer.repetitions,
-                                    "cfg_mute_admins": self.config.mute_admins})
+                             )""", {"id": session_dict["category"].id,
+                                    "name": session_dict["category"].name,
+                                    "guild_id": session_dict["category"].guild.id,
+                                    "info_channel_id": session_dict["info_channel"].id,
+                                    "lobby_channel_id": session_dict["lobby_channel"].id,
+                                    "work_time": (time if (time := session_dict["work_time"]) else 25),
+                                    "break_time": (time if (time := session_dict["pause_time"]) else 25),
+                                    "repetitions": (reps if (reps := session_dict["number_sessions"]) else 25),
+                                    "cfg_mute_admins": True})
                 conn.commit()
             # register lobby_id to dojo instance
-        # if not confirmed, cancel
+            dojo = self.get_dojo(session_dict["category"].guild.id)
+            dojo.lobby_ids.append(session_dict["lobby_channel"].id)
+        # send migration finished message
+        self.log.send_log(f"Migration finished!", delete_after=15)
 
     async def close(self):
         """ exit the whole application safely """
