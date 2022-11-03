@@ -1,7 +1,7 @@
 
 from discord.ext.commands import Cog
 
-from session import tools
+from ...session import tools
 
 
 class OnVSUpdate(Cog, name='OnVSUpdate module'):
