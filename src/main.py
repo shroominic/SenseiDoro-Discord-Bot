@@ -4,9 +4,9 @@ from dotenv import load_dotenv
 import discord
 import os
 
-import dbm
-from clients import SenseiClient
-from cogs import *
+from . import dbm
+from .clients import SenseiClient
+from .cogs import *
 
 load_dotenv()
 

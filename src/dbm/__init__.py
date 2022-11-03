@@ -1,3 +1,3 @@
-from dbm.setup import main
+from .setup import main
 
 setup = main
