@@ -22,8 +22,6 @@ class Dojo:
         # configuration
         self.mute_admins = kwargs.get("mute_admins", True)
         self.session_limit = kwargs.get("session_limit", 3)
-        # async init
-        asyncio.create_task(self.serialize_sessions())
 
     @classmethod
     def new_db_entry(cls, guild, bot, db_cursor):
@@ -55,34 +53,6 @@ class Dojo:
     @property
     def active_users(self):
         return sum([session.member_count for session in self.active_sessions.values()])
-
-    async def serialize_sessions(self):
-        """ Searches for old pomodoro sessions on the server
-            to reinitialize lost instances during a restart.
-        """
-        # serialize old session instances
-        for category in self.guild.categories:
-            if "🍅" in category.name:
-                # find message with session config
-                for tc in category.text_channels:
-                    if tc is not None:
-                        if tc.name == "config":
-                            async for msg in tc.history():
-                                if msg.author == self.bot.user and msg.content.startswith('Session config:'):
-                                    # parse string representation of json
-                                    config_json = str(msg.content)[15::]
-                                    config = json.loads(config_json)
-                                    # create session instance from json
-                                    temp = Session(self.bot,
-                                                   config["name"],
-                                                   self.guild.id,
-                                                   config["work_time"],
-                                                   config["pause_time"],
-                                                   config["number_sessions"],
-                                                   category_id=category.id,
-                                                   env=SessionEnvironment.match_from_category(category, self.bot))
-                                    await temp.create_db_entry()
-                                    await temp.env.update_environment()
 
     async def dispose(self):
         # delete all session environments
