@@ -91,7 +91,7 @@ class SessionEnvironment:
     async def create_work_channel(self):
         """ Creates a work channel for the session """
         work_ow = {self.guild.self_role: discord.PermissionOverwrite(connect=True, view_channel=True),
-                   self.guild.default_role: discord.PermissionOverwrite(speak=False, view_channel=False)}
+                   self.guild.default_role: discord.PermissionOverwrite(speak=False, connect=False)}
         self.work_channel = await self.guild.create_voice_channel(self.work_label,
                                                                   category=self.category,
                                                                   overwrites=work_ow)
