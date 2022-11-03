@@ -10,7 +10,7 @@ class Create(commands.Cog):
         self.bot = bot
 
     @commands.slash_command()
-    @commands.has_permissions(manage_channels=True)
+    @mod_required
     @default_feedback(title="Session successfully created")
     async def create(self, ctx, name: str = "Pomodoro", work_time: int = 25, break_time: int = 5, repetitions: int = 4):
         """
