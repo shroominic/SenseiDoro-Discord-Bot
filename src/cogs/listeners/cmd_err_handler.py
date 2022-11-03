@@ -3,7 +3,7 @@ import sys
 
 from discord.ext.commands import Cog, CommandNotFound
 
-from src.cogs.better_response import slash_response
+from cogs.better_response import slash_response
 
 
 class CommandErrHandler(Cog):
@@ -24,5 +24,9 @@ class CommandErrHandler(Cog):
             feedback = "Sorry, I do not know this command."
             slash_response(ctx, title, feedback, 10)
         else:
+            await self.bot.log.exception(
+                "Command Error",
+                f"```{traceback.format_exception(type(error), error, error.__traceback__)}```"
+            )
             print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
             traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
