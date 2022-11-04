@@ -176,7 +176,7 @@ class SenseiClient(commands.AutoShardedBot, ABC):
                     self.log.exception(f"failed to close session", e)
         # stop all tasks
         if self.topgg:
-            self.topgg.update_stats.stop()
+            await self.topgg.close()
         if self.log:
             self.log.auto_refresh.stop()
         # shutdown the bot
