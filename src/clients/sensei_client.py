@@ -48,6 +48,12 @@ class SenseiClient(commands.AutoShardedBot, ABC):
                         self.log.exception(f"Failed to migrate session", e)
             # search for old text and voice channel names
             for session_dict in sessions_to_migrate:
+                # init dict keys
+                session_dict["chat_channel"] = None
+                session_dict["info_channel"] = None
+                session_dict["lobby_channel"] = None
+                session_dict["start_channel"] = None
+                # search for channels
                 for tc in session_dict["category"].text_channels:
                     if tc is not None:
                         if tc.name == "chat":
@@ -61,9 +67,7 @@ class SenseiClient(commands.AutoShardedBot, ABC):
                         elif vc.name == "START SESSION":
                             session_dict["start_channel"] = vc
         # list these dojos
-        print(f"Found {len(sessions_to_migrate)} sessions to migrate")
-        print(f"Migration started...")
-        self.log.send_log(f"Found {len(self.dojos)} dojos to migrate", delete_after=5)
+        self.log.send_log(f"Found {len(sessions_to_migrate)} sessions to migrate", delete_after=25)
         self.log.send_log(f"Migration started...", delete_after=15)
         # migrate... (todo check for permissions)
         global migration_msg_instance
