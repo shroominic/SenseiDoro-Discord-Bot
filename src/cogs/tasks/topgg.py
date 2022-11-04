@@ -20,7 +20,7 @@ class TopGGUpdate(commands.Cog):
         else:
             with topgg.DBLClient(self.bot, self.dbl_token) as client:
                 try:
-                    await self.bot.topggpy.post_guild_count()
+                    await client.post_guild_count()
                 except Exception as e:
                     self.bot.log.exception("TopGGUpdate", f"Failed to post server count\n{e.__class__.__name__}: {e}")
 
