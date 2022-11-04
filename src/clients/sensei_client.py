@@ -23,7 +23,6 @@ class SenseiClient(commands.AutoShardedBot, ABC):
     async def migration(self):
         """ run the bot """
         sessions_to_migrate = []
-        previous_len_of_sessions_to_migrate = len(sessions_to_migrate)
         self.log.send_log("Collecting sessions to migrate...", delete_after=5)
         # search for dojos to migrate
         for dojo in self.dojos.values():
@@ -31,21 +30,22 @@ class SenseiClient(commands.AutoShardedBot, ABC):
             for category in dojo.guild.categories:
                 if "🍅" in category.name or "Pomodoro" in category.name:
                     # find message with session config
-                    for tc in category.text_channels:
-                        if tc is not None:
-                            if tc.name == "config":
-                                async for msg in tc.history():
-                                    if msg.author == self.user and msg.content.startswith('Session config:'):
-                                        # parse string representation of json
-                                        config_json = str(msg.content)[15::]
-                                        session_config = json.loads(config_json)
-                                        # add category and config channel
-                                        session_config["category"] = category
-                                        session_config["config_channel"] = tc
-                                        # add session to list
-                                        sessions_to_migrate.append(session_config)
-            # todo maybe to many logs?
-            self.log.send_log(f"Found {len(sessions_to_migrate) - previous_len_of_sessions_to_migrate} sessions to migrate in {dojo.guild.name}", delete_after=5)
+                    try:
+                        for tc in category.text_channels:
+                            if tc is not None:
+                                if tc.name == "config":
+                                    async for msg in tc.history():
+                                        if msg.author == self.user and msg.content.startswith('Session config:'):
+                                            # parse string representation of json
+                                            config_json = str(msg.content)[15::]
+                                            session_config = json.loads(config_json)
+                                            # add category and config channel
+                                            session_config["category"] = category
+                                            session_config["config_channel"] = tc
+                                            # add session to list
+                                            sessions_to_migrate.append(session_config)
+                    except Exception as e:
+                        self.log.exception(f"Failed to migrate session", e)
             # search for old text and voice channel names
             for session_dict in sessions_to_migrate:
                 for tc in session_dict["category"].text_channels:
@@ -61,6 +61,8 @@ class SenseiClient(commands.AutoShardedBot, ABC):
                         elif vc.name == "START SESSION":
                             session_dict["start_channel"] = vc
         # list these dojos
+        print(f"Found {len(sessions_to_migrate)} sessions to migrate")
+        print(f"Migration started...")
         self.log.send_log(f"Found {len(self.dojos)} dojos to migrate", delete_after=5)
         self.log.send_log(f"Migration started...", delete_after=15)
         # migrate... (todo check for permissions)
