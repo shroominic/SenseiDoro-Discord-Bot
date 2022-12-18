@@ -45,7 +45,8 @@ class SessionDashboard:
         """ disables all dashboard buttons """
         if self.buttons_view:
             self.buttons_view.disable_all_items()
-            self.session.env.info_msg = await self.session.env.info_msg.edit(view=self.buttons_view)
+            if self.session.env.info_msg:
+                await self.session.env.info_msg.edit(view=self.buttons_view)
 
     async def cleanup(self):
         """ clears you dashboard  """

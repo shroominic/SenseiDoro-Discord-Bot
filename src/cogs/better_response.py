@@ -10,14 +10,7 @@ async def _slash_response(context, title: str, description: str, seconds_until_d
     if description != "":
         embed_msg.description = description
     # send feedback message
-    await context.respond(embed=embed_msg)
-    # sleep until feedback gets removed again
-    await asyncio.sleep(seconds_until_dispose)
-    # noinspection PyBroadException
-    try:
-        await context.delete()
-    except:
-        pass
+    await context.respond(embed=embed_msg, ephemeral=True, delete_after=seconds_until_dispose)
 
 
 def slash_response(context, title: str, description: str = "", seconds_until_dispose: int = 10):

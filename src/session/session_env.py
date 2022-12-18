@@ -134,6 +134,14 @@ class SessionEnvironment:
                                     self.info_msg = msg
                         if "timer" in embed.title:
                             self.timer_msg = msg
+                        if "Session closed due to server maintenance" in embed.title:
+                            await msg.delete()
+                            embed = discord.Embed(
+                                title="Sensei Doro back online✨",
+                                description="If this caused any problems, "
+                                            "feel free to contact me in the" 
+                                            "[support server](https://discord.com/invite/4gZxCAK9mb)")
+                            await self.info_channel.send(embed=embed, delete_after=600)
 
     async def update_environment(self):
         await self.category.edit(name=self.category.name[1:])
