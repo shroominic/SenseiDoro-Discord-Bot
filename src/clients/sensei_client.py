@@ -38,7 +38,29 @@ class SenseiClient(commands.AutoShardedBot, ABC):
         await super().close()
         print("Shutdown complete.")
 
-    # statistics todo: move to different place
+    async def invoke_application_command(self, ctx: ApplicationContext) -> None:
+        """
+        Override the default invoke_application_command to allow for custom error handling
+        """
+
+        self._bot.dispatch("application_command", ctx)
+        try:
+            if await self._bot.can_run(ctx, call_once=True):
+                await ctx.command.invoke(ctx)
+            else:
+                raise CheckFailure("The global check once functions failed.")
+        except CommandOnCooldown as e:
+            await ctx.interaction.response.send_message(
+                embed=Embed(title="Command on cooldown", description=f"Try again in {e.retry_after:.2f}s"),
+                ephemeral=True,
+                delete_after=10)
+        except DiscordException as exc:
+            await ctx.command.dispatch_error(ctx, exc)
+        else:
+            self._bot.dispatch("application_command_completion", ctx)
+
+    # TODO: move to different file
+    # statistics
     @property
     def total_dojos(self):
         return len(self.dojos)
