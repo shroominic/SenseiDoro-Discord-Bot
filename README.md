@@ -8,34 +8,34 @@ A Discord Bot that automatically manages your study group using the Pomodoro Tec
 ### [**Invite Sensei Doro**](https://discord.com/api/oauth2/authorize?client_id=928304609636794388&permissions=21048400&scope=bot%20applications.commands)  to your discord server and get started with `/help`.
 ###### Please keep in mind that the bot will not work properly if you do not accept all required permissions.
 
-The Idea
---------
-The **Pomodoro Technique** is a time management method that has been used to boost productivity for students and workers since 1980.
-A *Pomodoro* was typically `25 minutes of work` with `5 minutes break`, tracked using a *Pomodoro timer* (a tomato kitchen timer).
-After completing four Pomodoros, you would take an extended break (15-30 minutes) and begin the process again.
-
-
-**Group study** has been around for as long as education itself. By working in a group, you boost the motivation for yourself and other group members.   
-Learning becomes much easier and more enjoyable through discussion of the content, and the group members can keep each other accountable.
-Working alone and being in an online study room will help you better learn because it gives you some kind of social pressure that you should learn instead of procrastinating.  
-In addition, it is simply comforting to know you are not alone and other people are working hard alongside you!
-
-
-**Sensei Doro** combines these techniques and brings them to the *Discord* voice and chat platform in the form of an easy-to-use bot.  
-Your mates from all around the world can use Sensei Doro to work together as a group, sharing a flexible Pomodoro-style group timer that notifies them when to take a break and when to start work again.
-Whether you work at night or in the day, you never need to be alone!
-
-
-Features
------------
-* Sensei Doro shows a timer with your work/break time.
-* When you start a new study session, it starts automatically for all your peers waiting inside the lobby channel.
-* During work time, everyone is muted, during the break, you can talk with your study mates.
-* You can control the session with different `/session` commands
 
 Demo
 ----
-![Giphy Gif](https://media.giphy.com/media/rFieX21uO4a97o8GTB/giphy.gif)
+![Giphy Gif](https://media.giphy.com/media/u4oU8yecrFmJy5Xxlp/giphy.gif)
+
+Features
+-----------
+* `Automatic Pomodoro Timer:` With Sensei Doro, you'll never have to worry about setting a timer or remembering to take breaks during your study sessions. The bot automatically manages your work and break times, ensuring that you stay focused and productive.
+- `Group Study Support:` Sensei Doro is designed to be used in a study group, making it easier for you and your friends to stay accountable and motivated while learning together. The bot mutes all members during work time, creating a quiet and distraction-free environment.
+* `Flexible Session Controls:` Sensei Doro gives you the ability to customize your study sessions to fit your needs. You can adjust the work and break times, as well as the number of repetitions, to create the perfect Pomodoro study routine. Plus, with the ability to start and stop sessions at any time, you'll always have control over your learning experience.
+
+How it works
+------------
+With Sensei Doro, you can easily manage your study group using the Pomodoro Technique. 
+Simply use the `/create` command to set up a study group, and then use the `🚀 START` button to begin a study session. 
+The bot will automatically mute all members of the group and start a countdown timer. 
+When the timer is up, the bot will unmute all members and start a break timer. 
+This cycle will continue until there are no repetitions left. 
+You can use the `STOP` button to end the study session at any time. 
+Plus, with the ability to adjust work and break times and the number of repetitions, 
+you can customize your study sessions to fit your needs.
+ 
+The Idea
+--------
+The **Pomodoro Technique** is a time management method that helps boost productivity by `working for 25 minutes` and taking a `5 minute break`. 
+Sensei Doro brings this technique to Discord, allowing users to create a study group and track work and break times using a timer. 
+The bot also allows for **group study**, with all members being automatically muted during work time to create a quiet, distraction-free environment. 
+Users can customize their study sessions with **adjustable work and break times** and the ability to start and stop sessions at any time.
 
 Commands
 --------
@@ -49,11 +49,8 @@ You can interact with the bot using discord `/` slash commands.
 
 
 ### Session
-* Start a session: `click on *START SESSION*`
-- Edit the session: `/session edit <'name'|'work_time'|'break_time'|'repetitions'> <value>`
-* Force a break: `/session break`
-- Delete a session environment: `/session delete`
-* Reset a session to the initial state: `/session reset`
+* Start a session: `click on the * 🚀 START * Button`
+- You can manage your session inside the * 📋 dashboard * channel using buttons.
 
 ### Admin
 - General configuration: `/config <'mute_admins'| > <true/false>` (more coming soon)
