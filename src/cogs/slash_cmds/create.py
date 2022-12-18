@@ -9,9 +9,11 @@ class Create(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.slash_command()
+    @commands.slash_command(
+        name="create",
+        description="Creates a new session in your server.",
+        cooldown=commands.CooldownMapping.from_cooldown(1, 30, commands.BucketType.user))
     @mod_required
-    @default_feedback(title="Session successfully created")
     async def create(self, ctx, name: str = "Pomodoro", work_time: int = 25, break_time: int = 5, repetitions: int = 4):
         """
         Creates a new session environment with a session instance.
@@ -33,3 +35,6 @@ class Create(commands.Cog):
             return
         # create new session
         Session.new_session(self.bot, ctx.guild.id, name, work_time, break_time, repetitions)
+        # success feedback
+        title = "Session successfully created"
+        slash_response(ctx, title, "", 10)
