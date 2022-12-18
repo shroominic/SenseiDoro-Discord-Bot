@@ -3,8 +3,6 @@ import asyncio
 import discord
 from discord.ext import commands
 
-from cogs.useful_decoration import admin_required, default_feedback
-
 
 class Data(commands.Cog):
     def __init__(self, bot):

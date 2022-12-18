@@ -68,8 +68,10 @@ class Session:
                 return session_instance
 
     async def create_db_entry(self):
+        # wait until environment is fully created
         while not self.id:
-            await asyncio.sleep(2)
+            await asyncio.sleep(1)
+        # create database entry
         with closing(sqlite3.connect("src/dbm/sensei.db")) as conn:
             c = conn.cursor()
             c.execute("SELECT * FROM sessions WHERE id=:id", {"id": self.id})
@@ -89,6 +91,8 @@ class Session:
                                    "repetitions": self.timer.repetitions,
                                    "cfg_mute_admins": self.config.mute_admins})
             conn.commit()
+        # add lobby_id to dojo.lobby_ids
+        self.dojo.lobby_ids.append(self.env.lobby_channel_id)
 
     @property
     def dojo(self):

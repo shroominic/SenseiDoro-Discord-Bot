@@ -116,15 +116,6 @@ class SessionEnvironment:
         }
         self.info_channel = await self.guild.create_text_channel(self.info_label, category=category, overwrites=info_ow)
         self.lobby_channel = await self.guild.create_voice_channel(self.lobby_label, category=category)
-        # load env ids to database - create whole new entry? todo
-        with closing(sqlite3.connect("src/dbm/sensei.db")) as conn:
-            c = conn.cursor()
-            print("database update")
-            c.execute("UPDATE sessions SET info_channel_id = :info_id WHERE id = :id",
-                      {"info_id": self.info_channel.id, "id": category.id})
-            c.execute("UPDATE sessions SET lobby_channel_id = :lobby_id WHERE id = :id",
-                      {"lobby_id": self.lobby_channel.id, "id": category.id})
-            conn.commit()
         self.category = category
 
     async def async_match_messages(self, bot_user):
@@ -159,10 +150,10 @@ class SessionEnvironment:
 
     @property
     def info_channel_id(self):
-        return self.info_channel.id if self.info_channel else None
+        return c.id if (c := self.info_channel) else None
 
     @property
     def lobby_channel_id(self):
-        return self.lobby_channel.id if self.lobby_channel else None
+        return c.id if (c := self.lobby_channel) else None
 
     # todo cmd to create old env for testing

@@ -3,7 +3,7 @@ import sqlite3
 from contextlib import closing
 from discord.ext.commands import Cog
 
-from dojo import Dojo
+from ...dojo import Dojo
 from ..tasks.logging import AdminDashboardView, MoreADView
 
 
@@ -52,8 +52,11 @@ class OnReady(Cog):
             c.execute("SELECT lobby_channel_id, guild_id FROM sessions")
             result = c.fetchall()
             for lobby_id, guild_id in result:
-                dojo = self.bot.get_dojo(guild_id)
-                dojo.lobby_ids.append(lobby_id)
+                try:
+                    dojo = self.bot.get_dojo(guild_id)
+                    dojo.lobby_ids.append(lobby_id)
+                except Exception as e:
+                    print("OnReady.get_dojo : ", e, guild_id, lobby_id)
 
         # startup message
         print(f'{self.bot.user} is ready and connected to {len(self.bot.guilds)} guilds.\n')
