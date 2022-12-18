@@ -14,10 +14,6 @@ help1 = discord.Embed(
                 """,
             color=0x00ff00)
 help1.add_field(name="Setup", value="`/create`")
-help1.add_field(name="Session", value="""`/session edit` 
-                                         `/session reset` 
-                                         `/session break` 
-                                         `/session delete` """)
 help1.add_field(name="Admin", value="""`/role`
                                        `/config`""")
 
@@ -52,19 +48,7 @@ class Help(commands.Cog):
                     title="Session commands",
                     description="""
                         - **Start the session:**
-                            `click on *START SESSION*`
-                            
-                        - **Edit the session: **
-                            `/session edit <'name'|'work_time'|'break_time'|'repetitions'> <value>`
-                            
-                        - **Force a break: **
-                            `/session break`
-                            
-                        - **Delete the session environment: **
-                            `/session delete`
-                            
-                        - **Reset the session to the initial state: **
-                            `/session reset` 
+                            `click on * 🚀 START *`
                             
                         If you have multiple sessions, you need to use the /session command inside #chat.
                         """,
