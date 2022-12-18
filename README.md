@@ -11,7 +11,10 @@ A Discord Bot that automatically manages your study group using the Pomodoro Tec
 
 Demo
 ----
-![Giphy Gif](https://media.giphy.com/media/u4oU8yecrFmJy5Xxlp/giphy.gif)
+###### Create a new session: <br>
+![Create Session](https://media.giphy.com/media/Istxtslpz2Ry3Ecd69/giphy.gif) <br>
+###### Basic functionality: <br>
+![Basic Functions](https://media.giphy.com/media/u4oU8yecrFmJy5Xxlp/giphy.gif)
 
 Features
 -----------
