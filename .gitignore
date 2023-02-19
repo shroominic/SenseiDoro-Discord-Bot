@@ -1,7 +1,7 @@
 src/.env
 .idea
 __pycache__/
-
+autodeploy.py
 .DS_Store
 
 src/dbm/sensei.db
