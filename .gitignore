@@ -1,4 +1,4 @@
-src/.env
+.env
 .idea
 __pycache__/
 autodeploy.py
