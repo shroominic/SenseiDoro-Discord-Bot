@@ -254,7 +254,7 @@ class Session:
                 for member in self.env.work_channel.members:
                     await member.move_to(None)
                 await self.env.work_channel.delete()
-                self.env.work_channel = None
+                del self.env.work_channel
         except Exception as e:
             self.bot.log.exception("close_session", e)
         # remove active session reference
@@ -275,6 +275,7 @@ class Session:
             conn.commit()
         # remove listener ids
         try:
+            # del self.dojo.lobby_ids[self.env.lobby_channel.id]
             self.dojo.lobby_ids.remove(self.env.lobby_channel.id)
         except Exception as e:
             self.bot.log.exception("dispose", e)
