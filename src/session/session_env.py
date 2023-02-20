@@ -120,10 +120,6 @@ class SessionEnvironment:
 
     async def async_match_messages(self, bot_user):
         # match msg references
-        if self.config_channel:
-            async for msg in self.config_channel.history():
-                if msg.author == bot_user and msg.content.startswith('Session config:'):
-                    self.config_msg = msg
         if self.info_channel:
             async for msg in self.info_channel.history():
                 if msg.embeds:
