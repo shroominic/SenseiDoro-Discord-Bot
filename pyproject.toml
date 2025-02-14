@@ -1,0 +1,23 @@
+[project]
+name = "sensei-doro"
+version = "0.1.0"
+description = "Sensei Doro"
+authors = [{ name = "Shroominic", email = "contact@shroominic.com" }]
+dependencies = ["py-cord>=2.6.1", "python-dotenv>=1.0.1"]
+readme = "README.md"
+requires-python = ">= 3.11"
+license = { text = "MIT" }
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+dev-dependencies = ["mypy>=1.15.0", "ruff>=0.9.6"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/sensei_doro"]
