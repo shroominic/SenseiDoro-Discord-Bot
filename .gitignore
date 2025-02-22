@@ -5,3 +5,4 @@ autodeploy.py
 .DS_Store
 
 src/dbm/sensei.db
+*.db
