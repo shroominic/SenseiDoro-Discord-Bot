@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD001 MD003 MD041 MD033 -->
+
 Sensei Doro
 -----------
 
@@ -26,7 +28,7 @@ Features
 
 * `Automatic Pomodoro Timer:` With Sensei Doro, you'll never have to worry about setting a timer or remembering to take breaks during your study sessions. The bot automatically manages your work and break times, ensuring that you stay focused and productive.
 
-- `Group Study Support:` Sensei Doro is designed to be used in a study group, making it easier for you and your friends to stay accountable and motivated while learning together. The bot mutes all members during work time, creating a quiet and distraction-free environment.
+* `Group Study Support:` Sensei Doro is designed to be used in a study group, making it easier for you and your friends to stay accountable and motivated while learning together. The bot mutes all members during work time, creating a quiet and distraction-free environment.
 
 * `Flexible Session Controls:` Sensei Doro gives you the ability to customize your study sessions to fit your needs. You can adjust the work and break times, as well as the number of repetitions, to create the perfect Pomodoro study routine. Plus, with the ability to start and stop sessions at any time, you'll always have control over your learning experience.
 
@@ -61,21 +63,21 @@ You can interact with the bot using discord `/` slash commands.
 
 * Show help information: `/help`
 
-- Create a new pomodoro environment: `/create [name]{"Pomorodo"} [work_time]{25} [break_time]{5} [repetitions]{4}`
+* Create a new pomodoro environment: `/create [name]{"Pomorodo"} [work_time]{25} [break_time]{5} [repetitions]{4}`
 
 ### Session
 
 * Start a session: `click on the * 🚀 START * Button`
 
-- You can manage your session inside the *📋 dashboard* channel using buttons.
+* You can manage your session inside the *📋 dashboard* channel using buttons.
 
 ### Admin
 
-- General configuration: `/config <'mute_admins'| > <true/false>` (more coming soon)
+* General configuration: `/config <'mute_admins'| > <true/false>` (more coming soon)
 
 * Set your own roles to control command permissions: `/role <'admin'|'moderator'> <@your_role>`
 
-- Delete/Reset all data Sensei Doro knows about this guild: `/data <'delete'|'reset'>`
+* Delete/Reset all data Sensei Doro knows about this guild: `/data <'delete'|'reset'>`
 
 Support this project
 --------------------

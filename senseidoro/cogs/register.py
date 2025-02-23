@@ -165,7 +165,7 @@ class Register(commands.Cog):
             # Attempt to rollback if there was an error
             try:
                 conn.rollback()
-            except:
+            except sqlite3.Error:
                 pass
         finally:
             conn.close()
