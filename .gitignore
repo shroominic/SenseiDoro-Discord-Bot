@@ -4,5 +4,6 @@ __pycache__/
 autodeploy.py
 .DS_Store
 
+sensei_doro_old
 src/dbm/sensei.db
 *.db
