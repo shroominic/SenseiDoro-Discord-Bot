@@ -3,7 +3,13 @@ name = "sensei-doro"
 version = "0.1.0"
 description = "Sensei Doro"
 authors = [{ name = "Shroominic", email = "contact@shroominic.com" }]
-dependencies = ["py-cord>=2.6.1", "python-dotenv>=1.0.1"]
+dependencies = [
+    "python-dotenv>=1.0.1",
+    "discord-py>=2.4.0",
+    "discord-ext-pages>=0.0.1",
+    "discord-ext-menus>=1.1",
+    "watchfiles>=1.0.4",
+]
 readme = "README.md"
 requires-python = ">= 3.11"
 license = { text = "MIT" }
