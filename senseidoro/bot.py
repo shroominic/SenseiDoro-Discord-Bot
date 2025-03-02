@@ -1,8 +1,9 @@
-import discord
-from discord.ext import commands
 import asyncio
 import logging
 from pathlib import Path
+
+import discord
+from discord.ext import commands
 from watchfiles import awatch
 
 from .db import init_db
