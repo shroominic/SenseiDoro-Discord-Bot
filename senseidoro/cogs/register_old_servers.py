@@ -10,11 +10,21 @@ from ..db import get_db
 logger = logging.getLogger(__name__)
 
 
-class Register(commands.Cog):
-    """Handles registration and initialization of servers"""
+class RegisterOldServers(commands.Cog):
+    """Handles registration and initialization of old servers"""
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
+        self.initialized = False  # Prevent multiple initializations
+
+    @commands.Cog.listener()
+    async def on_ready(self) -> None:
+        """Initialize bot and register unregistered servers when ready"""
+        if self.initialized:
+            return
+
+        await self.register_all_unregistered_servers()
+        self.initialized = True
 
     @app_commands.command(
         name="register",
@@ -234,4 +244,4 @@ class Register(commands.Cog):
 
 
 async def setup(bot: commands.Bot):
-    await bot.add_cog(Register(bot))
+    await bot.add_cog(RegisterOldServers(bot))

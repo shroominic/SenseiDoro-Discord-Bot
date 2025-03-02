@@ -48,8 +48,8 @@ async def setup_hook():
     for cog in [
         "senseidoro.cogs.onboarding",
         "senseidoro.cogs.admin",
-        "senseidoro.cogs.on_ready",
-        "senseidoro.cogs.register",
+        "senseidoro.cogs.create_session",
+        "senseidoro.cogs.register_old_servers",
     ]:
         await bot.load_extension(cog)
     await bot.tree.sync()
