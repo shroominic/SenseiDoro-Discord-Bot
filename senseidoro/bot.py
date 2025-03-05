@@ -44,13 +44,15 @@ async def watch_cogs(bot: commands.Bot):
 
 
 @bot.event
-async def setup_hook():
+async def setup_hook() -> None:
     await init_db()
+
     for cog in [
         "senseidoro.cogs.onboarding",
         "senseidoro.cogs.admin",
         "senseidoro.cogs.create_session",
         "senseidoro.cogs.register_old_servers",
+        "senseidoro.cogs.session_listener",
     ]:
         await bot.load_extension(cog)
     await bot.tree.sync()
