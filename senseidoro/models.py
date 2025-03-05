@@ -11,6 +11,7 @@ class SessionState(str, Enum):
     WORK = "work"
     BREAK = "break"
     FINISHED = "finished"
+    ERROR = "error"
 
 
 class UserBase(SQLModel):
@@ -56,7 +57,7 @@ class Session(SessionBase, table=True):
 
 
 class ActiveSessionBase(SQLModel):
-    work_channel_id: int
+    work_channel_id: Optional[int] = None
     started_at: datetime = Field(default_factory=datetime.utcnow)
     started_by_user_id: int = Field(foreign_key="user.id")
     participants: str = Field(default="[]")  # JSON string of participant IDs
