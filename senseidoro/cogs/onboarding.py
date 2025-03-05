@@ -4,7 +4,7 @@ from discord.ext import commands
 
 
 class OnboardingView(discord.ui.View):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(timeout=None)
         self.current_page = 0
         self.has_seen_last_page = False
@@ -26,12 +26,19 @@ class OnboardingView(discord.ui.View):
                 "fields": [
                     {
                         "name": "🎯 Perfect for",
-                        "value": "• Study groups\n• Learning communities\n• Work teams\n• Anyone wanting to study together",
+                        "value": (
+                            "• Study groups\n• Learning communities\n• Work teams\n• Anyone wanting to study together\n"
+                        ),
                         "inline": True,
                     },
                     {
                         "name": "🌟 Benefits",
-                        "value": "• Distraction-free environment\n• Group accountability\n• Automatic time management\n• Enhanced group productivity",
+                        "value": (
+                            "• Distraction-free environment\n"
+                            "• Group accountability\n"
+                            "• Automatic time management\n"
+                            "• Enhanced group productivity"
+                        ),
                         "inline": True,
                     },
                 ],
@@ -53,7 +60,10 @@ class OnboardingView(discord.ui.View):
                 "fields": [
                     {
                         "name": "⚡ Setup Command",
-                        "value": '• `/create [name] [work_time] [break_time] [repetitions]`\nExample: `/create "Study Room" 25 5 4`',
+                        "value": (
+                            "• `/create [name] [work_time] [break_time] [repetitions]`\n"
+                            'Example: `/create "Study Room" 25 5 4`'
+                        ),
                         "inline": False,
                     },
                     {
@@ -63,7 +73,11 @@ class OnboardingView(discord.ui.View):
                     },
                     {
                         "name": "⚙️ Customization",
-                        "value": "• Work duration (default: 25min)\n• Break duration (default: 5min)\n• Number of repetitions (default: 4)",
+                        "value": (
+                            "• Work duration (default: 25min)\n"
+                            "• Break duration (default: 5min)\n"
+                            "• Number of repetitions (default: 4)"
+                        ),
                         "inline": True,
                     },
                 ],
@@ -87,12 +101,19 @@ class OnboardingView(discord.ui.View):
                 "fields": [
                     {
                         "name": "🛠️ Admin Commands",
-                        "value": "• `/config` - Bot settings\n• `/role` - Permission control\n• `/data` - Manage bot data",
+                        "value": (
+                            "• `/config` - Bot settings\n• `/role` - Permission control\n• `/data` - Manage bot data"
+                        ),
                         "inline": True,
                     },
                     {
                         "name": "📊 Environment",
-                        "value": "• Dedicated dashboard channel\n• Visual session progress\n• Easy-to-use buttons\n• Group status tracking",
+                        "value": (
+                            "• Dedicated dashboard channel\n"
+                            "• Visual session progress\n"
+                            "• Easy-to-use buttons\n"
+                            "• Group status tracking"
+                        ),
                         "inline": True,
                     },
                 ],
@@ -101,27 +122,21 @@ class OnboardingView(discord.ui.View):
                 "title": "Help Keep Sensei Doro Running 🌟",
                 "description": (
                     "To maintain and improve Sensei Doro, we rely on community support. "
-                    "Your contribution helps cover server costs, development, and ensures the bot stays available 24/7.\n\n"
+                    "Your contribution helps cover server costs, development, "
+                    "and ensures the bot stays available 24/7.\n\n"
                     "Choose the option that works best for you:"
                 ),
                 "color": discord.Color.gold(),
                 "fields": [
                     {
                         "name": "🆓 Free Tier",
-                        "value": (
-                            "**Price:** Free\n"
-                            "• All features\n"
-                            "• Requires voting every 12 hours\n"
-                        ),
+                        "value": ("**Price:** Free\n• All features\n• Requires voting every 12 hours\n"),
                         "inline": True,
                     },
                     {
                         "name": "👤 User Tier",
                         "value": (
-                            "**Price:** $2.99/month\n"
-                            "• All features\n"
-                            "• No need for voting\n"
-                            "• Create multiple sessions\n"
+                            "**Price:** $2.99/month\n• All features\n• No need for voting\n• Create multiple sessions\n"
                         ),
                         "inline": True,
                     },
@@ -157,16 +172,12 @@ class OnboardingView(discord.ui.View):
         disabled=True,
         custom_id="prev",
     )
-    async def previous_button(
-        self, interaction: discord.Interaction, button: discord.ui.Button
-    ):
+    async def previous_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
         self.current_page = max(0, self.current_page - 1)
         await self.update_page(interaction)
 
     @discord.ui.button(label="➡️", style=discord.ButtonStyle.primary, custom_id="next")
-    async def next_button(
-        self, interaction: discord.Interaction, button: discord.ui.Button
-    ):
+    async def next_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
         self.current_page = min(len(self.pages) - 1, self.current_page + 1)
         if self.current_page == len(self.pages) - 1:
             self.has_seen_last_page = True
@@ -179,9 +190,7 @@ class OnboardingView(discord.ui.View):
         row=1,
         disabled=True,
     )
-    async def continue_button(
-        self, interaction: discord.Interaction, button: discord.ui.Button
-    ):
+    async def continue_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
         await interaction.response.send_message(
             "Great! You're all set to start using Sensei Doro. Here are some quick tips:\n\n"
             "1. Join the lobby channel and click the 🚀 START button to begin a session\n"
@@ -191,7 +200,7 @@ class OnboardingView(discord.ui.View):
             ephemeral=True,
         )
 
-    async def update_page(self, interaction: discord.Interaction):
+    async def update_page(self, interaction: discord.Interaction) -> None:
         page = self.pages[self.current_page]
 
         # Update button states
@@ -201,14 +210,10 @@ class OnboardingView(discord.ui.View):
         # Only enable Continue button if user has seen all pages
         self.continue_button.disabled = not self.has_seen_last_page
         self.continue_button.style = (
-            discord.ButtonStyle.success
-            if not self.continue_button.disabled
-            else discord.ButtonStyle.gray
+            discord.ButtonStyle.success if not self.continue_button.disabled else discord.ButtonStyle.gray
         )
 
-        embed = discord.Embed(
-            title=page["title"], description=page["description"], color=page["color"]
-        )
+        embed = discord.Embed(title=page["title"], description=page["description"], color=page["color"])
 
         # Add fields if they exist
         if "fields" in page:
@@ -229,15 +234,11 @@ class Onboarding(commands.Cog):
         self.bot = bot
 
     @commands.Cog.listener()
-    async def on_guild_join(self, guild: discord.Guild):
+    async def on_guild_join(self, guild: discord.Guild) -> None:
         """Send welcome message when bot joins a new server"""
         # Try to find the system channel or first available text channel
         target_channel = guild.system_channel or next(
-            (
-                channel
-                for channel in guild.text_channels
-                if channel.permissions_for(guild.me).send_messages
-            ),
+            (channel for channel in guild.text_channels if channel.permissions_for(guild.me).send_messages),
             None,
         )
 
@@ -263,7 +264,7 @@ class Onboarding(commands.Cog):
 
     @app_commands.command(name="welcome")
     @app_commands.checks.has_permissions(administrator=True)
-    async def show_welcome(self, interaction: discord.Interaction):
+    async def show_welcome(self, interaction: discord.Interaction) -> None:
         """Show the welcome message and setup guide"""
         view = OnboardingView()
         embed = discord.Embed(
@@ -285,5 +286,5 @@ class Onboarding(commands.Cog):
         await interaction.response.send_message(embed=embed, view=view)
 
 
-async def setup(bot: commands.Bot):
+async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(Onboarding(bot))
