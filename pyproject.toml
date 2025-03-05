@@ -9,6 +9,9 @@ dependencies = [
     "discord-ext-pages>=0.0.1",
     "discord-ext-menus>=1.1",
     "watchfiles>=1.0.4",
+    "sqlmodel>=0.0.23",
+    "aiosqlite>=0.21.0",
+    "greenlet>=3.1.1",
 ]
 readme = "README.md"
 requires-python = ">= 3.11"
@@ -45,3 +48,4 @@ disallow_untyped_calls = true
 disallow_incomplete_defs = true
 disallow_untyped_decorators = true
 # warn_untyped_raises = true
+plugins = ["./mypy_plugins/exception_hint_plugin.py:plugin"]
