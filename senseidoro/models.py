@@ -20,9 +20,6 @@ class User(SQLModel, table=True):
     subscription_expires_at: Optional[datetime] = Field(default=None)
     last_vote_at: Optional[datetime] = Field(default=None)
 
-    sessions: list["Session"] = Relationship(back_populates="started_by_user")
-    active_sessions: list["ActiveSession"] = Relationship(back_populates="started_by_user")
-
 
 class Server(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
