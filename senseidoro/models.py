@@ -6,10 +6,10 @@ from sqlmodel import Field, Relationship, SQLModel
 
 
 class SessionState(str, Enum):
+    ACTIVE = "active"
     WORK = "work"
     BREAK = "break"
-    FINISHED = "finished"
-    ERROR = "error"
+    DONE = "done"
 
 
 class User(SQLModel, table=True):
@@ -42,17 +42,16 @@ class Session(SQLModel, table=True):
     mute_admins: bool = Field(default=True)
 
     server: Server = Relationship(back_populates="sessions")
-    active_sessions: list["ActiveSession"] = Relationship(back_populates="parent")
+    session_instances: list["SessionInstance"] = Relationship(back_populates="parent")
 
 
-class ActiveSession(SQLModel, table=True):
+class SessionInstance(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
 
     work_channel_id: Optional[int] = None
     started_at: datetime = Field(default_factory=datetime.utcnow)
-    participants: str = Field(default="[]")  # JSON string of participant IDs
     state: SessionState = Field(default=SessionState.WORK)
     current_repetition: int = Field(default=0)
 
     parent_id: int = Field(foreign_key="session.id")
-    parent: Session = Relationship(back_populates="active_sessions")
+    parent: "Session" = Relationship(back_populates="session_instances")
